@@ -188,12 +188,16 @@ namespace Welco.API
             app.MapOpenApi();
             app.MapScalarApiReference(options =>
             {
-                options.WithTitle("Welco Platform APIs")
+                options.WithTitle("Welco Microservices Platform")
                        .WithTheme(ScalarTheme.Moon);
             });
             app.MapControllers();
 
-            await app.UseOcelot();
+            app.MapWhen(
+                context => context.Request.Path.StartsWithSegments("/api"),
+                subApp => subApp.UseOcelot().Wait()
+            );
+
             await app.RunAsync();
         }
     }
