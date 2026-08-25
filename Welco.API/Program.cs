@@ -182,21 +182,15 @@ namespace Welco.API
             app.UseRouting();
             app.UseCors("GatewayCorsPolicy");
             app.UseRateLimiter();
-            app.UseAuthorization();
-
-#pragma warning disable ASP0014
-            app.UseEndpoints(endpoints =>
+            app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Welco.Gateway.API" }));
+            app.MapGet("/", () => Results.Redirect("/scalar/v1"));
+            app.MapOpenApi();
+            app.MapScalarApiReference(options =>
             {
-                endpoints.MapGet("/", () => Results.Redirect("/scalar/v1"));
-                endpoints.MapOpenApi();
-                endpoints.MapScalarApiReference(options =>
-                {
-                    options.WithTitle("Welco Platform APIs")
-                           .WithTheme(ScalarTheme.Moon);
-                });
-                endpoints.MapControllers();
+                options.WithTitle("Welco Platform APIs")
+                       .WithTheme(ScalarTheme.Moon);
             });
-#pragma warning restore ASP0014
+            app.MapControllers();
 
             await app.UseOcelot();
             await app.RunAsync();
