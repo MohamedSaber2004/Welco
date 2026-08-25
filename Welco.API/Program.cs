@@ -183,13 +183,39 @@ namespace Welco.API
             app.UseRouting();
             app.UseCors("GatewayCorsPolicy");
             app.UseRateLimiter();
+
+            var microserviceDocRoutes = new List<(string Name, string Route)>();
+            if (Directory.Exists(ocelotDir))
+            {
+                foreach (var file in Directory.GetFiles(ocelotDir, $"ocelot.*.{env.EnvironmentName}.json"))
+                {
+                    var fileName = Path.GetFileName(file);
+                    if (!fileName.StartsWith("ocelot.global."))
+                    {
+                        var parts = fileName.Split('.');
+                        if (parts.Length >= 3)
+                        {
+                            var serviceName = parts[1]; 
+                            var displayName = char.ToUpper(serviceName[0]) + serviceName.Substring(1) + " Microservice";
+                            microserviceDocRoutes.Add((displayName, $"/api/docs/{serviceName}/openapi.json"));
+                        }
+                    }
+                }
+            }
+
             app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Welco.Gateway.API" }));
             app.MapGet("/", () => Results.Redirect("/scalar/v1"));
             app.MapOpenApi();
+            
             app.MapScalarApiReference(options =>
             {
                 options.WithTitle("Welco Microservices Platform")
                        .WithTheme(ScalarTheme.Moon);
+
+                if (microserviceDocRoutes.Count > 0)
+                {
+                    options.WithOpenApiRoutePattern(microserviceDocRoutes[0].Route);
+                }
             });
             app.MapControllers();
 
