@@ -15,6 +15,5 @@
 **/.env.*
 **/appsettings.Development.json
 **/appsettings.Local.json
-Dockerfile*
 docker-compose*
 README.md
