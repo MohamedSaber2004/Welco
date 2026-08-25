@@ -19,6 +19,15 @@ namespace Auth.Services.API
             builder.Services.AddControllers();
             builder.Services.AddJsonLocalization();
             builder.Services.AddOpenApi();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
 
             var app = builder.Build();
 
@@ -34,6 +43,7 @@ namespace Auth.Services.API
             {
                 app.UseHttpsRedirection();
             }
+            app.UseCors("AllowAll");
             app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Auth.Services.API" }));
             app.MapGet("/", () => Results.Redirect("/scalar/v1"));
             app.MapOpenApi();
