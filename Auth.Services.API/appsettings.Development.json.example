@@ -1,0 +1,13 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug",
+      "Microsoft.AspNetCore": "Information",
+      "Microsoft.EntityFrameworkCore": "Information",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "ConnectionStrings": {
+    "DatabaseConnection": "Server=localhost;Database=AuthDb;User Id=postgres;Password=YOUR_LOCAL_PASSWORD;Encrypt=False;"
+  }
+}

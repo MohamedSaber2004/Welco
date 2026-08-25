@@ -1,0 +1,20 @@
+@Gateway_BaseUrl = https://localhost:7166
+# @Gateway_BaseUrl = https://welco.innovation.com
+
+### 1. Test Gateway Scalar Documentation
+GET {{Gateway_BaseUrl}}/scalar/v1
+Accept: text/html
+
+###
+
+### 2. Test Gateway OpenAPI Schema
+GET {{Gateway_BaseUrl}}/openapi/v1.json
+Accept: application/json
+
+###
+
+### 3. Test Auth Microservice via Gateway (Ocelot Routing)
+GET {{Gateway_BaseUrl}}/api/auth/
+Accept: application/json
+
+###

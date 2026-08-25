@@ -1,0 +1,9 @@
+@Gateway_BaseUrl = https://localhost:7166
+# @Gateway_BaseUrl = https://welco.innovation.com
+
+### Test Auth Service via Gateway Route (Ocelot Proxy)
+# In microservices, clients and tests communicate strictly through the Gateway URL
+GET {{Gateway_BaseUrl}}/api/auth/
+Accept: application/json
+
+###

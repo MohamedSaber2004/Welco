@@ -1,0 +1,46 @@
+## 1. Build outputs, binaries, caches and logs
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+[Tt]est[Rr]esults/
+*.tmp
+*.log
+
+## 2. Visual Studio & IDE user settings
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.launch.json
+
+## 3. Environment files & secrets (NEVER PUSH TO GITHUB)
+.env
+.env.*
+*.env
+*.secrets.json
+secrets.json
+
+## 4. Environment-specific configuration files
+appsettings.*.json
+!appsettings.json
+!appsettings.example.json
+!appsettings.Development.json.example
+
+## 5. SSL Certificates and private keys
+*.pfx
+*.p12
+*.pem
+*.key
+*.cer
+*.crt
+
+## 6. OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
