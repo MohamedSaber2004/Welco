@@ -203,6 +203,7 @@ namespace Welco.API
                 }
             }
 
+#pragma warning disable ASP0014
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Welco.Gateway.API" }));
@@ -224,6 +225,7 @@ namespace Welco.API
 
                 endpoints.MapControllers();
             });
+#pragma warning restore ASP0014
 
             await app.UseOcelot();
             await app.RunAsync();
