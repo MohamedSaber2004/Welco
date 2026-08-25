@@ -12,9 +12,9 @@ services:
       - key: ASPNETCORE_HTTP_PORTS
         value: 8080
 
-  # 2. Auth Service (Private Service)
-  - type: pserv
-    name: auth-service
+  # 2. Auth Service (Web Service for Free Tier)
+  - type: web
+    name: welco-auth-service
     env: docker
     dockerfilePath: Auth.Services.API/Dockerfile
     dockerContext: .
