@@ -25,14 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\Models\" />
-    <Folder Include="Infrastructure\Services\" />
-    <Folder Include="Persistance\Configurations\" />
-    <Folder Include="Persistance\Migrations\" />
-    <Folder Include="Persistance\Seeding\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Welco.Shared\Welco.Shared.csproj" />
   </ItemGroup>
 

@@ -26,4 +26,10 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Persistance\Configurations\" />
+    <Folder Include="Persistance\Migrations\" />
+    <Folder Include="Persistance\Seeding\" />
+  </ItemGroup>
+
 </Project>
