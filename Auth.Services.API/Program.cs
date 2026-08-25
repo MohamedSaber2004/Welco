@@ -8,11 +8,10 @@ namespace Auth.Services.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            var port = Environment.GetEnvironmentVariable("PORT");
-            if (!string.IsNullOrEmpty(port))
-            {
-                builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
-            }
+            var port = Environment.GetEnvironmentVariable("PORT") 
+                       ?? Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS") 
+                       ?? "8080";
+            builder.WebHost.UseUrls($"http://*:{port}");
 
             builder.Services.AddControllers();
             builder.Services.AddJsonLocalization();
@@ -28,8 +27,12 @@ namespace Auth.Services.API
 
             app.UseJsonLocalization();
 
-            app.UseHttpsRedirection();
+            if (!app.Environment.IsEnvironment("Test") && !app.Environment.IsProduction())
+            {
+                app.UseHttpsRedirection();
+            }
             app.UseAuthorization();
+            app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Auth.Services.API" }));
             app.MapOpenApi();
             app.MapControllers();
 
