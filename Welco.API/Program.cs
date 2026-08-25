@@ -18,12 +18,10 @@ namespace Welco.API
         {
             var builder = WebApplication.CreateBuilder(args);
             var env = builder.Environment;
-
-            var port = Environment.GetEnvironmentVariable("PORT");
-            if (!string.IsNullOrEmpty(port))
-            {
-                builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
-            }
+            var port = Environment.GetEnvironmentVariable("PORT") 
+                       ?? Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS") 
+                       ?? "8080";
+            builder.WebHost.UseUrls($"http://*:{port}");
 
             builder.Configuration.Sources.Clear();
             builder.Configuration
@@ -178,7 +176,10 @@ namespace Welco.API
                 await next();
             });
 
-            app.UseHttpsRedirection();
+            if (!app.Environment.IsEnvironment("Test") && !app.Environment.IsProduction())
+            {
+                app.UseHttpsRedirection();
+            }
             app.UseRouting();
             app.UseCors("GatewayCorsPolicy");
             app.UseRateLimiter();
