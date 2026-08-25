@@ -203,27 +203,29 @@ namespace Welco.API
                 }
             }
 
-            app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Welco.Gateway.API" }));
-            app.MapGet("/", () => Results.Redirect("/scalar/v1"));
-            app.MapOpenApi();
-            
-            app.MapScalarApiReference(options =>
+            app.UseEndpoints(endpoints =>
             {
-                options.WithTitle("Welco Microservices Platform")
-                       .WithTheme(ScalarTheme.Moon);
-
-                if (microserviceDocRoutes.Count > 0)
+                endpoints.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Welco.Gateway.API" }));
+                endpoints.MapGet("/", () => Results.Redirect("/scalar/v1"));
+                endpoints.MapOpenApi();
+                
+                endpoints.MapScalarApiReference(options =>
                 {
-                    options.WithOpenApiRoutePattern(microserviceDocRoutes[0].Route);
-                }
+                    options.WithTitle("Welco Microservices Platform")
+                           .WithTheme(ScalarTheme.Moon);
+
+                    // Dynamic Multi-Document Dropdown for all microservices
+                    if (microserviceDocRoutes.Count > 0)
+                    {
+                        // Set the primary/default active document
+                        options.WithOpenApiRoutePattern(microserviceDocRoutes[0].Route);
+                    }
+                });
+
+                endpoints.MapControllers();
             });
-            app.MapControllers();
 
-            app.MapWhen(
-                context => context.Request.Path.StartsWithSegments("/api"),
-                subApp => subApp.UseOcelot().Wait()
-            );
-
+            await app.UseOcelot();
             await app.RunAsync();
         }
     }
