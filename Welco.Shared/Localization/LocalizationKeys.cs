@@ -41,6 +41,7 @@ namespace Welco.Shared.Localization
             public const string EmailInvalid = "Auth.EmailInvalid";
             public const string PasswordRequired = "Auth.PasswordRequired";
             public const string TokenRequired = "Auth.TokenRequired";
+            public const string TokenExpiryInFuture = "Auth.TokenExpiryInFuture";
             public const string UserIdRequired = "Auth.UserIdRequired";
             public const string UserNotFound = "Auth.UserNotFound";
             public const string UserAlreadyExists = "Auth.UserAlreadyExists";

@@ -31,6 +31,7 @@
     "EmailInvalid": "Invalid email format.",
     "PasswordRequired": "Password is required.",
     "TokenRequired": "Token is required.",
+    "TokenExpiryInFuture": "Reset token expiry must be in the future.",
     "UserIdRequired": "User ID is required.",
     "UserNotFound": "User not found.",
     "UserAlreadyExists": "User already exists.",

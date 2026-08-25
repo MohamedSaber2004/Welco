@@ -31,6 +31,7 @@
     "EmailInvalid": "صيغة البريد الإلكتروني غير صحيحة.",
     "PasswordRequired": "كلمة المرور مطلوبة.",
     "TokenRequired": "الرمز المميز مطلوب.",
+    "TokenExpiryInFuture": "يجب أن يكون تاريخ انتهاء صلاحية الرمز في المستقبل.",
     "UserIdRequired": "معرف المستخدم مطلوب.",
     "UserNotFound": "المستخدم غير موجود.",
     "UserAlreadyExists": "المستخدم مسجل بالفعل.",

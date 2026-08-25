@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Enums;
+using Welco.Shared.Localization;
 
 namespace Auth.Services.API.Domain.Models
 {
@@ -60,7 +61,7 @@ namespace Auth.Services.API.Domain.Models
         public void UpdateProfile(string fullName, string? profilePictureName, string updatedBy)
         {
             if (string.IsNullOrWhiteSpace(fullName))
-                throw new ArgumentException("Full name cannot be empty.", nameof(fullName));
+                throw new ArgumentException(LocalizationKeys.Auth.FullNameRequired, nameof(fullName));
 
             FullName = fullName;
             ProfilePictureName = profilePictureName;
@@ -82,10 +83,10 @@ namespace Auth.Services.API.Domain.Models
         public void RequestPasswordReset(string token, DateTime expiry)
         {
             if (string.IsNullOrWhiteSpace(token))
-                throw new ArgumentException("Reset token cannot be empty.", nameof(token));
+                throw new ArgumentException(LocalizationKeys.Auth.TokenRequired, nameof(token));
 
             if (expiry <= DateTime.Now)
-                throw new ArgumentException("Reset token expiry must be in the future.", nameof(expiry));
+                throw new ArgumentException(LocalizationKeys.Auth.TokenExpiryInFuture, nameof(expiry));
 
             PasswordResetToken = token;
             PasswordResetTokenExpiry = expiry;
