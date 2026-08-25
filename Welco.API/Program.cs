@@ -19,9 +19,11 @@ namespace Welco.API
             var builder = WebApplication.CreateBuilder(args);
             var env = builder.Environment;
             var port = Environment.GetEnvironmentVariable("PORT") 
-                       ?? Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS") 
-                       ?? "8080";
-            builder.WebHost.UseUrls($"http://*:{port}");
+                       ?? Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS");
+            if (!string.IsNullOrEmpty(port))
+            {
+                builder.WebHost.UseUrls($"http://*:{port}");
+            }
 
             builder.Configuration.Sources.Clear();
             builder.Configuration
