@@ -1,5 +1,5 @@
 {
   "GlobalConfiguration": {
-    "BaseUrl": "https://test-api.welco.innovation.com"
+    "BaseUrl": "https://welco-gatewayapi-test.up.railway.app/"
   }
 }
