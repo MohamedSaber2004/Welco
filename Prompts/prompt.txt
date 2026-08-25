@@ -1,1 +1,1 @@
-https://welco-gatewayapi-test.up.railway.app/
+I don't want the change to be limited to just the auth service; I want it to be dynamic and work with any service.
