@@ -19,6 +19,12 @@ namespace Welco.API
             var builder = WebApplication.CreateBuilder(args);
             var env = builder.Environment;
 
+            var port = Environment.GetEnvironmentVariable("PORT");
+            if (!string.IsNullOrEmpty(port))
+            {
+                builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+            }
+
             builder.Configuration.Sources.Clear();
             builder.Configuration
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
