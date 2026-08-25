@@ -16,12 +16,12 @@ namespace Auth.Services.API.Domain.Models
         public bool IsDeleted { get; set; }
         public bool IsActive {get; set;}
 
-        public string FullName { get; private set; } = null!;
-        public string? ProfilePictureName { get; private set; }
-        public string? PasswordResetToken { get; private set; }
-        public DateTime? PasswordResetTokenExpiry { get; private set; }
-        public AppLanguage Language { get; private set; }
-        public UserType UserType { get; private set; } = UserType.User;
+        public string FullName { get; set; } = null!;
+        public string? ProfilePictureName { get; set; }
+        public string? PasswordResetToken { get; set; }
+        public DateTime? PasswordResetTokenExpiry { get; set; }
+        public AppLanguage Language { get; set; }
+        public UserType UserType { get; set; } = UserType.User;
 
         public void MarkAsCreated(string createdBy)
         {
