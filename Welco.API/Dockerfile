@@ -4,7 +4,6 @@ WORKDIR /src
 
 # Copy project files for caching layer
 COPY ["Welco.API/Welco.Gateway.API.csproj", "Welco.API/"]
-COPY ["Auth.Services.API/Auth.Services.API.csproj", "Auth.Services.API/"]
 COPY ["Welco.Shared/Welco.Shared.csproj", "Welco.Shared/"]
 
 # Restore dependencies

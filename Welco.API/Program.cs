@@ -1,4 +1,3 @@
-using Auth.Services.API.Controllers;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Scalar.AspNetCore;
@@ -65,8 +64,7 @@ namespace Welco.API
                 }
             }
 
-            builder.Services.AddControllers()
-                .AddApplicationPart(typeof(AuthController).Assembly);
+            builder.Services.AddControllers();
             builder.Services.AddJsonLocalization();
 
             var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();

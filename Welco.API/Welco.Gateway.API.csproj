@@ -16,12 +16,8 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\Auth.Services.API\Auth.Services.API.csproj">
-      <ExcludeAssets>contentFiles</ExcludeAssets>
-      <PrivateAssets>contentFiles</PrivateAssets>
-    </ProjectReference>
+    <ProjectReference Include="..\Welco.Shared\Welco.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
