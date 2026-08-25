@@ -1,3 +1,4 @@
+using Scalar.AspNetCore;
 using Welco.Shared.Localization;
 
 namespace Auth.Services.API
@@ -33,9 +34,14 @@ namespace Auth.Services.API
             {
                 app.UseHttpsRedirection();
             }
-            app.UseAuthorization();
             app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Auth.Services.API" }));
+            app.MapGet("/", () => Results.Redirect("/scalar/v1"));
             app.MapOpenApi();
+            app.MapScalarApiReference(options =>
+            {
+                options.WithTitle("Welco Auth Microservice API")
+                       .WithTheme(ScalarTheme.Moon);
+            });
             app.MapControllers();
 
             app.Run();
