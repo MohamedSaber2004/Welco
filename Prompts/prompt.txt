@@ -1,29 +1,8 @@
-Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-Run actions/setup-dotnet@v4
-(node:6648) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-"C:\Program Files\PowerShell\7\pwsh.exe" -NoLogo -Sta -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command & 'D:\a\_actions\actions\setup-dotnet\v4\externals\install-dotnet.ps1' -SkipNonVersionedFiles -Runtime dotnet -Channel LTS
-dotnet-install: .NET Core Runtime with version '10.0.11' is already installed.
-"C:\Program Files\PowerShell\7\pwsh.exe" -NoLogo -Sta -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command & 'D:\a\_actions\actions\setup-dotnet\v4\externals\install-dotnet.ps1' -SkipNonVersionedFiles -Channel 10.0
-dotnet-install: .NET Core SDK with version '10.0.400' is already installed.
-45s
-  Determining projects to restore...
-  Restored D:\a\Welco\Welco\Welco.Shared\Welco.Shared.csproj (in 18.78 sec).
-  Restored D:\a\Welco\Welco\Auth.Services.API\Auth.Services.API.csproj (in 18.78 sec).
-  Welco.Shared -> D:\a\Welco\Welco\Welco.Shared\bin\Release\net10.0\Welco.Shared.dll
-  Auth.Services.API -> D:\a\Welco\Welco\Auth.Services.API\bin\Release\net10.0\Auth.Services.API.dll
-  Auth.Services.API -> D:\a\Welco\Welco\publish\auth\
-Parsing Publish Profile XML...
-Detected Publish Method: MSDeploy
-Target Site: site87730
-Publish URL: site87730.siteasp.net
-User Name: site87730
-Auth Type: Basic
-Password Loaded: YES (12 chars)
-Attempting Web Deploy to /msdeploy.axd...
-Info: Using ID '81e5068f-cafc-4e84-8d9f-57391009d775' for connections to the remote server.
-Error: The URI 'http:///msdeploy.axd/MSDEPLOYAGENTSERVICE' representing the remote machine is malformed.
-Error: Invalid URI: The hostname could not be parsed.
+Attempting Web Deploy to https://site87730.siteasp.net:8172/msdeploy.axd...
+Info: Using ID '6784aced-dc69-4408-8d5e-c7a4e111aa08' for connections to the remote server.
+Error Code: ERROR_USER_UNAUTHORIZED
+More Information: Connected to the remote computer ("site87730.siteasp.net") using the Web Management Service, but could not authorize. Make sure that you are using the correct user name and password, that the site you are connecting to exists, and that the credentials represent a user who has permissions to access the site.  Learn more at: https://go.microsoft.com/fwlink/?LinkId=221672#ERROR_USER_UNAUTHORIZED.
+Error: The remote server returned an error: (401) Unauthorized.
 Error count: 1.
 WARNING: Web Deploy returned exit code -1. Falling back to robust FTP deployment...
 =======================================================
@@ -45,20 +24,3 @@ Traceback (most recent call last):
     raise error_perm(resp)
 ftplib.error_perm: 530 Authentication error: invalid credentials
 Error: Process completed with exit code 1.
-0s
-3s
-Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-Post job cleanup.
-"C:\Program Files\Git\bin\git.exe" version
-git version 2.55.0.windows.5
-Temporarily overriding HOME='D:\a\_temp\025f9774-c278-4d4c-9829-d0aa8db3cb77' before making global git config changes
-Adding repository directory to the temporary git global config as a safe directory
-"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Welco\Welco
-"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
-"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
-"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
-http.https://github.com/.extraheader
-"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
-"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
-"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
-"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
