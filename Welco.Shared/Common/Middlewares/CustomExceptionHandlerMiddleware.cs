@@ -57,17 +57,33 @@ namespace Welco.Shared.Common.Middlewares
 
             switch (exception)
             {
-                case ValidationException validationEx:
-                    statusCode = validationEx.StatusCode;
-                    message = Localize(validationEx.LocalizationKey, validationEx.Args);
-                    if (validationEx.Errors.Any())
+                case ValidationException customValEx:
+                    statusCode = customValEx.StatusCode;
+                    message = Localize(customValEx.LocalizationKey, customValEx.Args);
+                    if (customValEx.Errors.Any())
                     {
-                        foreach (var kvp in validationEx.Errors)
+                        foreach (var kvp in customValEx.Errors)
                         {
                             foreach (var err in kvp.Value)
                             {
                                 errors.Add(Localize(err));
                             }
+                        }
+                    }
+                    else
+                    {
+                        errors.Add(message);
+                    }
+                    break;
+
+                case FluentValidation.ValidationException fvEx:
+                    statusCode = StatusCodes.Status400BadRequest;
+                    message = Localize(LocalizationKeys.ExceptionMessages.Validation);
+                    if (fvEx.Errors.Any())
+                    {
+                        foreach (var err in fvEx.Errors)
+                        {
+                            errors.Add(Localize(err.ErrorMessage));
                         }
                     }
                     else
@@ -93,6 +109,48 @@ namespace Welco.Shared.Common.Middlewares
                     {
                         errors.Add(message);
                     }
+                    break;
+
+                case NotFoundException notFoundEx:
+                    statusCode = notFoundEx.StatusCode;
+                    message = Localize(notFoundEx.LocalizationKey, notFoundEx.Args);
+                    errors.Add(message);
+                    break;
+
+                case KeyNotFoundException keyNotFoundEx:
+                    statusCode = StatusCodes.Status404NotFound;
+                    message = Localize(LocalizationKeys.ExceptionMessages.NotFound);
+                    errors.Add(!string.IsNullOrWhiteSpace(keyNotFoundEx.Message) ? keyNotFoundEx.Message : message);
+                    break;
+
+                case UnAuthorizedException unAuthEx:
+                    statusCode = unAuthEx.StatusCode;
+                    message = Localize(unAuthEx.LocalizationKey, unAuthEx.Args);
+                    errors.Add(message);
+                    break;
+
+                case UnauthorizedAccessException unAuthAccessEx:
+                    statusCode = StatusCodes.Status401Unauthorized;
+                    message = Localize(LocalizationKeys.ExceptionMessages.Unauthorized);
+                    errors.Add(!string.IsNullOrWhiteSpace(unAuthAccessEx.Message) ? unAuthAccessEx.Message : message);
+                    break;
+
+                case ForbiddenException forbiddenEx:
+                    statusCode = forbiddenEx.StatusCode;
+                    message = Localize(forbiddenEx.LocalizationKey, forbiddenEx.Args);
+                    errors.Add(message);
+                    break;
+
+                case ConflictException conflictEx:
+                    statusCode = conflictEx.StatusCode;
+                    message = Localize(conflictEx.LocalizationKey, conflictEx.Args);
+                    errors.Add(message);
+                    break;
+
+                case ArgumentException argEx:
+                    statusCode = StatusCodes.Status400BadRequest;
+                    message = Localize(LocalizationKeys.ExceptionMessages.BadRequest);
+                    errors.Add(!string.IsNullOrWhiteSpace(argEx.Message) ? argEx.Message : message);
                     break;
 
                 case ILocalizedException localizedEx:
