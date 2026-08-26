@@ -1,6 +1,19 @@
- Determining projects to restore...
-  Restored D:\a\Welco\Welco\Welco.Shared\Welco.Shared.csproj (in 16.31 sec).
-  Restored D:\a\Welco\Welco\Auth.Services.API\Auth.Services.API.csproj (in 16.31 sec).
+Run .\.github\workflows\webdeploy.ps1 `
+  .\.github\workflows\webdeploy.ps1 `
+    -ProjectPath "Auth.Services.API/Auth.Services.API.csproj" `
+    -PublishDir "./publish/auth" `
+    -PublishProfileContent $env:PROFILE_XML
+  shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+  env:
+    DOTNET_ROOT: C:\Program Files\dotnet
+    PROFILE_XML: ***
+  
+    PROFILE_PASSWORD: 
+=======================================================
+🚀 Building and publishing project: Auth.Services.API/Auth.Services.API.csproj
+=======================================================
+  Restored D:\a\Welco\Welco\Welco.Shared\Welco.Shared.csproj (in 13.72 sec).
+  Restored D:\a\Welco\Welco\Auth.Services.API\Auth.Services.API.csproj (in 13.72 sec).
   Welco.Shared -> D:\a\Welco\Welco\Welco.Shared\bin\Release\net10.0\Welco.Shared.dll
   Auth.Services.API -> D:\a\Welco\Welco\Auth.Services.API\bin\Release\net10.0\Auth.Services.API.dll
   Auth.Services.API -> D:\a\Welco\Welco\publish\auth\
@@ -8,18 +21,18 @@ Parsing Publish Profile XML...
 Detected Publish Method: MSDeploy
 Target Site: site87730
 Publish URL: site87730.siteasp.net
-Deploying via Web Deploy to https://site87730.siteasp.net:8172/msdeploy.axd...
-Info: Using ID '52043d21-4a31-4827-b4af-c77e0a453b2d' for connections to the remote server.
-Verbose: Pre-authenticating to remote agent URL 'https://site87730.siteasp.net:8172/msdeploy.axd' as 'site87730'.
+User Name: site87730
+Attempting Web Deploy to https://site87730.siteasp.net:8172/msdeploy.axd...
+Info: Using ID '9dbdbb1b-1341-4f7c-a953-631231ad050a' for connections to the remote server.
 Error Code: ERROR_USER_UNAUTHORIZED
 More Information: Connected to the remote computer ("site87730.siteasp.net") using the Web Management Service, but could not authorize. Make sure that you are using the correct user name and password, that the site you are connecting to exists, and that the credentials represent a user who has permissions to access the site.  Learn more at: https://go.microsoft.com/fwlink/?LinkId=221672#ERROR_USER_UNAUTHORIZED.
 Error: The remote server returned an error: (401) Unauthorized.
 Error count: 1.
-Write-Error: D:\a\_temp\3a101d04-7bf2-4f5d-84ee-35a4ee4b7ad1.ps1:2
-Line |
-   2 |  .\.github\workflows\webdeploy.ps1 `
-     |  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     | MSDeploy failed with exit code -1
+WARNING: Web Deploy returned exit code -1. Falling back to robust FTP deployment...
+=======================================================
+🔄 Executing IIS-Safe FTP Deployment...
+=======================================================
+C:\hostedtoolcache\windows\Python\3.12.10\x64\python.exe: can't open file 'D:\\a\\Welco\\Welco\\.github\\workflows\\ftp-deploy.py': [Errno 2] No such file or directory
 Error: Process completed with exit code 1.
 0s
 2s
@@ -27,7 +40,7 @@ Node 20 is being deprecated. This workflow is running with Node 24 by default. I
 Post job cleanup.
 "C:\Program Files\Git\bin\git.exe" version
 git version 2.55.0.windows.4
-Temporarily overriding HOME='D:\a\_temp\3654ddef-19b0-4540-9ac6-1e3e24ab9ec9' before making global git config changes
+Temporarily overriding HOME='D:\a\_temp\b4b566f3-2070-4a56-a65d-792c1529277d' before making global git config changes
 Adding repository directory to the temporary git global config as a safe directory
 "C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Welco\Welco
 "C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand

@@ -124,5 +124,6 @@ if (-not $msdeploySucceeded) {
     $env:REMOTE_DIR = "/"
 
     # Run Python deployer
-    python .github/workflows/ftp-deploy.py
+    $scriptPath = Join-Path $PSScriptRoot "ftp-deploy.py"
+    python $scriptPath
 }
