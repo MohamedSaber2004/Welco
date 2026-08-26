@@ -37,58 +37,73 @@ def deploy():
                 except Exception:
                     pass
 
-    ensure_dir(target_base_dir)
-
-    # 1. Upload app_offline.htm to shut down IIS worker process and release locked .dll files
     offline_file = "app_offline.htm"
-    print(f"Uploading app_offline.htm to {target_base_dir} to release IIS file locks...")
-    with open(offline_file, "w", encoding="utf-8") as f:
-        f.write("<!DOCTYPE html><html><body><h2>Deploying update...</h2></body></html>")
+    uploaded_count = 0
 
     try:
+        # 1. Upload app_offline.htm to shut down IIS worker process and release locked .dll files
+        print(f"Uploading app_offline.htm to {target_base_dir} to release IIS file locks...")
+        with open(offline_file, "w", encoding="utf-8") as f:
+            f.write("<!DOCTYPE html><html><body><h2>Deploying update...</h2></body></html>")
+
         ensure_dir(target_base_dir)
         with open(offline_file, "rb") as f:
             ftp.storbinary(f"STOR {offline_file}", f)
-        print("app_offline.htm uploaded. Waiting 3 seconds for IIS worker process to release file locks...")
-        time.sleep(3)
-    except Exception as ex:
-        print(f"Warning uploading app_offline.htm: {ex}")
-
-    # 2. Upload all published files recursively
-    print(f"Uploading files from local '{local_dir}' directly to '{target_base_dir}'...")
-    uploaded_count = 0
-
-    for root, dirs, files in os.walk(local_dir):
-        rel_path = os.path.relpath(root, local_dir).replace('\\', '/')
-        if rel_path == '.':
-            current_target = target_base_dir
-        else:
-            current_target = f"{target_base_dir}/{rel_path}".replace('//', '/')
         
-        ensure_dir(current_target)
+        print("app_offline.htm uploaded. Waiting 6 seconds for IIS worker process to gracefully shut down...")
+        time.sleep(6)
 
-        for file in files:
-            if file == "app_offline.htm":
-                continue
-            local_file = os.path.join(root, file)
-            with open(local_file, "rb") as f:
-                ftp.storbinary(f"STOR {file}", f)
-            uploaded_count += 1
-            display_path = os.path.join(rel_path, file) if rel_path != '.' else file
-            print(f"  ✓ Uploaded: {display_path}")
+        # 2. Upload all published files recursively with retry
+        print(f"Uploading files from local '{local_dir}' directly to '{target_base_dir}'...")
 
-    # 3. Remove app_offline.htm so IIS immediately boots with the new version
-    ensure_dir(target_base_dir)
-    try:
-        ftp.delete(offline_file)
-        print("✓ Removed app_offline.htm - IIS is now actively running the new code!")
-    except Exception as ex:
-        print(f"Notice when deleting app_offline.htm: {ex}")
+        for root, dirs, files in os.walk(local_dir):
+            rel_path = os.path.relpath(root, local_dir).replace('\\', '/')
+            if rel_path == '.':
+                current_target = target_base_dir
+            else:
+                current_target = f"{target_base_dir}/{rel_path}".replace('//', '/')
+            
+            ensure_dir(current_target)
 
-    if os.path.exists(offline_file):
-        os.remove(offline_file)
+            for file in files:
+                if file == "app_offline.htm":
+                    continue
+                local_file = os.path.join(root, file)
+                
+                max_retries = 3
+                for attempt in range(max_retries):
+                    try:
+                        with open(local_file, "rb") as f:
+                            ftp.storbinary(f"STOR {file}", f)
+                        uploaded_count += 1
+                        display_path = os.path.join(rel_path, file) if rel_path != '.' else file
+                        print(f"  ✓ Uploaded: {display_path}")
+                        break
+                    except Exception as ex:
+                        if attempt < max_retries - 1:
+                            print(f"  ⚠ Retry uploading {file} (attempt {attempt + 1})...")
+                            time.sleep(2)
+                        else:
+                            print(f"  ✗ Failed to upload {file}: {ex}")
+                            raise
 
-    ftp.quit()
+    finally:
+        # 3. Always remove app_offline.htm so IIS immediately boots with the new version
+        try:
+            ensure_dir(target_base_dir)
+            ftp.delete(offline_file)
+            print("✓ Removed app_offline.htm - IIS is now actively running the new code!")
+        except Exception as ex:
+            print(f"Notice when deleting app_offline.htm: {ex}")
+
+        if os.path.exists(offline_file):
+            os.remove(offline_file)
+
+        try:
+            ftp.quit()
+        except Exception:
+            pass
+
     print(f"\n=======================================================")
     print(f"🎉 Deployment completed successfully! Total files uploaded: {uploaded_count} directly to {target_base_dir}")
     print(f"=======================================================")
