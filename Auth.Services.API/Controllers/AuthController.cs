@@ -30,15 +30,15 @@ namespace Auth.Services.API.Controllers
         /// <param name="command"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        //[HttpPost]
-        //[Route(AuthApiRoutes.Authentication.Register)]
-        //[ProducesResponseType(StatusCodes.Status201Created)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //public async Task<IActionResult> Register([FromBody] RegisterCommand command, CancellationToken cancellationToken)
-        //{
-        //    var result = await _mediator.Send(command, cancellationToken);
-        //    return ToActionResult(result);
-        //}
+        [HttpPost]
+        [Route(AuthApiRoutes.Authentication.Register)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Register([FromBody] RegisterCommand command, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(command, cancellationToken);
+            return ToActionResult(result);
+        }
 
         /// <summary>
         /// Login a user with email and password.
