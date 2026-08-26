@@ -21,20 +21,52 @@ def deploy():
     ftp.set_pasv(True)
     print("Connected successfully.")
 
-    if remote_dir and remote_dir != "/":
-        try:
-            ftp.cwd(remote_dir)
-        except Exception:
-            ftp.mkd(remote_dir)
-            ftp.cwd(remote_dir)
+    # Auto-detect MonsterASP / IIS target directory
+    print("Detecting remote root directory structure...")
+    root_items = []
+    try:
+        root_items = [item.strip() for item in ftp.nlst()]
+    except Exception as ex:
+        print(f"Notice listing root: {ex}")
+    
+    print(f"Items in FTP root: {root_items}")
+
+    target_base_dir = remote_dir
+    if target_base_dir == "/":
+        lower_items = [i.lower() for i in root_items]
+        if "site" in lower_items:
+            target_base_dir = "/site/wwwroot"
+            print(f"Auto-detected MonsterASP site structure: target set to '{target_base_dir}'")
+        elif "wwwroot" in lower_items:
+            target_base_dir = "/wwwroot"
+            print(f"Auto-detected wwwroot structure: target set to '{target_base_dir}'")
+        else:
+            target_base_dir = "/"
+            print("Using FTP root '/' as target directory.")
+
+    def ensure_dir(path):
+        dirs = [d for d in path.split('/') if d]
+        ftp.cwd("/")
+        for d in dirs:
+            try:
+                ftp.cwd(d)
+            except Exception:
+                try:
+                    ftp.mkd(d)
+                    ftp.cwd(d)
+                except Exception:
+                    pass
+
+    ensure_dir(target_base_dir)
 
     # 1. Upload app_offline.htm to shut down IIS worker process and release locked .dll files
     offline_file = "app_offline.htm"
-    print("Uploading app_offline.htm to release IIS file locks...")
+    print(f"Uploading app_offline.htm to {target_base_dir} to release IIS file locks...")
     with open(offline_file, "w", encoding="utf-8") as f:
         f.write("<!DOCTYPE html><html><body><h2>Deploying update...</h2></body></html>")
 
     try:
+        ensure_dir(target_base_dir)
         with open(offline_file, "rb") as f:
             ftp.storbinary(f"STOR {offline_file}", f)
         print("app_offline.htm uploaded. Waiting 3 seconds for IIS worker process to release file locks...")
@@ -43,26 +75,17 @@ def deploy():
         print(f"Warning uploading app_offline.htm: {ex}")
 
     # 2. Upload all published files recursively
-    print(f"Uploading files from {local_dir}...")
+    print(f"Uploading files from local '{local_dir}' to remote '{target_base_dir}'...")
     uploaded_count = 0
 
     for root, dirs, files in os.walk(local_dir):
         rel_path = os.path.relpath(root, local_dir).replace('\\', '/')
+        if rel_path == '.':
+            current_target = target_base_dir
+        else:
+            current_target = f"{target_base_dir}/{rel_path}".replace('//', '/')
         
-        # Navigate to target directory on FTP
-        target_dir = f"{remote_dir}/{rel_path}".replace('//', '/').rstrip('/')
-        if not target_dir:
-            target_dir = "/"
-        
-        # Ensure directories exist
-        subdirs = [d for d in target_dir.split('/') if d]
-        ftp.cwd("/")
-        for d in subdirs:
-            try:
-                ftp.cwd(d)
-            except Exception:
-                ftp.mkd(d)
-                ftp.cwd(d)
+        ensure_dir(current_target)
 
         for file in files:
             if file == "app_offline.htm":
@@ -75,19 +98,19 @@ def deploy():
             print(f"  ✓ Uploaded: {display_path}")
 
     # 3. Remove app_offline.htm so IIS immediately boots with the new version
-    ftp.cwd(remote_dir if remote_dir else "/")
+    ensure_dir(target_base_dir)
     try:
         ftp.delete(offline_file)
         print("✓ Removed app_offline.htm - IIS is now actively running the new code!")
     except Exception as ex:
-        print(f"Notice: {ex}")
+        print(f"Notice when deleting app_offline.htm: {ex}")
 
     if os.path.exists(offline_file):
         os.remove(offline_file)
 
     ftp.quit()
     print(f"\n=======================================================")
-    print(f"🎉 Deployment completed successfully! Total files uploaded: {uploaded_count}")
+    print(f"🎉 Deployment completed successfully! Total files uploaded: {uploaded_count} to {target_base_dir}")
     print(f"=======================================================")
 
 if __name__ == "__main__":
