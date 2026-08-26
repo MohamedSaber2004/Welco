@@ -17,11 +17,10 @@ if ([string]::IsNullOrWhiteSpace($PublishProfileContent)) {
 }
 
 Write-Host "======================================================="
-Write-Host "🚀 Deploying with Publish Profile (.publishsettings)"
-Write-Host "Project: $ProjectPath"
+Write-Host "Building and publishing project: $ProjectPath"
 Write-Host "======================================================="
 
-# 1. Parse XML to inspect profile properties
+# 1. Parse XML
 [xml]$xml = $PublishProfileContent
 $profile = $xml.publishData.publishProfile | Where-Object { $_.publishMethod -eq "MSDeploy" }
 
@@ -30,7 +29,7 @@ if (-not $profile) {
 }
 
 if (-not $profile) {
-    Write-Error "Invalid Publish Profile XML format! Please ensure the entire XML content from the .publishsettings file is pasted into GitHub Secrets."
+    Write-Error "Invalid Publish Profile XML format!"
     exit 1
 }
 
@@ -42,14 +41,17 @@ $password = [string]$profile.userPWD
 Write-Host "Target Site: $siteName"
 Write-Host "Publish URL: $publishUrl"
 Write-Host "User Name: $userName"
-Write-Host "Password in XML: $(if ([string]::IsNullOrWhiteSpace($password)) { 'NO (Empty)' } else { 'YES (' + $password.Length + ' chars)' })"
+Write-Host "Password in XML: $(if ([string]::IsNullOrWhiteSpace($password)) { 'NO' } else { 'YES (' + $password.Length + ' chars)' })"
 
-# 2. Save .publishsettings to temporary file
-$tempProfilePath = Join-Path $env:RUNNER_TEMP "MonsterASP.publishsettings"
-Set-Content -Path $tempProfilePath -Value $PublishProfileContent -Encoding UTF8
-Write-Host "Saved Publish Profile to: $tempProfilePath"
+# 2. Build and publish locally first
+dotnet publish $ProjectPath -c Release -o $PublishDir
 
-# 3. Format computerName for MSDeploy
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "dotnet publish failed!"
+    exit $LASTEXITCODE
+}
+
+# 3. Format computerName
 $rawHost = $publishUrl.Trim().TrimEnd('/')
 if ($rawHost.StartsWith("http://", [System.StringComparison]::OrdinalIgnoreCase)) {
     $rawHost = $rawHost.Substring(7)
@@ -65,67 +67,28 @@ if (-not $rawHost.Contains(":8172") -and -not $rawHost.Contains("msdeploy.axd"))
     $computerName = "https://" + $rawHost
 }
 
-# 4. Execute dotnet publish with MSDeploy
-Write-Host "======================================================="
-Write-Host "📦 Building and Deploying via MSDeploy to $computerName..."
-Write-Host "======================================================="
-
-$msdeployParams = @(
-    "publish",
-    $ProjectPath,
-    "-c", "Release",
-    "-o", $PublishDir,
-    "/p:DeployOnBuild=true",
-    "/p:PublishProfile=$tempProfilePath",
-    "/p:AllowUntrustedCertificate=True",
-    "/p:EnableMSDeployAppOffline=true"
+# 4. Locate msdeploy.exe
+$msdeployPaths = @(
+    "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe",
+    "C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe"
 )
+$msdeploy = $msdeployPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
 
-if (-not [string]::IsNullOrWhiteSpace($password)) {
-    $msdeployParams += "/p:Password=$password"
+if (-not $msdeploy) {
+    Write-Error "msdeploy.exe not found on system!"
+    exit 1
 }
 
-dotnet @msdeployParams
+$fullPublishPath = (Resolve-Path $PublishDir).Path
+Write-Host "Deploying via MSDeploy to $computerName..."
+
+$msdeployCmd = "`"$msdeploy`" -verb:sync `"-source:contentPath=$fullPublishPath`" `"-dest:contentPath=$siteName,computerName=$computerName,userName=$userName,password=$password,authType=Basic,includeAcls=False`" -enableRule:AppOffline -allowUntrusted"
+
+cmd.exe /c $msdeployCmd
 
 if ($LASTEXITCODE -ne 0) {
-    # If MSBuild targets need direct msdeploy execution
-    Write-Host "Attempting direct msdeploy.exe sync..."
-
-    $msdeployPaths = @(
-        "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe",
-        "C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe"
-    )
-    $msdeploy = $msdeployPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
-
-    if ($msdeploy) {
-        $fullPublishPath = (Resolve-Path $PublishDir).Path
-        $destArg = "-dest:contentPath=" + $siteName + ",computerName=" + $computerName + ",userName=" + $userName + ",password=" + $password + ",authType=Basic,includeAcls=False"
-        $sourceArg = "-source:contentPath=" + $fullPublishPath
-
-        $directArgs = @(
-            "-verb:sync",
-            $sourceArg,
-            $destArg,
-            "-enableRule:AppOffline",
-            "-allowUntrusted",
-            "-verbose"
-        )
-
-        & $msdeploy $directArgs
-
-        if ($LASTEXITCODE -ne 0) {
-            Write-Error "Deployment failed with exit code $LASTEXITCODE. Please check credentials in MonsterASP."
-            exit $LASTEXITCODE
-        }
-    } else {
-        Write-Error "Deployment failed."
-        exit $LASTEXITCODE
-    }
-}
-
-# Clean up temp file
-if (Test-Path $tempProfilePath) {
-    Remove-Item $tempProfilePath -Force -ErrorAction SilentlyContinue
+    Write-Error "MSDeploy failed with exit code $LASTEXITCODE"
+    exit $LASTEXITCODE
 }
 
 Write-Host "======================================================="

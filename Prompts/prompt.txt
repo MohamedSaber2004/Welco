@@ -1,3 +1,7 @@
+
+that is pub files paths
+ E:\Welco site publish
+
 Attempting Web Deploy to https://site87730.siteasp.net:8172/msdeploy.axd...
 Info: Using ID '6784aced-dc69-4408-8d5e-c7a4e111aa08' for connections to the remote server.
 Error Code: ERROR_USER_UNAUTHORIZED
