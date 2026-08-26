@@ -27,7 +27,30 @@ namespace Auth.Services.API.Features.Auth.Commands.Login
 
         public async Task<Result<AuthResponseDto>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            var user = (await _userManager.FindByEmailAsync(request.Email))!;
+            var user = await _userManager.FindByEmailAsync(request.Email)
+                       ?? await _userManager.FindByNameAsync(request.Email);
+
+            if (user == null)
+            {
+                return Result<AuthResponseDto>.BadRequest(
+                    LocalizationKeys.Auth.InvalidCredentials,
+                    new List<string> { LocalizationKeys.Auth.InvalidCredentials });
+            }
+
+            if (user.IsDeleted || !user.IsActive)
+            {
+                return Result<AuthResponseDto>.BadRequest(
+                    LocalizationKeys.Auth.AccountDeactivated,
+                    new List<string> { LocalizationKeys.Auth.AccountDeactivated });
+            }
+
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
+            if (!isPasswordValid)
+            {
+                return Result<AuthResponseDto>.BadRequest(
+                    LocalizationKeys.Auth.InvalidCredentials,
+                    new List<string> { LocalizationKeys.Auth.InvalidCredentials });
+            }
 
             var roles = await _userManager.GetRolesAsync(user);
             var accessToken = _jwtTokenService.GenerateAccessToken(user, roles);

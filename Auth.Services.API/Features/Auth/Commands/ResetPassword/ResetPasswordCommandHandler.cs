@@ -17,7 +17,20 @@ namespace Auth.Services.API.Features.Auth.Commands.ResetPassword
 
         public async Task<Result<string>> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
-            var user = (await _userManager.FindByEmailAsync(request.Email))!;
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return Result<string>.NotFound(
+                    LocalizationKeys.Auth.UserNotFound,
+                    new List<string> { LocalizationKeys.Auth.UserNotFound });
+            }
+
+            if (!user.ValidatePasswordResetToken(request.Token))
+            {
+                return Result<string>.BadRequest(
+                    LocalizationKeys.Auth.InvalidCredentials,
+                    new List<string> { LocalizationKeys.Auth.InvalidCredentials });
+            }
 
             var identityResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
             var resetResult = await _userManager.ResetPasswordAsync(user, identityResetToken, request.NewPassword);

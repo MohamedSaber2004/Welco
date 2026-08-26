@@ -28,14 +28,38 @@ namespace Auth.Services.API.Features.Auth.Commands.RefreshToken
         public async Task<Result<AuthResponseDto>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
             var refreshRepo = _unitOfWork.GetRepository<UserRefreshToken, Guid>();
-            var tokenEntity = (await refreshRepo.GetFirstAsync(r => r.Token == request.RefreshToken, cancellationToken))!;
+            var tokenEntity = await refreshRepo.GetFirstAsync(r => r.Token == request.RefreshToken && !r.IsRevoked, cancellationToken);
+
+            if (tokenEntity == null)
+            {
+                return Result<AuthResponseDto>.BadRequest(
+                    LocalizationKeys.Auth.InvalidRefreshToken,
+                    new List<string> { LocalizationKeys.Auth.InvalidRefreshToken });
+            }
+
+            if (tokenEntity.ExpiryDate <= DateTime.UtcNow)
+            {
+                tokenEntity.Revoke();
+                refreshRepo.Update(tokenEntity);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return Result<AuthResponseDto>.BadRequest(
+                    LocalizationKeys.Auth.RefreshTokenExpired,
+                    new List<string> { LocalizationKeys.Auth.RefreshTokenExpired });
+            }
+
+            var user = await _userManager.FindByIdAsync(tokenEntity.UserId.ToString());
+            if (user == null || user.IsDeleted || !user.IsActive)
+            {
+                return Result<AuthResponseDto>.BadRequest(
+                    LocalizationKeys.Auth.UserNotFound,
+                    new List<string> { LocalizationKeys.Auth.UserNotFound });
+            }
 
             tokenEntity.Revoke();
             refreshRepo.Update(tokenEntity);
 
-            var user = (await _userManager.FindByIdAsync(tokenEntity.UserId.ToString()))!;
             var roles = await _userManager.GetRolesAsync(user);
-
             var newAccessToken = _jwtTokenService.GenerateAccessToken(user, roles);
             var newRefreshTokenString = _jwtTokenService.GenerateRefreshToken(user);
             var newRefreshTokenExpiry = DateTime.UtcNow.AddDays(30);

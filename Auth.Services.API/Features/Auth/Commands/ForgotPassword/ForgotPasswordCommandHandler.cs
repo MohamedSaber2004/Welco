@@ -18,8 +18,15 @@ namespace Auth.Services.API.Features.Auth.Commands.ForgotPassword
 
         public async Task<Result<string>> Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
         {
-            var user = (await _userManager.FindByEmailAsync(request.Email))!;
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return Result<string>.NotFound(
+                    LocalizationKeys.Auth.UserNotFound,
+                    new List<string> { LocalizationKeys.Auth.UserNotFound });
+            }
 
+            // Generate 6-digit OTP and store with 15-minute expiry
             var otp = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
             user.RequestPasswordReset(otp, DateTime.UtcNow.AddMinutes(15));
             await _userManager.UpdateAsync(user);
