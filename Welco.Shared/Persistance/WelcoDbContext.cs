@@ -15,6 +15,7 @@ namespace Welco.Shared.Persistance
     {
         private readonly ICurrentUserService? _currentUserService;
 
+
         public DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
         public DbSet<UserRefreshToken> UserRefreshTokens => Set<UserRefreshToken>();
 
