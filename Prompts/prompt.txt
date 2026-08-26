@@ -1,19 +1,15 @@
-Run .\.github\workflows\webdeploy.ps1 `
-  .\.github\workflows\webdeploy.ps1 `
-    -ProjectPath "Auth.Services.API/Auth.Services.API.csproj" `
-    -PublishDir "./publish/auth" `
-    -PublishProfileContent $env:PROFILE_XML
-  shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
-  env:
-    DOTNET_ROOT: C:\Program Files\dotnet
-    PROFILE_XML: ***
-  
-    PROFILE_PASSWORD: 
-=======================================================
-🚀 Building and publishing project: Auth.Services.API/Auth.Services.API.csproj
-=======================================================
-  Restored D:\a\Welco\Welco\Welco.Shared\Welco.Shared.csproj (in 13.72 sec).
-  Restored D:\a\Welco\Welco\Auth.Services.API\Auth.Services.API.csproj (in 13.72 sec).
+Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Run actions/setup-dotnet@v4
+(node:6648) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+"C:\Program Files\PowerShell\7\pwsh.exe" -NoLogo -Sta -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command & 'D:\a\_actions\actions\setup-dotnet\v4\externals\install-dotnet.ps1' -SkipNonVersionedFiles -Runtime dotnet -Channel LTS
+dotnet-install: .NET Core Runtime with version '10.0.11' is already installed.
+"C:\Program Files\PowerShell\7\pwsh.exe" -NoLogo -Sta -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command & 'D:\a\_actions\actions\setup-dotnet\v4\externals\install-dotnet.ps1' -SkipNonVersionedFiles -Channel 10.0
+dotnet-install: .NET Core SDK with version '10.0.400' is already installed.
+45s
+  Determining projects to restore...
+  Restored D:\a\Welco\Welco\Welco.Shared\Welco.Shared.csproj (in 18.78 sec).
+  Restored D:\a\Welco\Welco\Auth.Services.API\Auth.Services.API.csproj (in 18.78 sec).
   Welco.Shared -> D:\a\Welco\Welco\Welco.Shared\bin\Release\net10.0\Welco.Shared.dll
   Auth.Services.API -> D:\a\Welco\Welco\Auth.Services.API\bin\Release\net10.0\Auth.Services.API.dll
   Auth.Services.API -> D:\a\Welco\Welco\publish\auth\
@@ -22,25 +18,40 @@ Detected Publish Method: MSDeploy
 Target Site: site87730
 Publish URL: site87730.siteasp.net
 User Name: site87730
-Attempting Web Deploy to https://site87730.siteasp.net:8172/msdeploy.axd...
-Info: Using ID '9dbdbb1b-1341-4f7c-a953-631231ad050a' for connections to the remote server.
-Error Code: ERROR_USER_UNAUTHORIZED
-More Information: Connected to the remote computer ("site87730.siteasp.net") using the Web Management Service, but could not authorize. Make sure that you are using the correct user name and password, that the site you are connecting to exists, and that the credentials represent a user who has permissions to access the site.  Learn more at: https://go.microsoft.com/fwlink/?LinkId=221672#ERROR_USER_UNAUTHORIZED.
-Error: The remote server returned an error: (401) Unauthorized.
+Auth Type: Basic
+Password Loaded: YES (12 chars)
+Attempting Web Deploy to /msdeploy.axd...
+Info: Using ID '81e5068f-cafc-4e84-8d9f-57391009d775' for connections to the remote server.
+Error: The URI 'http:///msdeploy.axd/MSDEPLOYAGENTSERVICE' representing the remote machine is malformed.
+Error: Invalid URI: The hostname could not be parsed.
 Error count: 1.
 WARNING: Web Deploy returned exit code -1. Falling back to robust FTP deployment...
 =======================================================
 🔄 Executing IIS-Safe FTP Deployment...
 =======================================================
-C:\hostedtoolcache\windows\Python\3.12.10\x64\python.exe: can't open file 'D:\\a\\Welco\\Welco\\.github\\workflows\\ftp-deploy.py': [Errno 2] No such file or directory
+Connecting to FTP server: site87730.siteasp.net as site87730...
+Traceback (most recent call last):
+  File "D:\a\Welco\Welco\.github\workflows\ftp-deploy.py", line 126, in <module>
+    deploy()
+  File "D:\a\Welco\Welco\.github\workflows\ftp-deploy.py", line 20, in deploy
+    ftp.login(user, password)
+  File "C:\hostedtoolcache\windows\Python\3.12.10\x64\Lib\ftplib.py", line 414, in login
+    resp = self.sendcmd('PASS ' + passwd)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\hostedtoolcache\windows\Python\3.12.10\x64\Lib\ftplib.py", line 281, in sendcmd
+    return self.getresp()
+           ^^^^^^^^^^^^^^
+  File "C:\hostedtoolcache\windows\Python\3.12.10\x64\Lib\ftplib.py", line 254, in getresp
+    raise error_perm(resp)
+ftplib.error_perm: 530 Authentication error: invalid credentials
 Error: Process completed with exit code 1.
 0s
-2s
+3s
 Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
 Post job cleanup.
 "C:\Program Files\Git\bin\git.exe" version
-git version 2.55.0.windows.4
-Temporarily overriding HOME='D:\a\_temp\b4b566f3-2070-4a56-a65d-792c1529277d' before making global git config changes
+git version 2.55.0.windows.5
+Temporarily overriding HOME='D:\a\_temp\025f9774-c278-4d4c-9829-d0aa8db3cb77' before making global git config changes
 Adding repository directory to the temporary git global config as a safe directory
 "C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Welco\Welco
 "C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand

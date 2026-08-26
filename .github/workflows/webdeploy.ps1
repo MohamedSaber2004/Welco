@@ -38,24 +38,24 @@ if (-not $profile) {
     exit 1
 }
 
-$publishUrl = $profile.publishUrl
-$siteName = $profile.msdeploySite
-$userName = $profile.userName
-$publishMethod = $profile.publishMethod
+$publishUrl = [string]$profile.publishUrl
+$siteName = [string]$profile.msdeploySite
+$userName = [string]$profile.userName
+$publishMethod = [string]$profile.publishMethod
 
 # 1. Prioritize userPWD from the XML publish profile
-$password = $profile.userPWD
+$password = [string]$profile.userPWD
 if ([string]::IsNullOrWhiteSpace($password)) {
-    $password = $env:PROFILE_PASSWORD
+    $password = [string]$env:PROFILE_PASSWORD
 }
 if ([string]::IsNullOrWhiteSpace($password)) {
-    $password = $env:AUTH_FTP_PASSWORD
+    $password = [string]$env:AUTH_FTP_PASSWORD
 }
 if ([string]::IsNullOrWhiteSpace($password)) {
-    $password = $env:GATEWAY_FTP_PASSWORD
+    $password = [string]$env:GATEWAY_FTP_PASSWORD
 }
 
-$authType = if ($profile.authType) { $profile.authType } else { "Basic" }
+$authType = if ($profile.authType) { [string]$profile.authType } else { "Basic" }
 
 Write-Host "Detected Publish Method: $publishMethod"
 Write-Host "Target Site: $siteName"
@@ -74,23 +74,26 @@ if ($publishMethod -eq "MSDeploy" -or $publishUrl -match "msdeploy|:8172") {
     $msdeploy = $msdeployPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
 
     if ($msdeploy) {
-        $computerName = $publishUrl
-        if (-not ($computerName -match "^https?://")) {
-            $computerName = "https://$computerName"
+        $rawHost = $publishUrl.Trim().TrimEnd('/')
+        if ($rawHost.StartsWith("http://", [System.StringComparison]::OrdinalIgnoreCase)) {
+            $rawHost = $rawHost.Substring(7)
+        } elseif ($rawHost.StartsWith("https://", [System.StringComparison]::OrdinalIgnoreCase)) {
+            $rawHost = $rawHost.Substring(8)
         }
-        if ($computerName -notmatch "msdeploy\.axd") {
-            if ($computerName -notmatch ":8172") {
-                $computerName = "$computerName:8172/msdeploy.axd"
-            } else {
-                $computerName = "$computerName/msdeploy.axd"
-            }
+
+        if (-not $rawHost.Contains(":8172") -and -not $rawHost.Contains("msdeploy.axd")) {
+            $computerName = "https://" + $rawHost + ":8172/msdeploy.axd"
+        } elseif (-not $rawHost.Contains("msdeploy.axd")) {
+            $computerName = "https://" + $rawHost + "/msdeploy.axd"
+        } else {
+            $computerName = "https://" + $rawHost
         }
 
         $fullPublishPath = (Resolve-Path $PublishDir).Path
         Write-Host "Attempting Web Deploy to $computerName..."
 
-        $destArg = "-dest:contentPath=$siteName,computerName=$computerName,userName=$userName,password=$password,authType=$authType,includeAcls=False"
-        $sourceArg = "-source:contentPath=$fullPublishPath"
+        $destArg = "-dest:contentPath=" + $siteName + ",computerName=" + $computerName + ",userName=" + $userName + ",password=" + $password + ",authType=" + $authType + ",includeAcls=False"
+        $sourceArg = "-source:contentPath=" + $fullPublishPath
 
         $msdeployArgs = @(
             "-verb:sync",
@@ -121,8 +124,7 @@ if (-not $msdeploySucceeded) {
     Write-Host "🔄 Executing IIS-Safe FTP Deployment..."
     Write-Host "======================================================="
 
-    # Extract FTP server from publishUrl or publishProfile
-    $ftpServer = $profile.publishUrl -replace "^https?://", "" -replace "^ftp://", "" -replace ":[0-9]+.*$", "" -replace "/.*$", ""
+    $ftpServer = $publishUrl -replace "^https?://", "" -replace "^ftp://", "" -replace ":[0-9]+.*$", "" -replace "/.*$", ""
     
     $env:FTP_SERVER = $ftpServer
     $env:FTP_USERNAME = $userName
