@@ -1,9 +1,1 @@
-{
-  "isSuccess": false,
-  "statusCode": 404,
-  "message": "Auth.UserNotFound",
-  "errors": [
-    "Auth.UserNotFound"
-  ],
-  "data": null
-}
+https://welco-gateway.runasp.net/ => gateway link
