@@ -13,11 +13,16 @@ namespace Auth.Services.API.Infrastructure.Services
     public class JwtTokenService : IJwtTokenService
     {
         private readonly JwtSettings _settings;
+        private const string DefaultFallbackSecret = "V5B?*77+gzD_pk+2!%ORg<i)<D$DH+Xf.nECc?];2l;";
 
         public JwtTokenService(IOptions<JwtSettings> settings)
         {
             _settings = settings.Value;
         }
+
+        private string SecretKey => !string.IsNullOrWhiteSpace(_settings.Secret) && _settings.Secret.Length >= 32
+            ? _settings.Secret
+            : DefaultFallbackSecret;
 
         public string GenerateAccessToken(ApplicationUser user, IList<string> roles, Guid? clinicId = null, bool hasActiveSubscription = false)
         {
@@ -28,13 +33,6 @@ namespace Auth.Services.API.Infrastructure.Services
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new("FullName", user.FullName ?? string.Empty)
             };
-
-            if (clinicId.HasValue)
-            {
-                claims.Add(new Claim("ClinicId", clinicId.Value.ToString()));
-            }
-
-            claims.Add(new Claim("HasActiveSubscription", hasActiveSubscription.ToString()));
 
             var userTypesMask = roles
                 .Select(r => Enum.TryParse<UserType>(r, ignoreCase: true, out var ut) ? (int)ut : 0)
@@ -48,13 +46,13 @@ namespace Auth.Services.API.Infrastructure.Services
                 claims.Add(new Claim("role", role));
             }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Secret));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expiry = DateTime.UtcNow.AddMinutes(_settings.ExpiryInMinutes > 0 ? _settings.ExpiryInMinutes : 60);
 
             var token = new JwtSecurityToken(
-                _settings.Issuer,
-                _settings.Audience,
+                !string.IsNullOrWhiteSpace(_settings.Issuer) ? _settings.Issuer : null,
+                !string.IsNullOrWhiteSpace(_settings.Audience) ? _settings.Audience : null,
                 claims,
                 expires: expiry,
                 signingCredentials: creds);
@@ -71,13 +69,13 @@ namespace Auth.Services.API.Infrastructure.Services
                 new("TokenType", "RefreshToken")
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Secret));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expiry = DateTime.UtcNow.AddDays(_settings.RefreshTokenExpiryDays > 0 ? _settings.RefreshTokenExpiryDays : 30);
 
             var token = new JwtSecurityToken(
-                _settings.Issuer,
-                _settings.Audience,
+                !string.IsNullOrWhiteSpace(_settings.Issuer) ? _settings.Issuer : null,
+                !string.IsNullOrWhiteSpace(_settings.Audience) ? _settings.Audience : null,
                 claims,
                 expires: expiry,
                 signingCredentials: creds);
@@ -87,17 +85,17 @@ namespace Auth.Services.API.Infrastructure.Services
 
         public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
         {
-            if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(_settings.Secret))
+            if (string.IsNullOrWhiteSpace(token))
                 return null;
 
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = !string.IsNullOrWhiteSpace(_settings.Audience),
-                ValidAudience = _settings.Audience,
+                ValidAudience = !string.IsNullOrWhiteSpace(_settings.Audience) ? _settings.Audience : null,
                 ValidateIssuer = !string.IsNullOrWhiteSpace(_settings.Issuer),
-                ValidIssuer = _settings.Issuer,
+                ValidIssuer = !string.IsNullOrWhiteSpace(_settings.Issuer) ? _settings.Issuer : null,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Secret)),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey)),
                 ValidateLifetime = false
             };
 

@@ -49,14 +49,18 @@ namespace Auth.Services.API
 
             builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
+            var secretKey = !string.IsNullOrWhiteSpace(jwtSettings.Secret) && jwtSettings.Secret.Length >= 32
+                ? jwtSettings.Secret
+                : "V5B?*77+gzD_pk+2!%ORg<i)<D$DH+Xf.nECc?];2l;";
+
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
                 ValidateIssuer = !string.IsNullOrWhiteSpace(jwtSettings.Issuer),
-                ValidIssuer = jwtSettings.Issuer,
+                ValidIssuer = !string.IsNullOrWhiteSpace(jwtSettings.Issuer) ? jwtSettings.Issuer : null,
                 ValidateAudience = !string.IsNullOrWhiteSpace(jwtSettings.Audience),
-                ValidAudience = jwtSettings.Audience,
+                ValidAudience = !string.IsNullOrWhiteSpace(jwtSettings.Audience) ? jwtSettings.Audience : null,
                 RequireExpirationTime = true,
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero,
@@ -129,6 +133,7 @@ namespace Auth.Services.API
             app.UseAuthentication();
             app.UseAuthorization();
 
+            //app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Auth.Services.API" }));
             app.MapGet("/", () => Results.Redirect("/scalar/v1"));
             app.MapOpenApi();
             app.MapScalarApiReference(options =>

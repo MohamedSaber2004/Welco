@@ -1,7 +1,4 @@
-"JwtSettings": {
-  "Issuer": "https://localhost:44312/",
-  "Audience": "https://localhost:44312/",
-  "ExpiryInDays": 30,
-  "RefreshTokenExpiryDays": 30,
-  "Secret": "V5B?*77+gzD_pk+2!%ORg<i)<D$DH+Xf.nECc?];2l;"
-}
+Application '/LM/W3SVC/3821/ROOT' with physical root 'D:\Sites\site87542\wwwroot\' hit unexpected managed exception, exception code = '0xe0434352'. First 30KB characters of captured stdout and stderr logs:
+Unhandled exception. System.ArgumentException: IDX10703: Cannot create a 'Microsoft.IdentityModel.Tokens.SymmetricSecurityKey', key length is zero.
+at Microsoft.IdentityModel.Tokens.SymmetricSecurityKey..ctor(Byte[] key)
+at Auth.Services.API.Program.Main(String[] args) in D:\Deploy\site87542\source\Auth.Services.API\Program.cs:line 52
