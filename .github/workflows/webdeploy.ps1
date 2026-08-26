@@ -75,12 +75,19 @@ if ($publishMethod -eq "MSDeploy" -or $publishUrl -match "msdeploy|:8172") {
     $fullPublishPath = (Resolve-Path $PublishDir).Path
     Write-Host "Deploying via Web Deploy to $computerName..."
 
-    & $msdeploy -verb:sync `
-        -source:contentPath="$fullPublishPath" `
-        -dest:contentPath="$siteName",computerName="$computerName",userName="$userName",password="$password",authType="Basic",includeAcls="False" `
-        -enableRule:AppOffline `
-        -allowUntrusted `
-        -verbose
+    $destArg = "-dest:contentPath=$siteName,computerName=$computerName,userName=$userName,password=$password,authType=Basic,includeAcls=False"
+    $sourceArg = "-source:contentPath=$fullPublishPath"
+
+    $msdeployArgs = @(
+        "-verb:sync",
+        $sourceArg,
+        $destArg,
+        "-enableRule:AppOffline",
+        "-allowUntrusted",
+        "-verbose"
+    )
+
+    & $msdeploy $msdeployArgs
 
     if ($LASTEXITCODE -ne 0) {
         Write-Error "MSDeploy failed with exit code $LASTEXITCODE"

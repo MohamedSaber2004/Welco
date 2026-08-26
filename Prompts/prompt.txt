@@ -1,145 +1,49 @@
-19s
-2m 15s
-Run python .github/workflows/ftp-deploy.py
-  python .github/workflows/ftp-deploy.py
-  shell: /usr/bin/bash -e {0}
+Run .\.github\workflows\webdeploy.ps1 `
+  .\.github\workflows\webdeploy.ps1 `
+    -ProjectPath "Auth.Services.API/Auth.Services.API.csproj" `
+    -PublishDir "./publish/auth" `
+    -PublishProfileContent $env:PROFILE_XML
+  shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
   env:
-    DOTNET_ROOT: /usr/share/dotnet
-    FTP_SERVER: ***
-    FTP_USERNAME: ***
-    FTP_PASSWORD: ***
-    LOCAL_DIR: ./publish/gateway
-    REMOTE_DIR: /
+    DOTNET_ROOT: C:\Program Files\dotnet
+    PROFILE_XML: ***
   
-Connecting to FTP server: *** as ***...
-Connected successfully.
-Detecting remote root directory structure...
-Items in FTP root: ['.ftp-deploy-sync-state.json', 'appsettings.json', 'Azure.Core.dll', 'Azure.Identity.dll', 'cs', 'de', 'es', 'FluentValidation.DependencyInjectionExtensions.dll', 'FluentValidation.dll', 'fr', 'IPAddressRange.dll', 'it', 'ja', 'ko', 'Localization', 'MediatR.Contracts.dll', 'MediatR.dll', 'Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll', 'Microsoft.AspNetCore.JsonPatch.dll', 'Microsoft.AspNetCore.MiddlewareAnalysis.dll', 'Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll', 'Microsoft.AspNetCore.OpenApi.dll', 'Microsoft.Bcl.AsyncInterfaces.dll', 'Microsoft.Data.SqlClient.dll', 'Microsoft.EntityFrameworkCore.Abstractions.dll', 'Microsoft.EntityFrameworkCore.dll', 'Microsoft.EntityFrameworkCore.Relational.dll', 'Microsoft.EntityFrameworkCore.SqlServer.dll', 'Microsoft.Extensions.DependencyModel.dll', 'Microsoft.Extensions.DiagnosticAdapter.dll', 'Microsoft.Identity.Client.Broker.dll', 'Microsoft.Identity.Client.dll', 'Microsoft.Identity.Client.Extensions.Msal.dll', 'Microsoft.Identity.Client.
-Auto-detected wwwroot structure: target set to '/wwwroot'
-Uploading app_offline.htm to /wwwroot to release IIS file locks...
-app_offline.htm uploaded. Waiting 3 seconds for IIS worker process to release file locks...
-Uploading files from local './publish/gateway' to remote '/wwwroot'...
-  ✓ Uploaded: Microsoft.IdentityModel.Abstractions.dll
-  ✓ Uploaded: Serilog.dll
-  ✓ Uploaded: Welco.Gateway.API.deps.json
-  ✓ Uploaded: Microsoft.IdentityModel.Protocols.dll
-  ✓ Uploaded: Microsoft.SqlServer.Server.dll
-  ✓ Uploaded: Microsoft.Data.SqlClient.dll
-  ✓ Uploaded: Microsoft.EntityFrameworkCore.SqlServer.dll
-  ✓ Uploaded: Serilog.Sinks.Debug.dll
-  ✓ Uploaded: Microsoft.Identity.Client.NativeInterop.dll
-  ✓ Uploaded: Microsoft.OpenApi.dll
-  ✓ Uploaded: Microsoft.IdentityModel.JsonWebTokens.dll
-  ✓ Uploaded: Microsoft.EntityFrameworkCore.Relational.dll
-  ✓ Uploaded: Serilog.Settings.Configuration.dll
-  ✓ Uploaded: Serilog.AspNetCore.dll
-  ✓ Uploaded: System.Configuration.ConfigurationManager.dll
-  ✓ Uploaded: Welco.Gateway.API.runtimeconfig.json
-  ✓ Uploaded: Welco.Gateway.API.dll
-  ✓ Uploaded: Welco.Shared.dll
-  ✓ Uploaded: Serilog.Formatting.Compact.dll
-  ✓ Uploaded: System.Memory.Data.dll
-  ✓ Uploaded: System.Security.Cryptography.ProtectedData.dll
-  ✓ Uploaded: Welco.Gateway.API.pdb
-  ✓ Uploaded: Microsoft.Identity.Client.dll
-  ✓ Uploaded: Welco.Shared.pdb
-  ✓ Uploaded: Newtonsoft.Json.Bson.dll
-  ✓ Uploaded: IPAddressRange.dll
-  ✓ Uploaded: Serilog.Sinks.Console.dll
-  ✓ Uploaded: Newtonsoft.Json.dll
-  ✓ Uploaded: Serilog.Extensions.Logging.dll
-  ✓ Uploaded: System.IdentityModel.Tokens.Jwt.dll
-  ✓ Uploaded: Microsoft.AspNetCore.JsonPatch.dll
-  ✓ Uploaded: Welco.Gateway.API
-  ✓ Uploaded: Microsoft.Extensions.DiagnosticAdapter.dll
-  ✓ Uploaded: Microsoft.EntityFrameworkCore.Abstractions.dll
-  ✓ Uploaded: Microsoft.IdentityModel.Logging.dll
-  ✓ Uploaded: web.config
-  ✓ Uploaded: Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll
-  ✓ Uploaded: MediatR.Contracts.dll
-  ✓ Uploaded: Ocelot.dll
-  ✓ Uploaded: Azure.Identity.dll
-  ✓ Uploaded: Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
-  ✓ Uploaded: FluentValidation.dll
-  ✓ Uploaded: System.ClientModel.dll
-  ✓ Uploaded: Microsoft.EntityFrameworkCore.dll
-  ✓ Uploaded: MediatR.dll
-  ✓ Uploaded: Serilog.Sinks.File.dll
-  ✓ Uploaded: Microsoft.Identity.Client.Broker.dll
-  ✓ Uploaded: Serilog.Extensions.Hosting.dll
-  ✓ Uploaded: Microsoft.IdentityModel.Tokens.dll
-  ✓ Uploaded: Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
-  ✓ Uploaded: Microsoft.AspNetCore.OpenApi.dll
-  ✓ Uploaded: Microsoft.Extensions.DependencyModel.dll
-  ✓ Uploaded: appsettings.json
-  ✓ Uploaded: Microsoft.Bcl.AsyncInterfaces.dll
-  ✓ Uploaded: Microsoft.AspNetCore.MiddlewareAnalysis.dll
-  ✓ Uploaded: FluentValidation.DependencyInjectionExtensions.dll
-  ✓ Uploaded: Scalar.AspNetCore.dll
-  ✓ Uploaded: Azure.Core.dll
-  ✓ Uploaded: Welco.Gateway.API.staticwebassets.endpoints.json
-  ✓ Uploaded: Microsoft.Identity.Client.Extensions.Msal.dll
-  ✓ Uploaded: runtimes/osx-arm64/native/msalruntime_arm64.dylib
-  ✓ Uploaded: runtimes/win/lib/net9.0/Microsoft.Data.SqlClient.dll
-  ✓ Uploaded: runtimes/win-x86/native/Microsoft.Data.SqlClient.SNI.dll
-  ✓ Uploaded: runtimes/win-x86/native/msalruntime_x86.dll
-  ✓ Uploaded: runtimes/osx-x64/native/msalruntime.dylib
-  ✓ Uploaded: runtimes/win-arm64/native/Microsoft.Data.SqlClient.SNI.dll
-  ✓ Uploaded: runtimes/win-arm64/native/msalruntime_arm64.dll
-  ✓ Uploaded: runtimes/linux-x64/native/libmsalruntime.so
-  ✓ Uploaded: runtimes/unix/lib/net9.0/Microsoft.Data.SqlClient.dll
-  ✓ Uploaded: runtimes/win-x64/native/msalruntime.dll
-  ✓ Uploaded: runtimes/win-x64/native/Microsoft.Data.SqlClient.SNI.dll
-  ✓ Uploaded: ja/Microsoft.Data.SqlClient.resources.dll
-  ✓ Uploaded: Localization/Resources/messages.en.json
-  ✓ Uploaded: Localization/Resources/messages.ar.json
-  ✓ Uploaded: ru/Microsoft.Data.SqlClient.resources.dll
-  ✓ Uploaded: cs/Microsoft.Data.SqlClient.resources.dll
-  ✓ Uploaded: zh-Hans/Microsoft.Data.SqlClient.resources.dll
-  ✓ Uploaded: Persistance/Seeding/roles.json
-  ✓ Uploaded: Ocelot/ocelot.global.Production.json
-  ✓ Uploaded: Ocelot/ocelot.auth.Test.json
-  ✓ Uploaded: Ocelot/ocelot.global.json
-  ✓ Uploaded: Ocelot/ocelot.global.Development.json
-  ✓ Uploaded: Ocelot/ocelot.auth.Development.json
-  ✓ Uploaded: Ocelot/ocelot.auth.Production.json
-  ✓ Uploaded: Ocelot/ocelot.global.Test.json
-  ✓ Uploaded: pt-BR/Microsoft.Data.SqlClient.resources.dll
-  ✓ Uploaded: fr/Microsoft.Data.SqlClient.resources.dll
-  ✓ Uploaded: pl/Microsoft.Data.SqlClient.resources.dll
-  ✓ Uploaded: es/Microsoft.Data.SqlClient.resources.dll
-  ✓ Uploaded: ko/Microsoft.Data.SqlClient.resources.dll
-  ✓ Uploaded: tr/Microsoft.Data.SqlClient.resources.dll
-  ✓ Uploaded: zh-Hant/Microsoft.Data.SqlClient.resources.dll
-  ✓ Uploaded: de/Microsoft.Data.SqlClient.resources.dll
-  ✓ Uploaded: it/Microsoft.Data.SqlClient.resources.dll
-✓ Removed app_offline.htm - IIS is now actively running the new code!
 =======================================================
-🎉 Deployment completed successfully! Total files uploaded: 94 to /wwwroot
+🚀 Building and publishing project: Auth.Services.API/Auth.Services.API.csproj
 =======================================================
+  Determining projects to restore...
+  Restored D:\a\Welco\Welco\Welco.Shared\Welco.Shared.csproj (in 21.83 sec).
+  Restored D:\a\Welco\Welco\Auth.Services.API\Auth.Services.API.csproj (in 21.83 sec).
+  Welco.Shared -> D:\a\Welco\Welco\Welco.Shared\bin\Release\net10.0\Welco.Shared.dll
+  Auth.Services.API -> D:\a\Welco\Welco\Auth.Services.API\bin\Release\net10.0\Auth.Services.API.dll
+  Auth.Services.API -> D:\a\Welco\Welco\publish\auth\
+Parsing Publish Profile XML...
+Detected Publish Method: MSDeploy
+Target Site: site87730
+Publish URL: site87730.siteasp.net
+Deploying via Web Deploy to https://site87730.siteasp.net:8172/msdeploy.axd...
+Error: Unrecognized argument '"-dest:contentPath=\"$siteName\",computerName=\"$computerName\",userName=\"$userName\",***"$password\",authType=\"Basic\",includeAcls=\"False\""'. All arguments must begin with "-".
+Error count: 1.
+Write-Error: D:\a\_temp\7d6788c1-574c-47b1-8b48-b1a61490bacd.ps1:2
+Line |
+   2 |  .\.github\workflows\webdeploy.ps1 `
+     |  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | MSDeploy failed with exit code -1
+Error: Process completed with exit code 1.
 0s
-Warning: Unexpected input(s) 'include-prerelease', valid inputs are ['dotnet-version', 'dotnet-quality', 'global-json-file', 'source-url', 'owner', 'config-file', 'cache', 'cache-dependency-path']
+2s
 Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
 Post job cleanup.
-(node:2285) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-1s
-Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
-Post job cleanup.
-/usr/bin/git version
-git version 2.55.0
-Temporarily overriding HOME='/home/runner/work/_temp/3d3fc2af-a361-4654-a7f7-b044c5022988' before making global git config changes
+"C:\Program Files\Git\bin\git.exe" version
+git version 2.55.0.windows.4
+Temporarily overriding HOME='D:\a\_temp\f7017250-321d-4574-a24c-d4aad89524c1' before making global git config changes
 Adding repository directory to the temporary git global config as a safe directory
-/usr/bin/git config --global --add safe.directory /home/runner/work/Welco/Welco
-/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
-/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
-/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Welco\Welco
+"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
 http.https://github.com/.extraheader
-/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
-/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
-/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
-/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
-0s
-Cleaning up orphan processes
-Terminate orphan process: pid (2204) (VBCSCompiler)
-Warning: Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-dotnet@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
+"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
