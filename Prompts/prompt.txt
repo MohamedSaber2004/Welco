@@ -1,19 +1,6 @@
-Run .\.github\workflows\webdeploy.ps1 `
-  .\.github\workflows\webdeploy.ps1 `
-    -ProjectPath "Auth.Services.API/Auth.Services.API.csproj" `
-    -PublishDir "./publish/auth" `
-    -PublishProfileContent $env:PROFILE_XML
-  shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
-  env:
-    DOTNET_ROOT: C:\Program Files\dotnet
-    PROFILE_XML: ***
-  
-=======================================================
-🚀 Building and publishing project: Auth.Services.API/Auth.Services.API.csproj
-=======================================================
-  Determining projects to restore...
-  Restored D:\a\Welco\Welco\Welco.Shared\Welco.Shared.csproj (in 21.83 sec).
-  Restored D:\a\Welco\Welco\Auth.Services.API\Auth.Services.API.csproj (in 21.83 sec).
+ Determining projects to restore...
+  Restored D:\a\Welco\Welco\Welco.Shared\Welco.Shared.csproj (in 16.31 sec).
+  Restored D:\a\Welco\Welco\Auth.Services.API\Auth.Services.API.csproj (in 16.31 sec).
   Welco.Shared -> D:\a\Welco\Welco\Welco.Shared\bin\Release\net10.0\Welco.Shared.dll
   Auth.Services.API -> D:\a\Welco\Welco\Auth.Services.API\bin\Release\net10.0\Auth.Services.API.dll
   Auth.Services.API -> D:\a\Welco\Welco\publish\auth\
@@ -22,9 +9,13 @@ Detected Publish Method: MSDeploy
 Target Site: site87730
 Publish URL: site87730.siteasp.net
 Deploying via Web Deploy to https://site87730.siteasp.net:8172/msdeploy.axd...
-Error: Unrecognized argument '"-dest:contentPath=\"$siteName\",computerName=\"$computerName\",userName=\"$userName\",***"$password\",authType=\"Basic\",includeAcls=\"False\""'. All arguments must begin with "-".
+Info: Using ID '52043d21-4a31-4827-b4af-c77e0a453b2d' for connections to the remote server.
+Verbose: Pre-authenticating to remote agent URL 'https://site87730.siteasp.net:8172/msdeploy.axd' as 'site87730'.
+Error Code: ERROR_USER_UNAUTHORIZED
+More Information: Connected to the remote computer ("site87730.siteasp.net") using the Web Management Service, but could not authorize. Make sure that you are using the correct user name and password, that the site you are connecting to exists, and that the credentials represent a user who has permissions to access the site.  Learn more at: https://go.microsoft.com/fwlink/?LinkId=221672#ERROR_USER_UNAUTHORIZED.
+Error: The remote server returned an error: (401) Unauthorized.
 Error count: 1.
-Write-Error: D:\a\_temp\7d6788c1-574c-47b1-8b48-b1a61490bacd.ps1:2
+Write-Error: D:\a\_temp\3a101d04-7bf2-4f5d-84ee-35a4ee4b7ad1.ps1:2
 Line |
    2 |  .\.github\workflows\webdeploy.ps1 `
      |  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -36,7 +27,7 @@ Node 20 is being deprecated. This workflow is running with Node 24 by default. I
 Post job cleanup.
 "C:\Program Files\Git\bin\git.exe" version
 git version 2.55.0.windows.4
-Temporarily overriding HOME='D:\a\_temp\f7017250-321d-4574-a24c-d4aad89524c1' before making global git config changes
+Temporarily overriding HOME='D:\a\_temp\3654ddef-19b0-4540-9ac6-1e3e24ab9ec9' before making global git config changes
 Adding repository directory to the temporary git global config as a safe directory
 "C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Welco\Welco
 "C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand

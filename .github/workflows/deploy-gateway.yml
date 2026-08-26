@@ -10,6 +10,7 @@ on:
       - 'Welco.Shared/**'
       - '.github/workflows/deploy-gateway.yml'
       - '.github/workflows/webdeploy.ps1'
+      - '.github/workflows/ftp-deploy.py'
   workflow_dispatch:
 
 jobs:
@@ -30,6 +31,7 @@ jobs:
         shell: pwsh
         env:
           PROFILE_XML: ${{ secrets.GATEWAY_PUBLISH_PROFILE }}
+          PROFILE_PASSWORD: ${{ secrets.GATEWAY_FTP_PASSWORD }}
         run: |
           .\.github\workflows\webdeploy.ps1 `
             -ProjectPath "Welco.API/Welco.Gateway.API.csproj" `
