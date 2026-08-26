@@ -14,10 +14,12 @@ using Welco.Shared.Controllers;
 
 namespace Auth.Services.API.Controllers
 {
+    /// <summary>
+    /// Authentication and User Management Controller
+    /// </summary>
     [Route(AuthApiRoutes.Base)]
     public class AuthController : AppControllerBase
     {
-
         public AuthController(IMediator mediator) : base(mediator)
         {
         }
