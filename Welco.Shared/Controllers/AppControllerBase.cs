@@ -1,3 +1,4 @@
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,14 @@ namespace Welco.Shared.Controllers
     [ApiController]
     public abstract class AppControllerBase : ControllerBase
     {
+        protected readonly IMediator _mediator;
+
+
+        protected AppControllerBase(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
         [NonAction]
         public string Localize(string key, params object[] args)
         {
@@ -67,6 +76,40 @@ namespace Welco.Shared.Controllers
             {
                 StatusCode = result.StatusCode
             };
+        }
+
+        [NonAction]
+        public IActionResult ToActionResult<T>(Result<T> result)
+        {
+            return CustomResult(result);
+        }
+
+        [NonAction]
+        public IActionResult Paginated<T>(PaginatedResult<T> result)
+        {
+            return new ObjectResult(result)
+            {
+                StatusCode = result.StatusCode
+            };
+        }
+
+        [NonAction]
+        public IActionResult ToActionResult<T>(PaginatedResult<T> result)
+        {
+            return Paginated(result);
+        }
+
+        [NonAction]
+        public IActionResult PaginatedSuccess<T>(
+            IReadOnlyList<T> data,
+            int totalCount,
+            int pageNumber,
+            int pageSize,
+            string? message = null)
+        {
+            var msg = message ?? Localize(LocalizationKeys.ActionResults.Ok);
+            var paginated = PaginatedResult<T>.Success(data, totalCount, pageNumber, pageSize, msg);
+            return Paginated(paginated);
         }
 
         [NonAction]

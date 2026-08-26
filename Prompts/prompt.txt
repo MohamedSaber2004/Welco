@@ -1,1 +1,7 @@
-I don't want the change to be limited to just the auth service; I want it to be dynamic and work with any service.
+"JwtSettings": {
+  "Issuer": "https://localhost:44312/",
+  "Audience": "https://localhost:44312/",
+  "ExpiryInDays": 30,
+  "RefreshTokenExpiryDays": 30,
+  "Secret": "V5B?*77+gzD_pk+2!%ORg<i)<D$DH+Xf.nECc?];2l;"
+}

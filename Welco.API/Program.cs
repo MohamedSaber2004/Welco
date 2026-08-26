@@ -4,6 +4,8 @@ using Scalar.AspNetCore;
 using Serilog;
 using System.Reflection;
 using Welco.API.Options;
+using Welco.Shared;
+using Welco.Shared.Common.Middlewares;
 using Welco.Shared.Enums;
 using Welco.Shared.Localization;
 using Welco.Shared.Localization.Interfaces;
@@ -66,6 +68,7 @@ namespace Welco.API
 
             builder.Services.AddControllers();
             builder.Services.AddJsonLocalization();
+            builder.Services.AddWelcoSharedDependencies();
 
             var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
             builder.Services.AddCors(options =>
@@ -139,6 +142,7 @@ namespace Welco.API
                                    Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
             });
 
+            app.UseCustomExceptionHandler();
             app.UseJsonLocalization();
 
             app.Use(async (context, next) =>
@@ -206,7 +210,6 @@ namespace Welco.API
 #pragma warning disable ASP0014
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Welco.Gateway.API" }));
                 endpoints.MapGet("/", () => Results.Redirect("/scalar/v1"));
                 endpoints.MapOpenApi();
                 

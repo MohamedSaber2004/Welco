@@ -3,7 +3,7 @@ using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Enums;
 using Welco.Shared.Localization;
 
-namespace Auth.Services.API.Domain.Models
+namespace Welco.Shared.Domain.Models
 {
     public class ApplicationUser : IdentityUser<Guid>, IBaseEntity<Guid>
     {
@@ -21,7 +21,7 @@ namespace Auth.Services.API.Domain.Models
         public string? PasswordResetToken { get; set; }
         public DateTime? PasswordResetTokenExpiry { get; set; }
         public AppLanguage Language { get; set; }
-        public UserType UserType { get; set; } = UserType.User;
+        public UserType UserType { get; set; } = UserType.Doctor;
 
         public void MarkAsCreated(string createdBy)
         {

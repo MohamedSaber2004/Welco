@@ -42,6 +42,16 @@ namespace Welco.Shared.Results
             return new Result<T>(false, statusCode, message, default, errors);
         }
 
+        public static Result<T> BadRequest(string message = LocalizationKeys.ExceptionMessages.BadRequest, List<string>? errors = null)
+        {
+            return new Result<T>(false, (int)HttpStatusCode.BadRequest, message, default, errors ?? new List<string> { message });
+        }
+
+        public static Result<T> BadRequest(List<string> errors, string message = LocalizationKeys.ExceptionMessages.BadRequest)
+        {
+            return new Result<T>(false, (int)HttpStatusCode.BadRequest, message, default, errors);
+        }
+
         public static Result<T> NotFound(string message = LocalizationKeys.ExceptionMessages.NotFound, List<string>? errors = null)
         {
             return new Result<T>(false, (int)HttpStatusCode.NotFound, message, default, errors ?? new List<string> { message });

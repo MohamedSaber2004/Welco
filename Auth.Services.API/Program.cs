@@ -1,5 +1,19 @@
+using System.Text;
+using Auth.Services.API.Infrastructure;
+using Auth.Services.API.Infrastructure.Services;
+using FluentValidation;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using Welco.Shared;
+using Welco.Shared.Common.Behaviors;
+using Welco.Shared.Common.Interfaces;
+using Welco.Shared.Common.Middlewares;
+using Welco.Shared.Common.Options;
 using Welco.Shared.Localization;
+using Welco.Shared.Localization.Interfaces;
+using Welco.Shared.OpenApi;
 
 namespace Auth.Services.API
 {
@@ -18,7 +32,74 @@ namespace Auth.Services.API
 
             builder.Services.AddControllers();
             builder.Services.AddJsonLocalization();
-            builder.Services.AddOpenApi();
+            builder.Services.AddWelcoSharedDependencies(builder.Configuration);
+            builder.Services.AddWelcoIdentity(builder.Configuration);
+
+            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
+            var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>() ?? new JwtSettings();
+            builder.Services.AddSingleton(jwtSettings);
+
+            builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+
+            builder.Services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            });
+
+            builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
+                ValidateIssuer = !string.IsNullOrWhiteSpace(jwtSettings.Issuer),
+                ValidIssuer = jwtSettings.Issuer,
+                ValidateAudience = !string.IsNullOrWhiteSpace(jwtSettings.Audience),
+                ValidAudience = jwtSettings.Audience,
+                RequireExpirationTime = true,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero,
+            };
+            builder.Services.AddSingleton(tokenValidationParameters);
+
+            builder.Services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.TokenValidationParameters = tokenValidationParameters;
+                options.Events = new JwtBearerEvents
+                {
+                    OnChallenge = context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "application/json";
+
+                        var localizer = context.HttpContext.RequestServices.GetService<ILocalizationProvider>();
+                        var localizedMessage = localizer?.GetLocalizedString(LocalizationKeys.ExceptionMessages.Unauthorized)
+                                               ?? "You are not authorized to perform this action.";
+
+                        var result = System.Text.Json.JsonSerializer.Serialize(new
+                        {
+                            isSuccess = false,
+                            statusCode = StatusCodes.Status401Unauthorized,
+                            message = localizedMessage,
+                            errors = new[] { localizedMessage },
+                            data = (object?)null
+                        });
+
+                        return context.Response.WriteAsync(result);
+                    }
+                };
+            });
+
+            builder.Services.AddConfiguredOpenApi();
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
@@ -37,6 +118,7 @@ namespace Auth.Services.API
                                    Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
             });
 
+            app.UseCustomExceptionHandler();
             app.UseJsonLocalization();
 
             if (!app.Environment.IsEnvironment("Test") && !app.Environment.IsProduction())
@@ -44,7 +126,9 @@ namespace Auth.Services.API
                 app.UseHttpsRedirection();
             }
             app.UseCors("AllowAll");
-            app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Auth.Services.API" }));
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.MapGet("/", () => Results.Redirect("/scalar/v1"));
             app.MapOpenApi();
             app.MapScalarApiReference(options =>

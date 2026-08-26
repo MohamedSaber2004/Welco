@@ -1,7 +1,7 @@
-﻿namespace Welco.Shared.Enums
+namespace Welco.Shared.Enums
 {
     public enum UserType
     {
-        User = 0
+        Doctor = 0
     }
 }
