@@ -1,0 +1,49 @@
+name: Deploy Auth Microservice to MonsterASP
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'Auth.Services.API/**'
+      - 'Welco.Shared/**'
+      - '.github/workflows/deploy-auth.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Auth Service
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore Dependencies
+        run: dotnet restore "Auth.Services.API/Auth.Services.API.csproj"
+
+      - name: Build Project
+        run: dotnet build "Auth.Services.API/Auth.Services.API.csproj" --configuration Release --no-restore
+
+      - name: Publish Auth Microservice
+        run: |
+          dotnet publish "Auth.Services.API/Auth.Services.API.csproj" \
+            --configuration Release \
+            --no-build \
+            --output ./publish/auth
+
+      - name: Deploy to MonsterASP via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.AUTH_FTP_SERVER }}
+          username: ${{ secrets.AUTH_FTP_USERNAME }}
+          password: ${{ secrets.AUTH_FTP_PASSWORD }}
+          local-dir: ./publish/auth/
+          server-dir: /
+          dangerous-clean-slate: false
