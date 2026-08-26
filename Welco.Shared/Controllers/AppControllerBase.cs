@@ -72,7 +72,22 @@ namespace Welco.Shared.Controllers
         [NonAction]
         public IActionResult CustomResult<T>(Result<T> result)
         {
-            return new ObjectResult(result)
+            var localizedMessage = !string.IsNullOrWhiteSpace(result.Message)
+                ? Localize(result.Message)
+                : result.Message;
+
+            var localizedErrors = result.Errors?
+                .Select(e => !string.IsNullOrWhiteSpace(e) ? Localize(e) : e)
+                .ToList();
+
+            var localizedResult = new Result<T>(
+                result.IsSuccess,
+                result.StatusCode,
+                localizedMessage,
+                result.Data,
+                localizedErrors);
+
+            return new ObjectResult(localizedResult)
             {
                 StatusCode = result.StatusCode
             };
@@ -87,7 +102,25 @@ namespace Welco.Shared.Controllers
         [NonAction]
         public IActionResult Paginated<T>(PaginatedResult<T> result)
         {
-            return new ObjectResult(result)
+            var localizedMessage = !string.IsNullOrWhiteSpace(result.Message)
+                ? Localize(result.Message)
+                : result.Message;
+
+            var localizedErrors = result.Errors?
+                .Select(e => !string.IsNullOrWhiteSpace(e) ? Localize(e) : e)
+                .ToList();
+
+            var localizedResult = new PaginatedResult<T>(
+                result.IsSuccess,
+                result.Data,
+                result.TotalCount,
+                result.PageNumber,
+                result.PageSize,
+                localizedMessage,
+                result.StatusCode,
+                localizedErrors);
+
+            return new ObjectResult(localizedResult)
             {
                 StatusCode = result.StatusCode
             };

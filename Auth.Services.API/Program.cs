@@ -4,6 +4,8 @@ using Auth.Services.API.Infrastructure.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using Welco.Shared;
@@ -14,12 +16,14 @@ using Welco.Shared.Common.Options;
 using Welco.Shared.Localization;
 using Welco.Shared.Localization.Interfaces;
 using Welco.Shared.OpenApi;
+using Welco.Shared.Persistance;
+using Welco.Shared.Persistance.Seeding;
 
 namespace Auth.Services.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -116,6 +120,21 @@ namespace Auth.Services.API
 
             var app = builder.Build();
 
+            using (var scope = app.Services.CreateScope())
+            {
+                try
+                {
+                    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                    await RoleSeeder.SeedRolesAsync(roleManager, logger);
+                }
+                catch (Exception ex)
+                {
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "Database migration or role seeding failed during startup.");
+                }
+            }
+
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | 
@@ -133,7 +152,6 @@ namespace Auth.Services.API
             app.UseAuthentication();
             app.UseAuthorization();
 
-            //app.MapGet("/health", () => Results.Ok(new { status = "Healthy", service = "Auth.Services.API" }));
             app.MapGet("/", () => Results.Redirect("/scalar/v1"));
             app.MapOpenApi();
             app.MapScalarApiReference(options =>
