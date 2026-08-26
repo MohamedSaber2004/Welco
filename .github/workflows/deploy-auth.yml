@@ -9,13 +9,13 @@ on:
       - 'Auth.Services.API/**'
       - 'Welco.Shared/**'
       - '.github/workflows/deploy-auth.yml'
-      - '.github/workflows/ftp-deploy.py'
+      - '.github/workflows/webdeploy.ps1'
   workflow_dispatch:
 
 jobs:
   build-and-deploy:
     name: Build & Deploy Auth Service
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout Code
@@ -26,17 +26,12 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Publish Auth Microservice
-        run: |
-          dotnet publish "Auth.Services.API/Auth.Services.API.csproj" \
-            -c Release \
-            -o ./publish/auth
-
-      - name: Deploy to MonsterASP via FTP
+      - name: Deploy via Publish Profile
+        shell: pwsh
         env:
-          FTP_SERVER: ${{ secrets.AUTH_FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.AUTH_FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.AUTH_FTP_PASSWORD }}
-          LOCAL_DIR: ./publish/auth
-          REMOTE_DIR: /
-        run: python .github/workflows/ftp-deploy.py
+          PROFILE_XML: ${{ secrets.AUTH_PUBLISH_PROFILE }}
+        run: |
+          .\.github\workflows\webdeploy.ps1 `
+            -ProjectPath "Auth.Services.API/Auth.Services.API.csproj" `
+            -PublishDir "./publish/auth" `
+            -PublishProfileContent $env:PROFILE_XML

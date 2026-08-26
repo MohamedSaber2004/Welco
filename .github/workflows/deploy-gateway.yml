@@ -9,13 +9,13 @@ on:
       - 'Welco.API/**'
       - 'Welco.Shared/**'
       - '.github/workflows/deploy-gateway.yml'
-      - '.github/workflows/ftp-deploy.py'
+      - '.github/workflows/webdeploy.ps1'
   workflow_dispatch:
 
 jobs:
   build-and-deploy:
     name: Build & Deploy Gateway Service
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout Code
@@ -26,17 +26,12 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Publish API Gateway
-        run: |
-          dotnet publish "Welco.API/Welco.Gateway.API.csproj" \
-            -c Release \
-            -o ./publish/gateway
-
-      - name: Deploy to MonsterASP via FTP
+      - name: Deploy via Publish Profile
+        shell: pwsh
         env:
-          FTP_SERVER: ${{ secrets.GATEWAY_FTP_SERVER }}
-          FTP_USERNAME: ${{ secrets.GATEWAY_FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.GATEWAY_FTP_PASSWORD }}
-          LOCAL_DIR: ./publish/gateway
-          REMOTE_DIR: /
-        run: python .github/workflows/ftp-deploy.py
+          PROFILE_XML: ${{ secrets.GATEWAY_PUBLISH_PROFILE }}
+        run: |
+          .\.github\workflows\webdeploy.ps1 `
+            -ProjectPath "Welco.API/Welco.Gateway.API.csproj" `
+            -PublishDir "./publish/gateway" `
+            -PublishProfileContent $env:PROFILE_XML
