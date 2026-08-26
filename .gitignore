@@ -4,6 +4,7 @@
 [Ll]og/
 [Ll]ogs/
 [Tt]est[Rr]esults/
+publish/
 *.tmp
 *.log
 

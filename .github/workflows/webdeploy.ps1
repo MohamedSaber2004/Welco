@@ -10,6 +10,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$PSNativeCommandArgumentPassing = "Legacy"
 
 if ([string]::IsNullOrWhiteSpace($PublishProfileContent)) {
     Write-Error "Error: Publish Profile XML is empty! Please verify your GitHub Secret (AUTH_PUBLISH_PROFILE / GATEWAY_PUBLISH_PROFILE)."
@@ -82,9 +83,18 @@ if (-not $msdeploy) {
 $fullPublishPath = (Resolve-Path $PublishDir).Path
 Write-Host "Deploying via MSDeploy to $computerName..."
 
-$msdeployCmd = "`"$msdeploy`" -verb:sync `"-source:contentPath=$fullPublishPath`" `"-dest:contentPath=$siteName,computerName=$computerName,userName=$userName,password=$password,authType=Basic,includeAcls=False`" -enableRule:AppOffline -allowUntrusted"
+$sourceArg = "-source:contentPath=$fullPublishPath"
+$destArg = "-dest:contentPath=$siteName,computerName=$computerName,userName=$userName,password=$password,authType=Basic,includeAcls=False"
 
-cmd.exe /c $msdeployCmd
+$msdeployArgs = @(
+    "-verb:sync",
+    $sourceArg,
+    $destArg,
+    "-enableRule:AppOffline",
+    "-allowUntrusted"
+)
+
+& $msdeploy $msdeployArgs
 
 if ($LASTEXITCODE -ne 0) {
     Write-Error "MSDeploy failed with exit code $LASTEXITCODE"

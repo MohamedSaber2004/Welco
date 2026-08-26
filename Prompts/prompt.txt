@@ -1,30 +1,39 @@
-
-that is pub files paths
- E:\Welco site publish
-
-Attempting Web Deploy to https://site87730.siteasp.net:8172/msdeploy.axd...
-Info: Using ID '6784aced-dc69-4408-8d5e-c7a4e111aa08' for connections to the remote server.
-Error Code: ERROR_USER_UNAUTHORIZED
-More Information: Connected to the remote computer ("site87730.siteasp.net") using the Web Management Service, but could not authorize. Make sure that you are using the correct user name and password, that the site you are connecting to exists, and that the credentials represent a user who has permissions to access the site.  Learn more at: https://go.microsoft.com/fwlink/?LinkId=221672#ERROR_USER_UNAUTHORIZED.
-Error: The remote server returned an error: (401) Unauthorized.
+Run .\.github\workflows\webdeploy.ps1 `
+=======================================================
+Building and publishing project: Welco.API/Welco.Gateway.API.csproj
+=======================================================
+Target Site: site87729
+Publish URL: site87729.siteasp.net
+User Name: site87729
+Password in XML: YES (9 chars)
+  Restored D:\a\Welco\Welco\Welco.API\Welco.Gateway.API.csproj (in 29.87 sec).
+  Restored D:\a\Welco\Welco\Welco.Shared\Welco.Shared.csproj (in 38.54 sec).
+  Welco.Shared -> D:\a\Welco\Welco\Welco.Shared\bin\Release\net10.0\Welco.Shared.dll
+  Welco.Gateway.API -> D:\a\Welco\Welco\Welco.API\bin\Release\net10.0\Welco.Gateway.API.dll
+  Welco.Gateway.API -> D:\a\Welco\Welco\publish\gateway\
+Deploying via MSDeploy to https://site87729.siteasp.net:8172/msdeploy.axd...
+Error: Unrecognized argument '"-source:contentPath=D:\a\Welco\Welco\publish\gateway"'. All arguments must begin with "-".
 Error count: 1.
-WARNING: Web Deploy returned exit code -1. Falling back to robust FTP deployment...
-=======================================================
-🔄 Executing IIS-Safe FTP Deployment...
-=======================================================
-Connecting to FTP server: site87730.siteasp.net as site87730...
-Traceback (most recent call last):
-  File "D:\a\Welco\Welco\.github\workflows\ftp-deploy.py", line 126, in <module>
-    deploy()
-  File "D:\a\Welco\Welco\.github\workflows\ftp-deploy.py", line 20, in deploy
-    ftp.login(user, password)
-  File "C:\hostedtoolcache\windows\Python\3.12.10\x64\Lib\ftplib.py", line 414, in login
-    resp = self.sendcmd('PASS ' + passwd)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\hostedtoolcache\windows\Python\3.12.10\x64\Lib\ftplib.py", line 281, in sendcmd
-    return self.getresp()
-           ^^^^^^^^^^^^^^
-  File "C:\hostedtoolcache\windows\Python\3.12.10\x64\Lib\ftplib.py", line 254, in getresp
-    raise error_perm(resp)
-ftplib.error_perm: 530 Authentication error: invalid credentials
+Write-Error: D:\a\_temp\49829ea1-9a43-409f-9ae5-8d306aee47ab.ps1:2
+Line |
+   2 |  .\.github\workflows\webdeploy.ps1 `
+     |  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | MSDeploy failed with exit code -1
 Error: Process completed with exit code 1.
+0s
+2s
+Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+Post job cleanup.
+"C:\Program Files\Git\bin\git.exe" version
+git version 2.55.0.windows.4
+Temporarily overriding HOME='D:\a\_temp\4de80e77-62ea-4e9f-92c4-e21c50ac5115' before making global git config changes
+Adding repository directory to the temporary git global config as a safe directory
+"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory D:\a\Welco\Welco
+"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+http.https://github.com/.extraheader
+"C:\Program Files\Git\bin\git.exe" config --local --unset-all http.https://github.com/.extraheader
+"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
