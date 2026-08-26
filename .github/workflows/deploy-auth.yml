@@ -38,5 +38,5 @@ jobs:
           FTP_USERNAME: ${{ secrets.AUTH_FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.AUTH_FTP_PASSWORD }}
           LOCAL_DIR: ./publish/auth
-          REMOTE_DIR: /
+          REMOTE_DIR: /wwwroot
         run: python .github/workflows/ftp-deploy.py
