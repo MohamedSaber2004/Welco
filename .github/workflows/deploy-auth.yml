@@ -16,6 +16,7 @@ jobs:
   build-and-deploy:
     name: Build & Deploy Auth Service
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout Code
