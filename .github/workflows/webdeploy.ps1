@@ -41,25 +41,28 @@ if (-not $profile) {
 $publishUrl = $profile.publishUrl
 $siteName = $profile.msdeploySite
 $userName = $profile.userName
+$publishMethod = $profile.publishMethod
 
-# Resolve password: prioritize explicit secret over XML (since .publishsettings often omits the password)
-$password = $env:PROFILE_PASSWORD
-if (-not $password) {
-    $password = $profile.userPWD
+# 1. Prioritize userPWD from the XML publish profile
+$password = $profile.userPWD
+if ([string]::IsNullOrWhiteSpace($password)) {
+    $password = $env:PROFILE_PASSWORD
 }
-if (-not $password) {
+if ([string]::IsNullOrWhiteSpace($password)) {
     $password = $env:AUTH_FTP_PASSWORD
 }
-if (-not $password) {
+if ([string]::IsNullOrWhiteSpace($password)) {
     $password = $env:GATEWAY_FTP_PASSWORD
 }
 
-$publishMethod = $profile.publishMethod
+$authType = if ($profile.authType) { $profile.authType } else { "Basic" }
 
 Write-Host "Detected Publish Method: $publishMethod"
 Write-Host "Target Site: $siteName"
 Write-Host "Publish URL: $publishUrl"
 Write-Host "User Name: $userName"
+Write-Host "Auth Type: $authType"
+Write-Host "Password Loaded: $(if ([string]::IsNullOrWhiteSpace($password)) { 'NO (Empty)' } else { 'YES (' + $password.Length + ' chars)' })"
 
 $msdeploySucceeded = $false
 
@@ -71,20 +74,22 @@ if ($publishMethod -eq "MSDeploy" -or $publishUrl -match "msdeploy|:8172") {
     $msdeploy = $msdeployPaths | Where-Object { Test-Path $_ } | Select-Object -First 1
 
     if ($msdeploy) {
-        if (-not ($publishUrl -match "^https?://")) {
-            if ($publishUrl -notmatch "msdeploy\.axd") {
-                $computerName = "https://${publishUrl}:8172/msdeploy.axd"
+        $computerName = $publishUrl
+        if (-not ($computerName -match "^https?://")) {
+            $computerName = "https://$computerName"
+        }
+        if ($computerName -notmatch "msdeploy\.axd") {
+            if ($computerName -notmatch ":8172") {
+                $computerName = "$computerName:8172/msdeploy.axd"
             } else {
-                $computerName = "https://${publishUrl}"
+                $computerName = "$computerName/msdeploy.axd"
             }
-        } else {
-            $computerName = $publishUrl
         }
 
         $fullPublishPath = (Resolve-Path $PublishDir).Path
         Write-Host "Attempting Web Deploy to $computerName..."
 
-        $destArg = "-dest:contentPath=$siteName,computerName=$computerName,userName=$userName,password=$password,authType=Basic,includeAcls=False"
+        $destArg = "-dest:contentPath=$siteName,computerName=$computerName,userName=$userName,password=$password,authType=$authType,includeAcls=False"
         $sourceArg = "-source:contentPath=$fullPublishPath"
 
         $msdeployArgs = @(
@@ -99,7 +104,9 @@ if ($publishMethod -eq "MSDeploy" -or $publishUrl -match "msdeploy|:8172") {
             & $msdeploy $msdeployArgs
             if ($LASTEXITCODE -eq 0) {
                 $msdeploySucceeded = $true
+                Write-Host "======================================================="
                 Write-Host "🎉 Web Deploy finished successfully!"
+                Write-Host "======================================================="
             } else {
                 Write-Warning "Web Deploy returned exit code $LASTEXITCODE. Falling back to robust FTP deployment..."
             }
