@@ -38,6 +38,7 @@ def deploy():
                     pass
 
     offline_file = "app_offline.htm"
+    web_config_file = None
     uploaded_count = 0
 
     try:
@@ -53,7 +54,7 @@ def deploy():
         print("app_offline.htm uploaded. Waiting 6 seconds for IIS worker process to gracefully shut down...")
         time.sleep(6)
 
-        # 2. Upload all published files recursively with retry
+        # 2. Upload all published files recursively (delaying web.config to the end)
         print(f"Uploading files from local '{local_dir}' directly to '{target_base_dir}'...")
 
         for root, dirs, files in os.walk(local_dir):
@@ -68,6 +69,11 @@ def deploy():
             for file in files:
                 if file == "app_offline.htm":
                     continue
+                # Defer web.config to the very end to trigger clean IIS recycle
+                if file.lower() == "web.config" and rel_path == '.':
+                    web_config_file = os.path.join(root, file)
+                    continue
+
                 local_file = os.path.join(root, file)
                 
                 max_retries = 3
@@ -86,6 +92,14 @@ def deploy():
                         else:
                             print(f"  ✗ Failed to upload {file}: {ex}")
                             raise
+
+        # Upload web.config now at the end
+        if web_config_file and os.path.exists(web_config_file):
+            ensure_dir(target_base_dir)
+            with open(web_config_file, "rb") as f:
+                ftp.storbinary("STOR web.config", f)
+            uploaded_count += 1
+            print("  ✓ Uploaded: web.config (triggers IIS AppPool recycle)")
 
     finally:
         # 3. Always remove app_offline.htm so IIS immediately boots with the new version
