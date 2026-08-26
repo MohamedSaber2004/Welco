@@ -21,28 +21,8 @@ def deploy():
     ftp.set_pasv(True)
     print("Connected successfully.")
 
-    # Auto-detect MonsterASP / IIS target directory
-    print("Detecting remote root directory structure...")
-    root_items = []
-    try:
-        root_items = [item.strip() for item in ftp.nlst()]
-    except Exception as ex:
-        print(f"Notice listing root: {ex}")
-    
-    print(f"Items in FTP root: {root_items}")
-
-    target_base_dir = remote_dir
-    if target_base_dir == "/":
-        lower_items = [i.lower() for i in root_items]
-        if "site" in lower_items:
-            target_base_dir = "/site/wwwroot"
-            print(f"Auto-detected MonsterASP site structure: target set to '{target_base_dir}'")
-        elif "wwwroot" in lower_items:
-            target_base_dir = "/wwwroot"
-            print(f"Auto-detected wwwroot structure: target set to '{target_base_dir}'")
-        else:
-            target_base_dir = "/"
-            print("Using FTP root '/' as target directory.")
+    target_base_dir = remote_dir if remote_dir else "/"
+    print(f"Target deployment directory: '{target_base_dir}'")
 
     def ensure_dir(path):
         dirs = [d for d in path.split('/') if d]
@@ -75,7 +55,7 @@ def deploy():
         print(f"Warning uploading app_offline.htm: {ex}")
 
     # 2. Upload all published files recursively
-    print(f"Uploading files from local '{local_dir}' to remote '{target_base_dir}'...")
+    print(f"Uploading files from local '{local_dir}' directly to '{target_base_dir}'...")
     uploaded_count = 0
 
     for root, dirs, files in os.walk(local_dir):
@@ -110,7 +90,7 @@ def deploy():
 
     ftp.quit()
     print(f"\n=======================================================")
-    print(f"🎉 Deployment completed successfully! Total files uploaded: {uploaded_count} to {target_base_dir}")
+    print(f"🎉 Deployment completed successfully! Total files uploaded: {uploaded_count} directly to {target_base_dir}")
     print(f"=======================================================")
 
 if __name__ == "__main__":
