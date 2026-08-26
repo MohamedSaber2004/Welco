@@ -9,6 +9,7 @@ on:
       - 'Welco.API/**'
       - 'Welco.Shared/**'
       - '.github/workflows/deploy-gateway.yml'
+      - '.github/workflows/ftp-deploy.py'
   workflow_dispatch:
 
 jobs:
@@ -33,12 +34,10 @@ jobs:
             -o ./publish/gateway
 
       - name: Deploy to MonsterASP via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.GATEWAY_FTP_SERVER }}
-          username: ${{ secrets.GATEWAY_FTP_USERNAME }}
-          password: ${{ secrets.GATEWAY_FTP_PASSWORD }}
-          local-dir: ./publish/gateway/
-          server-dir: /
-          security: loose
-          dangerous-clean-slate: false
+        env:
+          FTP_SERVER: ${{ secrets.GATEWAY_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.GATEWAY_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.GATEWAY_FTP_PASSWORD }}
+          LOCAL_DIR: ./publish/gateway
+          REMOTE_DIR: /
+        run: python .github/workflows/ftp-deploy.py

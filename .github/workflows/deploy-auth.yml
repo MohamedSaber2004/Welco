@@ -9,6 +9,7 @@ on:
       - 'Auth.Services.API/**'
       - 'Welco.Shared/**'
       - '.github/workflows/deploy-auth.yml'
+      - '.github/workflows/ftp-deploy.py'
   workflow_dispatch:
 
 jobs:
@@ -33,12 +34,10 @@ jobs:
             -o ./publish/auth
 
       - name: Deploy to MonsterASP via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.AUTH_FTP_SERVER }}
-          username: ${{ secrets.AUTH_FTP_USERNAME }}
-          password: ${{ secrets.AUTH_FTP_PASSWORD }}
-          local-dir: ./publish/auth/
-          server-dir: /
-          security: loose
-          dangerous-clean-slate: false
+        env:
+          FTP_SERVER: ${{ secrets.AUTH_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.AUTH_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.AUTH_FTP_PASSWORD }}
+          LOCAL_DIR: ./publish/auth
+          REMOTE_DIR: /
+        run: python .github/workflows/ftp-deploy.py
