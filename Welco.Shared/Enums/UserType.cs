@@ -2,6 +2,10 @@ namespace Welco.Shared.Enums
 {
     public enum UserType
     {
-        Doctor = 0
+        Admin = 1,
+        Doctor = 2,
+        Provider = 3,
+        Marketing = 4,
+        OrderFulfillmentOfficer = 5
     }
 }

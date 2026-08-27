@@ -1,69 +1,39 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Welco.Shared.Enums;
 
 namespace Welco.Shared.Persistance.Seeding
 {
-    public class RoleSeedModel
-    {
-        public string Name { get; set; } = string.Empty;
-        public string? NormalizedName { get; set; }
-    }
-
     public static class RoleSeeder
     {
         public static async Task SeedRolesAsync(RoleManager<IdentityRole<Guid>> roleManager, ILogger? logger = null)
         {
             try
             {
-                var basePath = AppContext.BaseDirectory;
-                var possiblePaths = new[]
-                {
-                    Path.Combine(basePath, "Persistance", "Seeding", "roles.json"),
-                    Path.Combine(basePath, "roles.json"),
-                    Path.Combine(Directory.GetCurrentDirectory(), "Persistance", "Seeding", "roles.json")
-                };
+                var roleNames = Enum.GetNames<UserType>();
 
-                var filePath = possiblePaths.FirstOrDefault(File.Exists);
-                List<RoleSeedModel>? rolesToSeed = null;
-
-                if (filePath != null)
+                foreach (var roleName in roleNames)
                 {
-                    var json = await File.ReadAllTextAsync(filePath);
-                    rolesToSeed = JsonSerializer.Deserialize<List<RoleSeedModel>>(json, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-                }
-
-                rolesToSeed ??= new List<RoleSeedModel>
-                {
-                    new() { Name = "Admin", NormalizedName = "ADMIN" },
-                    new() { Name = "Doctor", NormalizedName = "DOCTOR" }
-                };
-
-                foreach (var roleModel in rolesToSeed)
-                {
-                    if (string.IsNullOrWhiteSpace(roleModel.Name))
+                    if (string.IsNullOrWhiteSpace(roleName))
                         continue;
 
-                    if (!await roleManager.RoleExistsAsync(roleModel.Name))
+                    if (!await roleManager.RoleExistsAsync(roleName))
                     {
                         var identityRole = new IdentityRole<Guid>
                         {
                             Id = Guid.NewGuid(),
-                            Name = roleModel.Name,
-                            NormalizedName = roleModel.NormalizedName ?? roleModel.Name.ToUpperInvariant()
+                            Name = roleName,
+                            NormalizedName = roleName.ToUpperInvariant()
                         };
 
                         await roleManager.CreateAsync(identityRole);
-                        logger?.LogInformation("Seeded role: {RoleName} with Id: {RoleId}", roleModel.Name, identityRole.Id);
+                        logger?.LogInformation("Seeded role: {RoleName} with Id: {RoleId}", roleName, identityRole.Id);
                     }
                 }
             }
             catch (Exception ex)
             {
-                logger?.LogError(ex, "Error while seeding roles from roles.json");
+                logger?.LogError(ex, "Error while seeding roles from UserType enum");
             }
         }
     }
