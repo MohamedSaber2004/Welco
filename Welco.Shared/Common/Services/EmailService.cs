@@ -59,14 +59,15 @@ namespace Welco.Shared.Common.Services
                 message.Body = builder.ToMessageBody();
 
                 using var client = new SmtpClient();
+                client.Timeout = 15000;
                 client.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
                 var secureSocketOptions = _emailSettings.Port switch
                 {
-                    465 => SecureSocketOptions.SslOnConnect,
                     587 => SecureSocketOptions.StartTls,
+                    465 => SecureSocketOptions.SslOnConnect,
                     25 => SecureSocketOptions.None,
-                    _ => _emailSettings.EnableSsl ? SecureSocketOptions.Auto : SecureSocketOptions.None
+                    _ => SecureSocketOptions.Auto
                 };
 
                 await client.ConnectAsync(_emailSettings.Host, _emailSettings.Port, secureSocketOptions, cancellationToken);
