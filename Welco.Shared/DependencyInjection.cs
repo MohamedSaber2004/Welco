@@ -47,6 +47,9 @@ namespace Welco.Shared
                     });
             }
 
+            services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
+            services.AddSingleton(sp => sp.GetRequiredService<IOptions<EmailSettings>>().Value);
+
             services.AddDbContext<WelcoDbContext>((serviceProvider, options) =>
             {
                 var config = configuration ?? serviceProvider.GetRequiredService<IConfiguration>();

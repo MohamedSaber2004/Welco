@@ -1,16 +1,12 @@
 {
   "isSuccess": false,
-  "message": "Email sending failed",
+  "message": "Email configuration is missing or incomplete on the server. Please ensure 'EmailSettings' section exists in appsettings.json.",
   "data": {
     "Configured_Host": null,
     "Configured_Port": 587,
     "Configured_Username": null,
     "Configured_Email": null,
     "Configured_Password_Present": false,
-    "DNS_Resolution": "Failed: Value cannot be null. (Parameter 'hostName')",
-    "TCP_Port_587": "Failed: Value cannot be null. (Parameter 'host')",
-    "TCP_Port_465": "Failed: Value cannot be null. (Parameter 'host')",
-    "MailKit_Send_Result": "FAILED: ArgumentNullException: Value cannot be null. (Parameter 'address')",
-    "Error_Stack": "System.ArgumentNullException: Value cannot be null. (Parameter 'address')\r\n   at MimeKit.MailboxAddress..ctor(Encoding encoding, String name, String address)\r\n   at MimeKit.MailboxAddress..ctor(String name, String address)\r\n   at Auth.Services.API.Controllers.AuthController.TestEmail(String toEmail, IOptions`1 emailOptions, CancellationToken cancellationToken) in /home/runner/work/Welco/Welco/Auth.Services.API/Controllers/AuthController.cs:line 243"
+    "Configuration_Status": "MISSING_CONFIGURATION: 'EmailSettings:Host' and 'EmailSettings:Email' must be configured in appsettings.json."
   }
 }
