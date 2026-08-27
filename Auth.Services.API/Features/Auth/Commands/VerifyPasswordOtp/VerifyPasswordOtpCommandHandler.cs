@@ -56,7 +56,7 @@ namespace Auth.Services.API.Features.Auth.Commands.VerifyPasswordOtp
             user.RequestPasswordReset(resetToken, DateTime.UtcNow.AddMinutes(expiryMinutes));
             await _userManager.UpdateAsync(user);
 
-            return Result<string>.Success(resetToken, LocalizationKeys.Auth.OtpVerified);
+            return Result<string>.Success(LocalizationKeys.Auth.OtpVerified, LocalizationKeys.Auth.OtpVerified);
         }
     }
 }
