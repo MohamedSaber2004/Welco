@@ -37,7 +37,6 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
             {
                 FullName = request.FullName,
                 Email = request.Email,
-                UserName = request.Email,
                 PhoneNumber = request.PhoneNumber,
                 UserType = request.UserType,
                 Language = request.Language,
