@@ -8,23 +8,11 @@ namespace Auth.Services.API.Features.Auth.Commands.ForgotPassword
 {
     public class ForgotPasswordCommandValidator : AbstractValidator<ForgotPasswordCommand>
     {
-        public ForgotPasswordCommandValidator(UserManager<ApplicationUser> userManager)
+        public ForgotPasswordCommandValidator()
         {
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage(LocalizationKeys.Auth.EmailRequired)
                 .EmailAddress().WithMessage(LocalizationKeys.Auth.EmailInvalid);
-
-            RuleFor(x => x.Email).CustomAsync(async (email, context, ct) =>
-            {
-                if (string.IsNullOrWhiteSpace(email))
-                    return;
-
-                var user = await userManager.FindByEmailAsync(email);
-                if (user == null)
-                {
-                    context.AddFailure(nameof(email), LocalizationKeys.Auth.UserNotFound);
-                }
-            });
         }
     }
 }

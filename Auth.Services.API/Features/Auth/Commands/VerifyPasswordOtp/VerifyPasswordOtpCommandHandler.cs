@@ -24,7 +24,17 @@ namespace Auth.Services.API.Features.Auth.Commands.VerifyPasswordOtp
 
         public async Task<Result<string>> Handle(VerifyPasswordOtpCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
+            var email = request.Email?.Trim();
+            var otpCode = request.OtpCode?.Trim();
+
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(otpCode))
+            {
+                return Result<string>.BadRequest(
+                    LocalizationKeys.Auth.InvalidOtp,
+                    new List<string> { LocalizationKeys.Auth.InvalidOtp });
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 return Result<string>.NotFound(
@@ -32,7 +42,7 @@ namespace Auth.Services.API.Features.Auth.Commands.VerifyPasswordOtp
                     new List<string> { LocalizationKeys.Auth.UserNotFound });
             }
 
-            if (!user.ValidatePasswordResetToken(request.OtpCode))
+            if (!user.ValidatePasswordResetToken(otpCode))
             {
                 return Result<string>.BadRequest(
                     LocalizationKeys.Auth.InvalidOtp,

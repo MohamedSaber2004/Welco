@@ -91,14 +91,14 @@ namespace Welco.Shared.Domain.Models
             if (expiry <= DateTime.UtcNow)
                 throw new BadRequestException(LocalizationKeys.Auth.TokenExpiryInFuture);
 
-            PasswordResetToken = token;
+            PasswordResetToken = token.Trim();
             PasswordResetTokenExpiry = expiry;
         }
 
         public bool ValidatePasswordResetToken(string token)
         {
             return !string.IsNullOrWhiteSpace(token)
-                && PasswordResetToken == token
+                && string.Equals(PasswordResetToken?.Trim(), token.Trim(), StringComparison.Ordinal)
                 && PasswordResetTokenExpiry.HasValue
                 && PasswordResetTokenExpiry.Value > DateTime.UtcNow;
         }
@@ -117,14 +117,14 @@ namespace Welco.Shared.Domain.Models
             if (expiry <= DateTime.UtcNow)
                 throw new BadRequestException(LocalizationKeys.Auth.TokenExpiryInFuture);
 
-            EmailConfirmationOtp = otp;
+            EmailConfirmationOtp = otp.Trim();
             EmailConfirmationOtpExpiry = expiry;
         }
 
         public bool ValidateEmailConfirmationOtp(string otp)
         {
             return !string.IsNullOrWhiteSpace(otp)
-                && EmailConfirmationOtp == otp
+                && string.Equals(EmailConfirmationOtp?.Trim(), otp.Trim(), StringComparison.Ordinal)
                 && EmailConfirmationOtpExpiry.HasValue
                 && EmailConfirmationOtpExpiry.Value > DateTime.UtcNow;
         }

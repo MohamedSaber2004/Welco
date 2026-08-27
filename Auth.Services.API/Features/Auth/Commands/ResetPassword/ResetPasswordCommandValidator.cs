@@ -8,7 +8,7 @@ namespace Auth.Services.API.Features.Auth.Commands.ResetPassword
 {
     public class ResetPasswordCommandValidator : AbstractValidator<ResetPasswordCommand>
     {
-        public ResetPasswordCommandValidator(UserManager<ApplicationUser> userManager)
+        public ResetPasswordCommandValidator()
         {
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage(LocalizationKeys.Auth.EmailRequired)
@@ -25,24 +25,6 @@ namespace Auth.Services.API.Features.Auth.Commands.ResetPassword
             RuleFor(x => x.ConfirmNewPassword)
                 .NotEmpty().WithMessage(LocalizationKeys.Auth.ConfirmPasswordRequired)
                 .Equal(x => x.NewPassword).WithMessage(LocalizationKeys.Auth.PasswordMismatch);
-
-            RuleFor(x => x).CustomAsync(async (command, context, ct) =>
-            {
-                if (string.IsNullOrWhiteSpace(command.Email) || string.IsNullOrWhiteSpace(command.Token))
-                    return;
-
-                var user = await userManager.FindByEmailAsync(command.Email);
-                if (user == null)
-                {
-                    context.AddFailure(nameof(command.Email), LocalizationKeys.Auth.UserNotFound);
-                    return;
-                }
-
-                if (!user.ValidatePasswordResetToken(command.Token))
-                {
-                    context.AddFailure(nameof(command.Token), LocalizationKeys.Auth.InvalidCredentials);
-                }
-            });
         }
     }
 }
