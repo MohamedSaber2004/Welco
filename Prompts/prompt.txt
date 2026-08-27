@@ -1,9 +1,14 @@
-{
-    "isSuccess": false,
-    "statusCode": 400,
-    "message": "الطلب غير صالح.",
-    "errors": [
-        "Value cannot be null. (Parameter 'address')"
-    ],
-    "data": null
-}
+        private async Task SendEmailAsync(string toEmail, string fullName, string subject, string body, CancellationToken ct)
+        {
+            var email = new MimeMessage();
+            email.From.Add(new MailboxAddress(_settings.Name, _settings.Email));
+            email.To.Add(new MailboxAddress(fullName, toEmail));
+            email.Subject = subject;
+            email.Body = new TextPart(TextFormat.Html) { Text = body };
+
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync(_settings.Host, _settings.Port, SecureSocketOptions.StartTls, ct);
+            await smtp.AuthenticateAsync(_settings.Username, _settings.Password, ct);
+            await smtp.SendAsync(email, ct);
+            await smtp.DisconnectAsync(true, ct);
+        }

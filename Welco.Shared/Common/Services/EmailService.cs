@@ -3,6 +3,7 @@ using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using MimeKit.Text;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Options;
 using Welco.Shared.Localization;
@@ -42,56 +43,48 @@ namespace Welco.Shared.Common.Services
 
                 var fromName = string.IsNullOrWhiteSpace(_emailSettings.Name) ? "Welco" : _emailSettings.Name;
 
-                var message = new MimeMessage();
-                message.From.Add(new MailboxAddress(fromName, fromEmail));
-                message.To.Add(MailboxAddress.Parse(toEmail));
-                message.Subject = subject;
+                var email = new MimeMessage();
+                email.From.Add(new MailboxAddress(fromName, fromEmail));
+                email.To.Add(MailboxAddress.Parse(toEmail));
+                email.Subject = subject;
+                email.Body = isHtml
+                    ? new TextPart(TextFormat.Html) { Text = body }
+                    : new TextPart(TextFormat.Plain) { Text = body };
 
-                var builder = new BodyBuilder();
-                if (isHtml)
-                {
-                    builder.HtmlBody = body;
-                }
-                else
-                {
-                    builder.TextBody = body;
-                }
-                message.Body = builder.ToMessageBody();
+                using var smtp = new SmtpClient();
+                smtp.Timeout = 15000;
+                smtp.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
-                using var client = new SmtpClient();
-                client.Timeout = 15000;
-                client.ServerCertificateValidationCallback = (s, c, h, e) => true;
-
-                var secureSocketOptions = _emailSettings.Port switch
+                var socketOptions = _emailSettings.Port switch
                 {
-                    587 => SecureSocketOptions.StartTls,
                     465 => SecureSocketOptions.SslOnConnect,
+                    587 => SecureSocketOptions.StartTls,
                     25 => SecureSocketOptions.None,
                     _ => SecureSocketOptions.Auto
                 };
 
                 try
                 {
-                    await client.ConnectAsync(_emailSettings.Host, _emailSettings.Port, secureSocketOptions, cancellationToken);
+                    await smtp.ConnectAsync(_emailSettings.Host, _emailSettings.Port, socketOptions, cancellationToken);
                 }
                 catch (Exception connEx) when (_emailSettings.Port == 587)
                 {
                     _logger.LogWarning(connEx, "Failed connecting to SMTP host {Host}:587 (STARTTLS). Attempting fallback to port 465 (SSL)...", _emailSettings.Host);
-                    await client.ConnectAsync(_emailSettings.Host, 465, SecureSocketOptions.SslOnConnect, cancellationToken);
+                    await smtp.ConnectAsync(_emailSettings.Host, 465, SecureSocketOptions.SslOnConnect, cancellationToken);
                 }
                 catch (Exception connEx) when (_emailSettings.Port == 465)
                 {
                     _logger.LogWarning(connEx, "Failed connecting to SMTP host {Host}:465 (SSL). Attempting fallback to port 587 (STARTTLS)...", _emailSettings.Host);
-                    await client.ConnectAsync(_emailSettings.Host, 587, SecureSocketOptions.StartTls, cancellationToken);
+                    await smtp.ConnectAsync(_emailSettings.Host, 587, SecureSocketOptions.StartTls, cancellationToken);
                 }
 
                 if (!string.IsNullOrWhiteSpace(_emailSettings.Username) && !string.IsNullOrWhiteSpace(_emailSettings.Password))
                 {
-                    await client.AuthenticateAsync(_emailSettings.Username, _emailSettings.Password, cancellationToken);
+                    await smtp.AuthenticateAsync(_emailSettings.Username, _emailSettings.Password, cancellationToken);
                 }
 
-                await client.SendAsync(message, cancellationToken);
-                await client.DisconnectAsync(true, cancellationToken);
+                await smtp.SendAsync(email, cancellationToken);
+                await smtp.DisconnectAsync(true, cancellationToken);
 
                 _logger.LogInformation("Email successfully sent to {ToEmail} with subject '{Subject}'", toEmail, subject);
             }
