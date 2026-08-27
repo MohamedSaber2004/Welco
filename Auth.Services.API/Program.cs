@@ -28,6 +28,7 @@ namespace Auth.Services.API
         {
             var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
+
             var builder = WebApplication.CreateBuilder(new WebApplicationOptions
             {
                 Args = args,
