@@ -17,7 +17,17 @@ namespace Auth.Services.API.Features.Auth.Commands.ResetPassword
 
         public async Task<Result<string>> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
+            var email = request.Email?.Trim();
+            var token = request.Token?.Trim();
+
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(token))
+            {
+                return Result<string>.BadRequest(
+                    LocalizationKeys.Auth.InvalidOtp,
+                    new List<string> { LocalizationKeys.Auth.InvalidOtp });
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 return Result<string>.NotFound(
@@ -25,11 +35,11 @@ namespace Auth.Services.API.Features.Auth.Commands.ResetPassword
                     new List<string> { LocalizationKeys.Auth.UserNotFound });
             }
 
-            if (!user.ValidatePasswordResetToken(request.Token))
+            if (!user.ValidatePasswordResetToken(token))
             {
                 return Result<string>.BadRequest(
-                    LocalizationKeys.Auth.InvalidCredentials,
-                    new List<string> { LocalizationKeys.Auth.InvalidCredentials });
+                    LocalizationKeys.Auth.InvalidOtp,
+                    new List<string> { LocalizationKeys.Auth.InvalidOtp });
             }
 
             var identityResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -39,7 +49,7 @@ namespace Auth.Services.API.Features.Auth.Commands.ResetPassword
             {
                 var errors = resetResult.Errors.Select(e => e.Description).ToList();
                 return Result<string>.BadRequest(
-                    errors.FirstOrDefault() ?? LocalizationKeys.Auth.InvalidCredentials,
+                    errors.FirstOrDefault() ?? LocalizationKeys.ExceptionMessages.BadRequest,
                     errors);
             }
 

@@ -49,14 +49,7 @@ namespace Auth.Services.API.Features.Auth.Commands.VerifyPasswordOtp
                     new List<string> { LocalizationKeys.Auth.InvalidOtp });
             }
 
-            var expiryMinutes = _emailSettings.VerificationCodeExpiryMinutes > 0 ? _emailSettings.VerificationCodeExpiryMinutes : 10;
-
-            // Generate 6-digit reset token and store in user model
-            var resetToken = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
-            user.RequestPasswordReset(resetToken, DateTime.UtcNow.AddMinutes(expiryMinutes));
-            await _userManager.UpdateAsync(user);
-
-            return Result<string>.Success(LocalizationKeys.Auth.OtpVerified, LocalizationKeys.Auth.OtpVerified);
+            return Result<string>.Success(otpCode, LocalizationKeys.Auth.OtpVerified);
         }
     }
 }
