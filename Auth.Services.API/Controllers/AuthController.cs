@@ -184,6 +184,20 @@ namespace Auth.Services.API.Controllers
                 return BadRequest(new { isSuccess = false, message = "Query parameter 'toEmail' is required.", data = diagnostics });
             }
 
+            var fromName = string.IsNullOrWhiteSpace(settings.Name) ? "Welco Team" : settings.Name;
+            var fromEmail = !string.IsNullOrWhiteSpace(settings.Email) ? settings.Email : settings.Username;
+
+            if (string.IsNullOrWhiteSpace(settings.Host) || string.IsNullOrWhiteSpace(fromEmail))
+            {
+                diagnostics["Configuration_Status"] = "MISSING_CONFIGURATION: 'EmailSettings:Host' and 'EmailSettings:Email' must be configured in appsettings.json.";
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    isSuccess = false,
+                    message = "Email configuration is missing or incomplete on the server. Please ensure 'EmailSettings' section exists in appsettings.json.",
+                    data = diagnostics
+                });
+            }
+
             // 1. DNS Resolution Test
             try
             {
@@ -236,9 +250,6 @@ namespace Auth.Services.API.Controllers
             // 4. MailKit Live Send Test
             try
             {
-                var fromName = string.IsNullOrWhiteSpace(settings.Name) ? "Welco Team" : settings.Name;
-                var fromEmail = !string.IsNullOrWhiteSpace(settings.Email) ? settings.Email : settings.Username;
-
                 var email = new MimeKit.MimeMessage();
                 email.From.Add(new MimeKit.MailboxAddress(fromName, fromEmail));
                 email.To.Add(MimeKit.MailboxAddress.Parse(toEmail));
