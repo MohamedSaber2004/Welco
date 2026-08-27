@@ -17,6 +17,7 @@ namespace Auth.Services.API.AuthRoutes
             public const string RefreshToken = "refresh-token";
             public const string Profile = "profile";
             public const string Health = "health";
+            public const string TestEmail = "test-email";
         }
     }
 }
