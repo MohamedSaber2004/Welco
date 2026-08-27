@@ -1,1 +1,9 @@
-check app settings file in auth project microservice and make a c# object option for bind email settings 
+{
+    "isSuccess": false,
+    "statusCode": 400,
+    "message": "الطلب غير صالح.",
+    "errors": [
+        "Value cannot be null. (Parameter 'address')"
+    ],
+    "data": null
+}

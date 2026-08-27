@@ -27,6 +27,15 @@ namespace Auth.Services.API
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var activeEnv = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            builder.Environment.EnvironmentName = activeEnv;
+
+            builder.Configuration
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
 
             var port = Environment.GetEnvironmentVariable("PORT") 
                        ?? Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS");
