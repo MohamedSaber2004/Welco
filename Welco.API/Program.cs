@@ -18,6 +18,7 @@ namespace Welco.API
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
             var env = builder.Environment;
             var port = Environment.GetEnvironmentVariable("PORT") 
                        ?? Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS");
