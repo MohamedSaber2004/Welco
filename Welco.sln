@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Welco.Gateway.API", "Welco.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Welco.Shared", "Welco.Shared\Welco.Shared.csproj", "{6C66ABC0-08A3-4EA9-A1A1-320C26954037}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserManamgent.Service.API", "UserManamgent.Service.API\UserManamgent.Service.API.csproj", "{9586B7BB-DA53-4FD4-ABCC-ADE3C149C7A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,18 @@ Global
 		{6C66ABC0-08A3-4EA9-A1A1-320C26954037}.Release|x64.Build.0 = Release|Any CPU
 		{6C66ABC0-08A3-4EA9-A1A1-320C26954037}.Release|x86.ActiveCfg = Release|Any CPU
 		{6C66ABC0-08A3-4EA9-A1A1-320C26954037}.Release|x86.Build.0 = Release|Any CPU
+		{9586B7BB-DA53-4FD4-ABCC-ADE3C149C7A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9586B7BB-DA53-4FD4-ABCC-ADE3C149C7A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9586B7BB-DA53-4FD4-ABCC-ADE3C149C7A6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9586B7BB-DA53-4FD4-ABCC-ADE3C149C7A6}.Debug|x64.Build.0 = Debug|Any CPU
+		{9586B7BB-DA53-4FD4-ABCC-ADE3C149C7A6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9586B7BB-DA53-4FD4-ABCC-ADE3C149C7A6}.Debug|x86.Build.0 = Debug|Any CPU
+		{9586B7BB-DA53-4FD4-ABCC-ADE3C149C7A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9586B7BB-DA53-4FD4-ABCC-ADE3C149C7A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9586B7BB-DA53-4FD4-ABCC-ADE3C149C7A6}.Release|x64.ActiveCfg = Release|Any CPU
+		{9586B7BB-DA53-4FD4-ABCC-ADE3C149C7A6}.Release|x64.Build.0 = Release|Any CPU
+		{9586B7BB-DA53-4FD4-ABCC-ADE3C149C7A6}.Release|x86.ActiveCfg = Release|Any CPU
+		{9586B7BB-DA53-4FD4-ABCC-ADE3C149C7A6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
