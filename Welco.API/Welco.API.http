@@ -14,7 +14,19 @@ Accept: application/json
 ###
 
 ### 3. Test Auth Microservice via Gateway (Ocelot Routing)
-GET {{Gateway_BaseUrl}}/api/auth/
+GET {{Gateway_BaseUrl}}/api/v1/auth/health
+Accept: application/json
+
+###
+
+### 4. Test User Management Microservice via Gateway (Ocelot Routing)
+GET {{Gateway_BaseUrl}}/api/v1/user-management/users
+Accept: application/json
+
+###
+
+### 5. Test User Management OpenAPI Docs via Gateway
+GET {{Gateway_BaseUrl}}/api/docs/usermanagement/openapi.json
 Accept: application/json
 
 ###

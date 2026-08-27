@@ -133,6 +133,13 @@ namespace Welco.API
                 });
             });
 
+            builder.Services.AddHttpClient("InsecureClient")
+                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                });
+            builder.Services.AddSingleton<Welco.API.Services.OpenApiAggregatorService>();
+
             builder.Services.AddOcelot(builder.Configuration);
             builder.Services.AddConfiguredOpenApi();
 
@@ -190,7 +197,7 @@ namespace Welco.API
             app.UseCors("GatewayCorsPolicy");
             app.UseRateLimiter();
 
-            var microserviceDocRoutes = new List<(string Name, string Route)>();
+            var microserviceDocRoutes = new List<(string ServiceName, string DisplayName, string DocRoute, string ScalarRoute)>();
             if (Directory.Exists(ocelotDir))
             {
                 foreach (var file in Directory.GetFiles(ocelotDir, $"ocelot.*.{env.EnvironmentName}.json"))
@@ -202,8 +209,8 @@ namespace Welco.API
                         if (parts.Length >= 3)
                         {
                             var serviceName = parts[1]; 
-                            var displayName = char.ToUpper(serviceName[0]) + serviceName.Substring(1) + " Microservice";
-                            microserviceDocRoutes.Add((displayName, $"/api/docs/{serviceName}/openapi.json"));
+                            var displayName = char.ToUpper(serviceName[0]) + serviceName.Substring(1) + " Microservice API";
+                            microserviceDocRoutes.Add((serviceName, displayName, $"/api/docs/{serviceName}/openapi.json", $"/docs/{serviceName}"));
                         }
                     }
                 }
@@ -212,21 +219,34 @@ namespace Welco.API
 #pragma warning disable ASP0014
             app.UseEndpoints(endpoints =>
             {
+                // Unified OpenAPI schema aggregating all microservices
+                endpoints.MapGet("/openapi/all.json", async (HttpContext httpContext, Welco.API.Services.OpenApiAggregatorService aggregator, CancellationToken ct) =>
+                {
+                    var gatewayBaseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
+                    var json = await aggregator.GetAggregatedOpenApiAsync(gatewayBaseUrl, ct);
+                    return Results.Content(json, "application/json");
+                });
+
                 endpoints.MapGet("/", () => Results.Redirect("/scalar/v1"));
-                endpoints.MapOpenApi();
-                
+
+                // Unified Scalar UI loading ALL microservices endpoints together
                 endpoints.MapScalarApiReference(options =>
                 {
-                    options.WithTitle("Welco Microservices Platform")
-                           .WithTheme(ScalarTheme.Moon);
-
-                    // Dynamic Multi-Document Dropdown for all microservices
-                    if (microserviceDocRoutes.Count > 0)
-                    {
-                        // Set the primary/default active document
-                        options.WithOpenApiRoutePattern(microserviceDocRoutes[0].Route);
-                    }
+                    options.WithTitle("Welco Microservices Platform API")
+                           .WithTheme(ScalarTheme.Moon)
+                           .WithOpenApiRoutePattern("/openapi/all.json");
                 });
+
+                // Dedicated Scalar Documentation pages for individual microservices
+                foreach (var doc in microserviceDocRoutes)
+                {
+                    endpoints.MapScalarApiReference(doc.ScalarRoute, options =>
+                    {
+                        options.WithTitle(doc.DisplayName)
+                               .WithTheme(ScalarTheme.Moon)
+                               .WithOpenApiRoutePattern(doc.DocRoute);
+                    });
+                }
 
                 endpoints.MapControllers();
             });

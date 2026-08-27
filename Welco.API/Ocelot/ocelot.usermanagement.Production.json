@@ -1,0 +1,43 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/v1/user-management/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user.welco.internal",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/user-management/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DangerousAcceptAnyServerCertificateValidator": false
+    },
+    {
+      "DownstreamPathTemplate": "/openapi/v1.json",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user.welco.internal",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/api/docs/usermanagement/openapi.json",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": false
+    },
+    {
+      "DownstreamPathTemplate": "/scalar/v1",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user.welco.internal",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/api/docs/usermanagement",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": false
+    }
+  ]
+}
