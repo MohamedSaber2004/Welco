@@ -1,0 +1,43 @@
+name: Deploy User Management Microservice to MonsterASP
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'UserManamgent.Service.API/**'
+      - 'Welco.Shared/**'
+      - '.github/workflows/deploy-user-management.yml'
+      - '.github/workflows/ftp-deploy.py'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy User Management Service
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish User Management Microservice
+        run: |
+          dotnet publish "UserManamgent.Service.API/UserManamgent.Service.API.csproj" \
+            -c Release \
+            -o ./publish/user-management
+
+      - name: Deploy to MonsterASP via FTP
+        env:
+          FTP_SERVER: ${{ secrets.USER_MGMT_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.USER_MGMT_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.USER_MGMT_FTP_PASSWORD }}
+          LOCAL_DIR: ./publish/user-management
+          REMOTE_DIR: /wwwroot
+        run: python .github/workflows/ftp-deploy.py
