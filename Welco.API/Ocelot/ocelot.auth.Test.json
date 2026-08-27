@@ -1,7 +1,7 @@
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/api/v1/auth/register",
+      "DownstreamPathTemplate": "/api/v1/auth/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -9,99 +9,8 @@
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/api/v1/auth/register",
-      "UpstreamHttpMethod": [ "POST" ],
-      "DangerousAcceptAnyServerCertificateValidator": true
-    },
-    {
-      "DownstreamPathTemplate": "/api/v1/auth/login",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "welco-auth.runasp.net",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/api/v1/auth/login",
-      "UpstreamHttpMethod": [ "POST" ],
-      "DangerousAcceptAnyServerCertificateValidator": true
-    },
-    {
-      "DownstreamPathTemplate": "/api/v1/auth/verify-register-otp",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "welco-auth.runasp.net",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/api/v1/auth/verify-register-otp",
-      "UpstreamHttpMethod": [ "POST" ],
-      "DangerousAcceptAnyServerCertificateValidator": true
-    },
-    {
-      "DownstreamPathTemplate": "/api/v1/auth/forgot-password",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "welco-auth.runasp.net",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/api/v1/auth/forgot-password",
-      "UpstreamHttpMethod": [ "POST" ],
-      "DangerousAcceptAnyServerCertificateValidator": true
-    },
-    {
-      "DownstreamPathTemplate": "/api/v1/auth/verify-password-otp",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "welco-auth.runasp.net",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/api/v1/auth/verify-password-otp",
-      "UpstreamHttpMethod": [ "POST" ],
-      "DangerousAcceptAnyServerCertificateValidator": true
-    },
-    {
-      "DownstreamPathTemplate": "/api/v1/auth/reset-password",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "welco-auth.runasp.net",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/api/v1/auth/reset-password",
-      "UpstreamHttpMethod": [ "POST" ],
-      "DangerousAcceptAnyServerCertificateValidator": true
-    },
-    {
-      "DownstreamPathTemplate": "/api/v1/auth/refresh-token",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "welco-auth.runasp.net",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/api/v1/auth/refresh-token",
-      "UpstreamHttpMethod": [ "POST" ],
-      "DangerousAcceptAnyServerCertificateValidator": true
-    },
-    {
-      "DownstreamPathTemplate": "/api/v1/auth/profile",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "welco-auth.runasp.net",
-          "Port": 443
-        }
-      ],
-      "UpstreamPathTemplate": "/api/v1/auth/profile",
-      "UpstreamHttpMethod": [ "GET" ],
+      "UpstreamPathTemplate": "/api/v1/auth/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DangerousAcceptAnyServerCertificateValidator": true
     },
     {

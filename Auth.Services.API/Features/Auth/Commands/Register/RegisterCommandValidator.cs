@@ -26,10 +26,10 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
                 .Equal(x => x.Password).WithMessage(LocalizationKeys.Auth.PasswordMismatch);
 
             RuleFor(x => x.UserType)
-                .IsInEnum();
+                .IsInEnum().WithMessage(LocalizationKeys.Auth.UserTypeRequired);
 
             RuleFor(x => x.Language)
-                .IsInEnum();
+                .IsInEnum().WithMessage(LocalizationKeys.Auth.LanguageRequired);
 
             RuleFor(x => x).CustomAsync(async (command, context, ct) =>
             {
@@ -39,8 +39,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
                 var existingUser = await userManager.FindByEmailAsync(command.Email);
                 if (existingUser != null)
                 {
-                    Result<string>.BadRequest(LocalizationKeys.Auth.EmailAlreadyExists,
-                        new List<string> { LocalizationKeys.Auth.EmailAlreadyExists });
+                    context.AddFailure(nameof(command.Email), LocalizationKeys.Auth.EmailAlreadyExists);
                 }
             });
         }

@@ -1,7 +1,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Auth.Responses;
+using Welco.Shared.Common.DTOs.UserManagement;
 using Welco.Shared.Common.Interfaces;
+using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Domain.Models;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
@@ -12,13 +15,16 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IUnitOfWork _unitOfWork;
 
         public GetUserProfileQueryHandler(
             UserManager<ApplicationUser> userManager,
-            ICurrentUserService currentUserService)
+            ICurrentUserService currentUserService,
+            IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _currentUserService = currentUserService;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Result<UserProfileDto>> Handle(GetUserProfileQuery request, CancellationToken cancellationToken)
@@ -41,6 +47,31 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
 
             var roles = await _userManager.GetRolesAsync(user);
 
+            var addressRepo = _unitOfWork.GetRepository<UserAddress, Guid>();
+            var addresses = await addressRepo
+                .GetAll(a => a.UserId == user.Id && !a.IsDeleted)
+                .Select(a => new UserAddressDto
+                {
+                    Id = a.Id,
+                    UserId = a.UserId,
+                    CountryId = a.CountryId,
+                    CountryNameEn = a.Country != null ? a.Country.NameEn : null,
+                    CountryNameAr = a.Country != null ? a.Country.NameAr : null,
+                    CityId = a.CityId,
+                    CityNameEn = a.City != null ? a.City.NameEn : null,
+                    CityNameAr = a.City != null ? a.City.NameAr : null,
+                    ZoneId = a.ZoneId,
+                    ZoneNameEn = a.Zone != null ? a.Zone.NameEn : null,
+                    ZoneNameAr = a.Zone != null ? a.Zone.NameAr : null,
+                    Street = a.Street,
+                    Building = a.Building,
+                    Floor = a.Floor,
+                    Apartment = a.Apartment,
+                    CreatedAt = a.CreatedAt,
+                    UpdatedAt = a.UpdatedAt
+                })
+                .ToListAsync(cancellationToken);
+
             var profile = new UserProfileDto
             {
                 UserId = user.Id,
@@ -52,7 +83,8 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                 Language = user.Language,
                 IsEmailConfirmed = user.EmailConfirmed,
                 CreatedAt = user.CreatedAt,
-                Roles = roles
+                Roles = roles,
+                Addresses = addresses
             };
 
             return Result<UserProfileDto>.Success(profile, LocalizationKeys.Auth.ProfileFetched);

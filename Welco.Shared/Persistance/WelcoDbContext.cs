@@ -18,6 +18,10 @@ namespace Welco.Shared.Persistance
 
         public DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
         public DbSet<UserRefreshToken> UserRefreshTokens => Set<UserRefreshToken>();
+        public DbSet<Country> Countries => Set<Country>();
+        public DbSet<City> Cities => Set<City>();
+        public DbSet<Zone> Zones => Set<Zone>();
+        public DbSet<UserAddress> UserAddresses => Set<UserAddress>();
 
         public WelcoDbContext(DbContextOptions<WelcoDbContext> options, ICurrentUserService? currentUserService = null)
             : base(options)

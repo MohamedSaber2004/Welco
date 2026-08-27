@@ -2,9 +2,7 @@ namespace Auth.Services.API.AuthRoutes
 {
     public static class AuthApiRoutes
     {
-        public const string Root = "api";
-        public const string Version = "v1";
-        public const string Base = Root + "/" + Version + "/auth";
+        public const string Base = "api/v1/auth";
 
         public static class Authentication
         {

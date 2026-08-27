@@ -1,5 +1,14 @@
 using System.Reflection;
+using FluentValidation;
+using MediatR;
+using Microsoft.AspNetCore.Identity;
+using Scalar.AspNetCore;
 using Welco.Shared;
+using Welco.Shared.Common.Behaviors;
+using Welco.Shared.Common.Middlewares;
+using Welco.Shared.Localization;
+using Welco.Shared.OpenApi;
+using Welco.Shared.Persistance.Seeding;
 
 namespace UserManamgent.Service.API
 {
@@ -36,18 +45,27 @@ namespace UserManamgent.Service.API
 
             builder.Configuration.AddEnvironmentVariables().AddCommandLine(args);
 
-            var port = Environment.GetEnvironmentVariable("PORT") 
+            var port = Environment.GetEnvironmentVariable("PORT")
                        ?? Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS");
             if (!string.IsNullOrEmpty(port))
             {
                 builder.WebHost.UseUrls($"http://*:{port}");
             }
 
-            // Add services to the container
             builder.Services.AddControllers();
-            builder.Services.AddOpenApi();
+            builder.Services.AddJsonLocalization();
             builder.Services.AddWelcoSharedDependencies(builder.Configuration);
+            builder.Services.AddWelcoIdentity(builder.Configuration);
 
+            // MediatR + FluentValidation
+            builder.Services.AddMediatR(cfg =>
+            {
+                cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+                cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            });
+            builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+
+            builder.Services.AddConfiguredOpenApi();
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
@@ -60,11 +78,27 @@ namespace UserManamgent.Service.API
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline
-            if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Test"))
+            using (var scope = app.Services.CreateScope())
             {
-                app.MapOpenApi();
+                try
+                {
+                    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                    await RoleSeeder.SeedRolesAsync(roleManager, logger);
+                }
+                catch (Exception)
+                {
+                }
             }
+
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
+                                   Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
+            });
+
+            app.UseCustomExceptionHandler();
+            app.UseJsonLocalization();
 
             if (!app.Environment.IsEnvironment("Test") && !app.Environment.IsProduction())
             {
@@ -73,6 +107,14 @@ namespace UserManamgent.Service.API
 
             app.UseCors("AllowAll");
             app.UseAuthorization();
+
+            app.MapGet("/", () => Results.Redirect("/scalar/v1"));
+            app.MapOpenApi();
+            app.MapScalarApiReference(options =>
+            {
+                options.WithTitle("User Management Microservice API")
+                       .WithTheme(ScalarTheme.Moon);
+            });
             app.MapControllers();
 
             await app.RunAsync();

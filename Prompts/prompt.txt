@@ -1,12 +1,6 @@
-{
-  "isSuccess": false,
-  "message": "Email configuration is missing or incomplete on the server. Please ensure 'EmailSettings' section exists in appsettings.json.",
-  "data": {
-    "Configured_Host": null,
-    "Configured_Port": 587,
-    "Configured_Username": null,
-    "Configured_Email": null,
-    "Configured_Password_Present": false,
-    "Configuration_Status": "MISSING_CONFIGURATION: 'EmailSettings:Host' and 'EmailSettings:Email' must be configured in appsettings.json."
-  }
-}
+        public string? PostalCode { get; set; }
+        public string AddressType { get; set; } = "Home";
+        public bool IsDefault { get; set; } = false;
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
+        public string? AdditionalDirections { get; set; }

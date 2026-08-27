@@ -1,3 +1,4 @@
+using Welco.Shared.Common.DTOs.UserManagement;
 using Welco.Shared.Enums;
 
 namespace Welco.Shared.Common.DTOs.Auth.Responses
@@ -14,5 +15,6 @@ namespace Welco.Shared.Common.DTOs.Auth.Responses
         public bool IsEmailConfirmed { get; set; }
         public DateTime CreatedAt { get; set; }
         public IList<string> Roles { get; set; } = new List<string>();
+        public IList<UserAddressDto> Addresses { get; set; } = new List<UserAddressDto>();
     }
 }

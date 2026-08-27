@@ -4,6 +4,7 @@ using Auth.Services.API.Features.Auth.Commands.Login;
 using Auth.Services.API.Features.Auth.Commands.RefreshToken;
 using Auth.Services.API.Features.Auth.Commands.Register;
 using Auth.Services.API.Features.Auth.Commands.ResetPassword;
+using Auth.Services.API.Features.Auth.Commands.UpdateProfile;
 using Auth.Services.API.Features.Auth.Commands.VerifyEmailOtp;
 using Auth.Services.API.Features.Auth.Commands.VerifyPasswordOtp;
 using Auth.Services.API.Features.Auth.Queries.GetUserProfile;
@@ -156,6 +157,25 @@ namespace Auth.Services.API.Controllers
         public async Task<IActionResult> GetProfile(CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetUserProfileQuery(), cancellationToken);
+            return ToActionResult(result);
+        }
+
+        /// <summary>
+        /// Update the profile of the currently authenticated user, including addresses.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [RoleAuthorize]
+        [Route(AuthApiRoutes.Authentication.Profile)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileCommand command, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(command, cancellationToken);
             return ToActionResult(result);
         }
     }

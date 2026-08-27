@@ -26,6 +26,8 @@ namespace Welco.Shared.Domain.Models
         public AppLanguage Language { get; set; }
         public UserType UserType { get; set; } = UserType.Doctor;
 
+        public virtual ICollection<UserAddress> Addresses { get; set; } = new List<UserAddress>();
+
         public void MarkAsCreated(string createdBy)
         {
             CreatedAt = DateTime.UtcNow;
