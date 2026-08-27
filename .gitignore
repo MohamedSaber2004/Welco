@@ -45,3 +45,6 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 .DS_Store
+/Auth.Services.API/appsettings.Development.json
+/Auth.Services.API/appsettings.Production.json
+/Auth.Services.API/appsettings.Test.json
