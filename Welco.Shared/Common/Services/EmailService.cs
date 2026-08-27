@@ -70,7 +70,20 @@ namespace Welco.Shared.Common.Services
                     _ => SecureSocketOptions.Auto
                 };
 
-                await client.ConnectAsync(_emailSettings.Host, _emailSettings.Port, secureSocketOptions, cancellationToken);
+                try
+                {
+                    await client.ConnectAsync(_emailSettings.Host, _emailSettings.Port, secureSocketOptions, cancellationToken);
+                }
+                catch (Exception connEx) when (_emailSettings.Port == 587)
+                {
+                    _logger.LogWarning(connEx, "Failed connecting to SMTP host {Host}:587 (STARTTLS). Attempting fallback to port 465 (SSL)...", _emailSettings.Host);
+                    await client.ConnectAsync(_emailSettings.Host, 465, SecureSocketOptions.SslOnConnect, cancellationToken);
+                }
+                catch (Exception connEx) when (_emailSettings.Port == 465)
+                {
+                    _logger.LogWarning(connEx, "Failed connecting to SMTP host {Host}:465 (SSL). Attempting fallback to port 587 (STARTTLS)...", _emailSettings.Host);
+                    await client.ConnectAsync(_emailSettings.Host, 587, SecureSocketOptions.StartTls, cancellationToken);
+                }
 
                 if (!string.IsNullOrWhiteSpace(_emailSettings.Username) && !string.IsNullOrWhiteSpace(_emailSettings.Password))
                 {
@@ -84,7 +97,8 @@ namespace Welco.Shared.Common.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to send email to {ToEmail} with subject '{Subject}'", toEmail, subject);
+                _logger.LogError(ex, "Failed to send email to {ToEmail} with subject '{Subject}'. Settings: Host={Host}, Port={Port}, Username={Username}",
+                    toEmail, subject, _emailSettings.Host, _emailSettings.Port, _emailSettings.Username);
             }
         }
 
