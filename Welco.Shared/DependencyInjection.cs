@@ -29,6 +29,7 @@ namespace Welco.Shared
             if (configuration != null)
             {
                 services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+                services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
             }
             else
             {
@@ -36,6 +37,12 @@ namespace Welco.Shared
                     .Configure<IConfiguration>((options, config) =>
                     {
                         config.GetSection(JwtSettings.SectionName).Bind(options);
+                    });
+
+                services.AddOptions<EmailSettings>()
+                    .Configure<IConfiguration>((options, config) =>
+                    {
+                        config.GetSection(EmailSettings.SectionName).Bind(options);
                     });
             }
 

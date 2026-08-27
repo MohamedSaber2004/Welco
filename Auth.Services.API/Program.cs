@@ -43,6 +43,10 @@ namespace Auth.Services.API
             var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>() ?? new JwtSettings();
             builder.Services.AddSingleton(jwtSettings);
 
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection(EmailSettings.SectionName));
+            var emailSettings = builder.Configuration.GetSection(EmailSettings.SectionName).Get<EmailSettings>() ?? new EmailSettings();
+            builder.Services.AddSingleton(emailSettings);
+
             builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
             builder.Services.AddMediatR(cfg =>
@@ -90,8 +94,7 @@ namespace Auth.Services.API
                         context.Response.ContentType = "application/json";
 
                         var localizer = context.HttpContext.RequestServices.GetService<ILocalizationProvider>();
-                        var localizedMessage = localizer?.GetLocalizedString(LocalizationKeys.ExceptionMessages.Unauthorized)
-                                               ?? "You are not authorized to perform this action.";
+                        var localizedMessage = localizer?.GetLocalizedString(LocalizationKeys.ExceptionMessages.Unauthorized);
 
                         var result = System.Text.Json.JsonSerializer.Serialize(new
                         {
@@ -128,10 +131,8 @@ namespace Auth.Services.API
                     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
                     await RoleSeeder.SeedRolesAsync(roleManager, logger);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "Database migration or role seeding failed during startup.");
                 }
             }
 

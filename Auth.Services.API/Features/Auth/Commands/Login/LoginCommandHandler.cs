@@ -32,22 +32,22 @@ namespace Auth.Services.API.Features.Auth.Commands.Login
 
             if (user == null)
             {
-                return Result<AuthResponseDto>.BadRequest(
+                return Result<AuthResponseDto>.Unauthorized(
                     LocalizationKeys.Auth.InvalidCredentials,
                     new List<string> { LocalizationKeys.Auth.InvalidCredentials });
             }
 
             if (user.IsDeleted || !user.IsActive)
             {
-                return Result<AuthResponseDto>.BadRequest(
+                return Result<AuthResponseDto>.Unauthorized(
                     LocalizationKeys.Auth.AccountDeactivated,
-                    new List<string> { LocalizationKeys.Auth.AccountDeactivated });
+                    new List<string> { LocalizationKeys.Auth.InvalidCredentials });
             }
 
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
             if (!isPasswordValid)
             {
-                return Result<AuthResponseDto>.BadRequest(
+                return Result<AuthResponseDto>.Unauthorized(
                     LocalizationKeys.Auth.InvalidCredentials,
                     new List<string> { LocalizationKeys.Auth.InvalidCredentials });
             }
