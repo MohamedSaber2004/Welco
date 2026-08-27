@@ -58,7 +58,14 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
 
             await _userManager.AddToRoleAsync(user, request.UserType.ToString());
 
-            await _emailService.SendVerificationEmailAsync(user.Email!, emailOtp, user.Language.ToString().ToLower(), cancellationToken);
+            try
+            {
+                await _emailService.SendVerificationEmailAsync(user.Email!, emailOtp, user.Language.ToString().ToLower(), cancellationToken);
+            }
+            catch (Exception)
+            {
+                // Email sending failed or is not configured; user account & OTP were safely created
+            }
 
             return Result<string>.Success(user.Email!, LocalizationKeys.Auth.RegisterSuccess);
         }

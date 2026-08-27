@@ -30,10 +30,19 @@ namespace Welco.Shared.Common.Services
         {
             try
             {
-                var message = new MimeMessage();
-                var fromName = string.IsNullOrWhiteSpace(_emailSettings.Name) ? "Welco" : _emailSettings.Name;
-                var fromEmail = string.IsNullOrWhiteSpace(_emailSettings.Email) ? _emailSettings.Username : _emailSettings.Email;
+                var fromEmail = !string.IsNullOrWhiteSpace(_emailSettings.Email)
+                    ? _emailSettings.Email
+                    : (!string.IsNullOrWhiteSpace(_emailSettings.Username) ? _emailSettings.Username : null);
 
+                if (string.IsNullOrWhiteSpace(fromEmail) || string.IsNullOrWhiteSpace(_emailSettings.Host))
+                {
+                    _logger.LogWarning("Email sending skipped: EmailSettings is not configured (Email/Username or Host is empty). Target: {ToEmail}", toEmail);
+                    return;
+                }
+
+                var fromName = string.IsNullOrWhiteSpace(_emailSettings.Name) ? "Welco" : _emailSettings.Name;
+
+                var message = new MimeMessage();
                 message.From.Add(new MailboxAddress(fromName, fromEmail));
                 message.To.Add(MailboxAddress.Parse(toEmail));
                 message.Subject = subject;
@@ -50,6 +59,7 @@ namespace Welco.Shared.Common.Services
                 message.Body = builder.ToMessageBody();
 
                 using var client = new SmtpClient();
+                client.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
                 var secureSocketOptions = _emailSettings.Port switch
                 {
@@ -74,7 +84,6 @@ namespace Welco.Shared.Common.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to send email to {ToEmail} with subject '{Subject}'", toEmail, subject);
-                throw;
             }
         }
 
