@@ -1,11 +1,10 @@
 using MediatR;
-using Welco.Shared.Common.DTOs.Auth.Responses;
 using Welco.Shared.Enums;
 using Welco.Shared.Results;
 
 namespace Auth.Services.API.Features.Auth.Commands.Register
 {
-    public class RegisterCommand : IRequest<Result<AuthResponseDto>>
+    public class RegisterCommand : IRequest<Result<string>>
     {
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;

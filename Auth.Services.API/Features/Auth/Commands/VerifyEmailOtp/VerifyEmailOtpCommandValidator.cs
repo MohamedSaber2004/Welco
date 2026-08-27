@@ -26,9 +26,13 @@ namespace Auth.Services.API.Features.Auth.Commands.VerifyEmailOtp
                 var user = await userManager.FindByEmailAsync(command.Email);
                 if (user == null)
                 {
-                    Result<string>.NotFound(LocalizationKeys.Auth.UserNotFound,
-                        new List<string> { LocalizationKeys.Auth.UserNotFound });
+                    context.AddFailure(nameof(command.Email), LocalizationKeys.Auth.UserNotFound);
                     return;
+                }
+
+                if (!user.ValidateEmailConfirmationOtp(command.OtpCode))
+                {
+                    context.AddFailure(nameof(command.OtpCode), LocalizationKeys.Auth.InvalidOtp);
                 }
             });
         }

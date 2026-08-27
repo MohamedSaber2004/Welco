@@ -1,4 +1,4 @@
-﻿using Welco.Shared.Common.Classes;
+using Welco.Shared.Common.Classes;
 
 namespace Welco.Shared.Domain.Models
 {
@@ -20,6 +20,6 @@ namespace Welco.Shared.Domain.Models
 
         public void Revoke() => IsRevoked = true;
 
-        public bool IsValid => !IsRevoked && ExpiryDate > DateTime.Now;
+        public bool IsValid => !IsRevoked && ExpiryDate > DateTime.UtcNow;
     }
 }

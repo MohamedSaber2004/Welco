@@ -23,6 +23,7 @@ namespace Welco.Shared
         {
             services.AddHttpContextAccessor();
             services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddScoped<IEmailService, EmailService>();
             services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 

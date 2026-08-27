@@ -22,8 +22,7 @@ namespace Auth.Services.API.Features.Auth.Commands.ForgotPassword
                 var user = await userManager.FindByEmailAsync(email);
                 if (user == null)
                 {
-                    Result<string>.NotFound(LocalizationKeys.Auth.UserNotFound,
-                        new List<string> { LocalizationKeys.Auth.UserNotFound });
+                    context.AddFailure(nameof(email), LocalizationKeys.Auth.UserNotFound);
                 }
             });
         }

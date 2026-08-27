@@ -25,7 +25,6 @@ namespace Welco.Shared.Enums
                 return AppLanguage.En;
             }
 
-            // Support comma-separated Accept-Language headers (e.g. "ar-EG,ar;q=0.9,en-US;q=0.8" or "en-US,en;q=0.9")
             var parts = code.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             foreach (var part in parts)

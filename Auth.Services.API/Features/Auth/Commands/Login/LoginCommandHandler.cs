@@ -41,7 +41,14 @@ namespace Auth.Services.API.Features.Auth.Commands.Login
             {
                 return Result<AuthResponseDto>.Unauthorized(
                     LocalizationKeys.Auth.AccountDeactivated,
-                    new List<string> { LocalizationKeys.Auth.InvalidCredentials });
+                    new List<string> { LocalizationKeys.Auth.AccountDeactivated });
+            }
+
+            if (!user.EmailConfirmed)
+            {
+                return Result<AuthResponseDto>.Unauthorized(
+                    LocalizationKeys.Auth.EmailNotConfirmed,
+                    new List<string> { LocalizationKeys.Auth.EmailNotConfirmed });
             }
 
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);

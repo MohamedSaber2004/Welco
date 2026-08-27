@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Welco.Shared.Persistance;
 
@@ -11,9 +12,11 @@ using Welco.Shared.Persistance;
 namespace Welco.Shared.Persistance.Migrations
 {
     [DbContext(typeof(WelcoDbContext))]
-    partial class WelcoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260827075457_AddEmailConfirmationOtpToUsers")]
+    partial class AddEmailConfirmationOtpToUsers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

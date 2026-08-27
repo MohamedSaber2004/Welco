@@ -20,6 +20,8 @@ namespace Welco.Shared.Domain.Models
         public string? ProfilePictureName { get; set; }
         public string? PasswordResetToken { get; set; }
         public DateTime? PasswordResetTokenExpiry { get; set; }
+        public string? EmailConfirmationOtp { get; set; }
+        public DateTime? EmailConfirmationOtpExpiry { get; set; }
         public AppLanguage Language { get; set; }
         public UserType UserType { get; set; } = UserType.Doctor;
 
@@ -85,7 +87,7 @@ namespace Welco.Shared.Domain.Models
             if (string.IsNullOrWhiteSpace(token))
                 throw new ArgumentException(LocalizationKeys.Auth.TokenRequired, nameof(token));
 
-            if (expiry <= DateTime.Now)
+            if (expiry <= DateTime.UtcNow)
                 throw new ArgumentException(LocalizationKeys.Auth.TokenExpiryInFuture, nameof(expiry));
 
             PasswordResetToken = token;
@@ -97,13 +99,39 @@ namespace Welco.Shared.Domain.Models
             return !string.IsNullOrWhiteSpace(token)
                 && PasswordResetToken == token
                 && PasswordResetTokenExpiry.HasValue
-                && PasswordResetTokenExpiry.Value > DateTime.Now;
+                && PasswordResetTokenExpiry.Value > DateTime.UtcNow;
         }
 
         public void ClearPasswordResetToken()
         {
             PasswordResetToken = null;
             PasswordResetTokenExpiry = null;
+        }
+
+        public void SetEmailConfirmationOtp(string otp, DateTime expiry)
+        {
+            if (string.IsNullOrWhiteSpace(otp))
+                throw new ArgumentException(LocalizationKeys.Auth.OtpCodeRequired, nameof(otp));
+
+            if (expiry <= DateTime.UtcNow)
+                throw new ArgumentException(LocalizationKeys.Auth.TokenExpiryInFuture, nameof(expiry));
+
+            EmailConfirmationOtp = otp;
+            EmailConfirmationOtpExpiry = expiry;
+        }
+
+        public bool ValidateEmailConfirmationOtp(string otp)
+        {
+            return !string.IsNullOrWhiteSpace(otp)
+                && EmailConfirmationOtp == otp
+                && EmailConfirmationOtpExpiry.HasValue
+                && EmailConfirmationOtpExpiry.Value > DateTime.UtcNow;
+        }
+
+        public void ClearEmailConfirmationOtp()
+        {
+            EmailConfirmationOtp = null;
+            EmailConfirmationOtpExpiry = null;
         }
     }
 }
