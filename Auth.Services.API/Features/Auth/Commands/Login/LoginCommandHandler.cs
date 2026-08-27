@@ -32,9 +32,9 @@ namespace Auth.Services.API.Features.Auth.Commands.Login
 
             if (user == null)
             {
-                return Result<AuthResponseDto>.NotFound(
-                    LocalizationKeys.Auth.UserNotFound,
-                    new List<string> { LocalizationKeys.Auth.UserNotFound });
+                return Result<AuthResponseDto>.BadRequest(
+                    LocalizationKeys.Auth.InvalidCredentials,
+                    new List<string> { LocalizationKeys.Auth.InvalidCredentials });
             }
 
             if (user.IsDeleted || !user.IsActive)
