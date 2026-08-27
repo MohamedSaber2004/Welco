@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Welco.Shared.Common.Exceptions;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Enums;
 using Welco.Shared.Localization;
@@ -27,7 +28,7 @@ namespace Welco.Shared.Domain.Models
 
         public void MarkAsCreated(string createdBy)
         {
-            CreatedAt = DateTime.Now;
+            CreatedAt = DateTime.UtcNow;
             CreatedBy = createdBy;
             IsActive = true;
             IsDeleted = false;
@@ -35,7 +36,7 @@ namespace Welco.Shared.Domain.Models
 
         public void MarkAsUpdated(string updatedBy)
         {
-            UpdatedAt = DateTime.Now;
+            UpdatedAt = DateTime.UtcNow;
             UpdatedBy = updatedBy;
         }
 
@@ -43,7 +44,7 @@ namespace Welco.Shared.Domain.Models
         {
             IsDeleted = true;
             IsActive = false;
-            DeletedAt = DateTime.Now;
+            DeletedAt = DateTime.UtcNow;
             DeletedBy = deletedBy;
         }
 
@@ -63,7 +64,7 @@ namespace Welco.Shared.Domain.Models
         public void UpdateProfile(string fullName, string? profilePictureName, string updatedBy)
         {
             if (string.IsNullOrWhiteSpace(fullName))
-                throw new ArgumentException(LocalizationKeys.Auth.FullNameRequired, nameof(fullName));
+                throw new BadRequestException(LocalizationKeys.Auth.FullNameRequired);
 
             FullName = fullName;
             ProfilePictureName = profilePictureName;
@@ -85,10 +86,10 @@ namespace Welco.Shared.Domain.Models
         public void RequestPasswordReset(string token, DateTime expiry)
         {
             if (string.IsNullOrWhiteSpace(token))
-                throw new ArgumentException(LocalizationKeys.Auth.TokenRequired, nameof(token));
+                throw new BadRequestException(LocalizationKeys.Auth.TokenRequired);
 
             if (expiry <= DateTime.UtcNow)
-                throw new ArgumentException(LocalizationKeys.Auth.TokenExpiryInFuture, nameof(expiry));
+                throw new BadRequestException(LocalizationKeys.Auth.TokenExpiryInFuture);
 
             PasswordResetToken = token;
             PasswordResetTokenExpiry = expiry;
@@ -111,10 +112,10 @@ namespace Welco.Shared.Domain.Models
         public void SetEmailConfirmationOtp(string otp, DateTime expiry)
         {
             if (string.IsNullOrWhiteSpace(otp))
-                throw new ArgumentException(LocalizationKeys.Auth.OtpCodeRequired, nameof(otp));
+                throw new BadRequestException(LocalizationKeys.Auth.OtpCodeRequired);
 
             if (expiry <= DateTime.UtcNow)
-                throw new ArgumentException(LocalizationKeys.Auth.TokenExpiryInFuture, nameof(expiry));
+                throw new BadRequestException(LocalizationKeys.Auth.TokenExpiryInFuture);
 
             EmailConfirmationOtp = otp;
             EmailConfirmationOtpExpiry = expiry;
