@@ -63,6 +63,7 @@
     "CurrentPasswordRequired": "كلمة المرور الحالية مطلوبة.",
     "WrongCurrentPassword": "كلمة المرور الحالية غير صحيحة.",
     "PasswordChanged": "تم تغيير كلمة المرور بنجاح.",
+    "NewPasswordSameAsOld": "لا يمكن أن تكون كلمة المرور الجديدة مطابقة لكلمة المرور القديمة.",
     "LogoutSuccess": "تم تسجيل الخروج بنجاح.",
     "RoleAssigned": "تم تعيين الدور بنجاح.",
     "RoleNotFound": "الدور غير موجود.",

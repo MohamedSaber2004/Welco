@@ -63,6 +63,7 @@
     "CurrentPasswordRequired": "Current password is required.",
     "WrongCurrentPassword": "Wrong current password.",
     "PasswordChanged": "Password changed successfully.",
+    "NewPasswordSameAsOld": "New password cannot be the same as the old password.",
     "LogoutSuccess": "Logged out successfully.",
     "RoleAssigned": "Role assigned successfully.",
     "RoleNotFound": "Role not found.",

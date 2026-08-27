@@ -73,6 +73,7 @@ namespace Welco.Shared.Localization
             public const string CurrentPasswordRequired = "Auth.CurrentPasswordRequired";
             public const string WrongCurrentPassword = "Auth.WrongCurrentPassword";
             public const string PasswordChanged = "Auth.PasswordChanged";
+            public const string NewPasswordSameAsOld = "Auth.NewPasswordSameAsOld";
             public const string LogoutSuccess = "Auth.LogoutSuccess";
             public const string RoleAssigned = "Auth.RoleAssigned";
             public const string RoleNotFound = "Auth.RoleNotFound";

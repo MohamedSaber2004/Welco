@@ -42,6 +42,14 @@ namespace Auth.Services.API.Features.Auth.Commands.ResetPassword
                     new List<string> { LocalizationKeys.Auth.InvalidOtp });
             }
 
+            var isSameAsOldPassword = await _userManager.CheckPasswordAsync(user, request.NewPassword);
+            if (isSameAsOldPassword)
+            {
+                return Result<string>.BadRequest(
+                    LocalizationKeys.Auth.NewPasswordSameAsOld,
+                    new List<string> { LocalizationKeys.Auth.NewPasswordSameAsOld });
+            }
+
             var identityResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
             var resetResult = await _userManager.ResetPasswordAsync(user, identityResetToken, request.NewPassword);
 
