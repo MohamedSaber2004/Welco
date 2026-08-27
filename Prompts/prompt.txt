@@ -1,14 +1,16 @@
-        private async Task SendEmailAsync(string toEmail, string fullName, string subject, string body, CancellationToken ct)
-        {
-            var email = new MimeMessage();
-            email.From.Add(new MailboxAddress(_settings.Name, _settings.Email));
-            email.To.Add(new MailboxAddress(fullName, toEmail));
-            email.Subject = subject;
-            email.Body = new TextPart(TextFormat.Html) { Text = body };
-
-            using var smtp = new SmtpClient();
-            await smtp.ConnectAsync(_settings.Host, _settings.Port, SecureSocketOptions.StartTls, ct);
-            await smtp.AuthenticateAsync(_settings.Username, _settings.Password, ct);
-            await smtp.SendAsync(email, ct);
-            await smtp.DisconnectAsync(true, ct);
-        }
+{
+  "isSuccess": false,
+  "message": "Email sending failed",
+  "data": {
+    "Configured_Host": null,
+    "Configured_Port": 587,
+    "Configured_Username": null,
+    "Configured_Email": null,
+    "Configured_Password_Present": false,
+    "DNS_Resolution": "Failed: Value cannot be null. (Parameter 'hostName')",
+    "TCP_Port_587": "Failed: Value cannot be null. (Parameter 'host')",
+    "TCP_Port_465": "Failed: Value cannot be null. (Parameter 'host')",
+    "MailKit_Send_Result": "FAILED: ArgumentNullException: Value cannot be null. (Parameter 'address')",
+    "Error_Stack": "System.ArgumentNullException: Value cannot be null. (Parameter 'address')\r\n   at MimeKit.MailboxAddress..ctor(Encoding encoding, String name, String address)\r\n   at MimeKit.MailboxAddress..ctor(String name, String address)\r\n   at Auth.Services.API.Controllers.AuthController.TestEmail(String toEmail, IOptions`1 emailOptions, CancellationToken cancellationToken) in /home/runner/work/Welco/Welco/Auth.Services.API/Controllers/AuthController.cs:line 243"
+  }
+}
