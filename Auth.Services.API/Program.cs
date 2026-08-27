@@ -1,4 +1,3 @@
-using System.Text;
 using Auth.Services.API.Infrastructure;
 using Auth.Services.API.Infrastructure.Services;
 using FluentValidation;
@@ -8,6 +7,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using System.Reflection;
+using System.Text;
 using Welco.Shared;
 using Welco.Shared.Common.Behaviors;
 using Welco.Shared.Common.Interfaces;
@@ -25,17 +26,34 @@ namespace Auth.Services.API
     {
         public static async Task Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (string.IsNullOrWhiteSpace(environmentName) || environmentName.Equals("Production", StringComparison.OrdinalIgnoreCase))
+            {
+                environmentName = "Test";
+            }
 
-            var activeEnv = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+            {
+                Args = args,
+                EnvironmentName = environmentName,
+                ContentRootPath = AppContext.BaseDirectory
+            });
 
-            builder.Environment.EnvironmentName = activeEnv;
+            var env = builder.Environment;
 
+            builder.Configuration.Sources.Clear();
             builder.Configuration
-                .SetBasePath(Directory.GetCurrentDirectory())
+                .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables();
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+
+            if (env.IsDevelopment() || env.EnvironmentName == "Test")
+            {
+                var appAssembly = Assembly.Load(new AssemblyName(env.ApplicationName));
+                if (appAssembly != null) builder.Configuration.AddUserSecrets(appAssembly, optional: true);
+            }
+
+            builder.Configuration.AddEnvironmentVariables().AddCommandLine(args);
 
             var port = Environment.GetEnvironmentVariable("PORT") 
                        ?? Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS");
