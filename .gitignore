@@ -25,12 +25,6 @@ publish/
 *.secrets.json
 secrets.json
 
-## 4. Environment-specific configuration files
-!appsettings.*.json
-!appsettings.json
-!appsettings.example.json
-!appsettings.Development.json.example
-
 ## 5. SSL Certificates and private keys
 *.pfx
 *.p12
@@ -45,6 +39,3 @@ ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 .DS_Store
-/Auth.Services.API/appsettings.Development.json
-/Auth.Services.API/appsettings.Production.json
-/Auth.Services.API/appsettings.Test.json
