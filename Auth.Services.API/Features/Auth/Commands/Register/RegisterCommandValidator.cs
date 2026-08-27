@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Welco.Shared.Domain.Models;
 using Welco.Shared.Localization;
+using Welco.Shared.Results;
 
 namespace Auth.Services.API.Features.Auth.Commands.Register
 {
@@ -38,7 +39,8 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
                 var existingUser = await userManager.FindByEmailAsync(command.Email);
                 if (existingUser != null)
                 {
-                    context.AddFailure(nameof(command.Email), LocalizationKeys.Auth.EmailAlreadyExists);
+                    Result<string>.BadRequest(LocalizationKeys.Auth.EmailAlreadyExists,
+                        new List<string> { LocalizationKeys.Auth.EmailAlreadyExists });
                 }
             });
         }
