@@ -11,6 +11,10 @@
       ],
       "UpstreamPathTemplate": "/api/v1/user-management/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
       "DangerousAcceptAnyServerCertificateValidator": true
     },
     {

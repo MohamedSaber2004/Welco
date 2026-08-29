@@ -7,8 +7,10 @@ using UserManamgent.Service.API.Features.Cities.Commands.UpdateCity;
 using UserManamgent.Service.API.Features.Cities.Queries.GetCities;
 using UserManamgent.Service.API.Features.Cities.Queries.GetCityById;
 using UserManamgent.Service.API.UserManagementRoutes;
+using Microsoft.AspNetCore.Authorization;
 using Welco.Shared.Common.Attributes;
 using Welco.Shared.Controllers;
+using Welco.Shared.Enums;
 
 namespace UserManamgent.Service.API.Controllers
 {
@@ -21,6 +23,7 @@ namespace UserManamgent.Service.API.Controllers
         }
 
         [HttpGet]
+        [RoleAuthorize(UserType.Doctor, UserType.Admin)]
         [Route(UserManagementApiRoutes.Cities.GetAll)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll([FromQuery] Guid? countryId, CancellationToken cancellationToken)
@@ -30,6 +33,7 @@ namespace UserManamgent.Service.API.Controllers
         }
 
         [HttpGet]
+        [RoleAuthorize(UserType.Doctor, UserType.Admin)]
         [Route(UserManagementApiRoutes.Cities.GetByCountry)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByCountry([FromRoute] Guid countryId, CancellationToken cancellationToken)
@@ -39,6 +43,7 @@ namespace UserManamgent.Service.API.Controllers
         }
 
         [HttpGet]
+        [RoleAuthorize(UserType.Doctor, UserType.Admin)]
         [Route(UserManagementApiRoutes.Cities.GetById)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -50,6 +55,7 @@ namespace UserManamgent.Service.API.Controllers
 
         [HttpPost]
         [Route(UserManagementApiRoutes.Cities.Create)]
+        [RoleAuthorize(UserType.Admin)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -62,6 +68,7 @@ namespace UserManamgent.Service.API.Controllers
 
         [HttpPut]
         [Route(UserManagementApiRoutes.Cities.Update)]
+        [RoleAuthorize(UserType.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -75,6 +82,7 @@ namespace UserManamgent.Service.API.Controllers
 
         [HttpDelete]
         [Route(UserManagementApiRoutes.Cities.Delete)]
+        [RoleAuthorize(UserType.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken)

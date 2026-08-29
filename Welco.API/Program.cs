@@ -1,3 +1,6 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Scalar.AspNetCore;
@@ -5,7 +8,9 @@ using Serilog;
 using System.Reflection;
 using Welco.API.Options;
 using Welco.Shared;
+using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Middlewares;
+using Welco.Shared.Common.Options;
 using Welco.Shared.Enums;
 using Welco.Shared.Localization;
 using Welco.Shared.Localization.Interfaces;
@@ -71,6 +76,46 @@ namespace Welco.API
             builder.Services.AddControllers();
             builder.Services.AddJsonLocalization();
             builder.Services.AddWelcoSharedDependencies();
+
+            // JWT — Gateway is the single entry point that validates Auth-issued tokens (Option 1)
+            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
+            var jwtSettings = new JwtSettings();
+            builder.Configuration.GetSection(JwtSettings.SectionName).Bind(jwtSettings);
+            var gatewaySecret = !string.IsNullOrWhiteSpace(jwtSettings.Secret) && jwtSettings.Secret.Length >= 32
+                ? jwtSettings.Secret
+                : "V5B?*77+gzD_pk+2!%ORg<i)<D$DH+Xf.nECc?];2l;";
+            var gatewayValidation = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(gatewaySecret)),
+                ValidateIssuer = !string.IsNullOrWhiteSpace(jwtSettings.Issuer),
+                ValidIssuer = string.IsNullOrWhiteSpace(jwtSettings.Issuer) ? null : jwtSettings.Issuer,
+                ValidateAudience = !string.IsNullOrWhiteSpace(jwtSettings.Audience),
+                ValidAudience = string.IsNullOrWhiteSpace(jwtSettings.Audience) ? null : jwtSettings.Audience,
+                RequireExpirationTime = true,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+            builder.Services.AddSingleton(gatewayValidation);
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(o =>
+                {
+                    o.SaveToken = true;
+                    o.TokenValidationParameters = gatewayValidation;
+                    o.Events = new JwtBearerEvents
+                    {
+                        OnChallenge = async ctx =>
+                        {
+                            ctx.HandleResponse();
+                            ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            ctx.Response.ContentType = "application/json";
+                            var loc = ctx.HttpContext.RequestServices.GetService<ILocalizationProvider>();
+                            var lang = ctx.Request.Headers["Accept-Language"].FirstOrDefault()?.Split(',')[0].Trim().ToLowerInvariant().StartsWith("ar") == true ? "ar" : "en";
+                            var msg = loc?.GetLocalizedString("ExceptionMessages.Unauthorized", lang) ?? "Unauthorized";
+                            await ctx.Response.WriteAsJsonAsync(new { isSuccess = false, statusCode = 401, message = msg, errors = new[] { msg }, data = (object?)null });
+                        }
+                    };
+                });
 
             var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
             builder.Services.AddCors(options =>
@@ -195,6 +240,8 @@ namespace Welco.API
             }
             app.UseRouting();
             app.UseCors("GatewayCorsPolicy");
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseRateLimiter();
 
             var microserviceDocRoutes = new List<(string ServiceName, string DisplayName, string DocRoute, string ScalarRoute)>();

@@ -1,6 +1,23 @@
 {
   "Routes": [
     {
+      "DownstreamPathTemplate": "/api/v1/auth/profile",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7203
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/auth/profile",
+      "UpstreamHttpMethod": [ "GET", "PUT" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
       "DownstreamPathTemplate": "/api/v1/auth/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [

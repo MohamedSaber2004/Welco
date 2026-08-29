@@ -10,6 +10,7 @@ using UserManamgent.Service.API.Features.Users.Queries.GetUsers;
 using UserManamgent.Service.API.UserManagementRoutes;
 using Welco.Shared.Common.Attributes;
 using Welco.Shared.Controllers;
+using Welco.Shared.Enums;
 
 namespace UserManamgent.Service.API.Controllers
 {
@@ -23,6 +24,7 @@ namespace UserManamgent.Service.API.Controllers
 
         [HttpGet]
         [Route(UserManagementApiRoutes.Users.GetAll)]
+        [RoleAuthorize(UserType.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll([FromQuery] GetUsersQuery query, CancellationToken cancellationToken)
         {
@@ -42,6 +44,7 @@ namespace UserManamgent.Service.API.Controllers
 
         [HttpPost]
         [Route(UserManagementApiRoutes.Users.Create)]
+        [RoleAuthorize(UserType.Admin)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateUserCommand command, CancellationToken cancellationToken)
@@ -52,6 +55,7 @@ namespace UserManamgent.Service.API.Controllers
 
         [HttpPut]
         [Route(UserManagementApiRoutes.Users.Update)]
+        [RoleAuthorize(UserType.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -64,6 +68,7 @@ namespace UserManamgent.Service.API.Controllers
 
         [HttpDelete]
         [Route(UserManagementApiRoutes.Users.Delete)]
+        [RoleAuthorize(UserType.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken)
