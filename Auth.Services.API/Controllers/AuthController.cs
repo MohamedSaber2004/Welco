@@ -1,6 +1,7 @@
 using Auth.Services.API.AuthRoutes;
 using Auth.Services.API.Features.Auth.Commands.ForgotPassword;
 using Auth.Services.API.Features.Auth.Commands.Login;
+using Auth.Services.API.Features.Auth.Commands.Logout;
 using Auth.Services.API.Features.Auth.Commands.RefreshToken;
 using Auth.Services.API.Features.Auth.Commands.Register;
 using Auth.Services.API.Features.Auth.Commands.ResetPassword;
@@ -139,6 +140,21 @@ namespace Auth.Services.API.Controllers
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand command, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(command, cancellationToken);
+            return ToActionResult(result);
+        }
+
+        /// <summary>
+        /// Logout the user and revoke refresh tokens.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route(AuthApiRoutes.Authentication.Logout)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> Logout([FromBody] LogoutCommand? command, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(command ?? new LogoutCommand(), cancellationToken);
             return ToActionResult(result);
         }
 

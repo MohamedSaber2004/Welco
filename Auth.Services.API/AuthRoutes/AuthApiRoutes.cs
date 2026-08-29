@@ -13,6 +13,7 @@ namespace Auth.Services.API.AuthRoutes
             public const string VerifyPasswordOtp = "verify-password-otp";
             public const string ResetPassword = "reset-password";
             public const string RefreshToken = "refresh-token";
+            public const string Logout = "logout";
             public const string Profile = "profile";
             public const string Health = "health";
         }
