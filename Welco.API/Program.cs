@@ -117,17 +117,20 @@ namespace Welco.API
             var gatewaySecret = !string.IsNullOrWhiteSpace(jwtSettings.Secret) && jwtSettings.Secret.Length >= 32
                 ? jwtSettings.Secret
                 : "V5B?*77+gzD_pk+2!%ORg<i)<D$DH+Xf.nECc?];2l;";
+            var validIssuers = jwtSettings.GetAllValidIssuers().ToList();
+            var validAudiences = jwtSettings.GetAllValidAudiences().ToList();
+
             var gatewayValidation = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(gatewaySecret)),
-                ValidateIssuer = !string.IsNullOrWhiteSpace(jwtSettings.Issuer),
-                ValidIssuer = string.IsNullOrWhiteSpace(jwtSettings.Issuer) ? null : jwtSettings.Issuer,
-                ValidateAudience = !string.IsNullOrWhiteSpace(jwtSettings.Audience),
-                ValidAudience = string.IsNullOrWhiteSpace(jwtSettings.Audience) ? null : jwtSettings.Audience,
+                ValidateIssuer = validIssuers.Count > 0,
+                ValidIssuers = validIssuers.Count > 0 ? validIssuers : null,
+                ValidateAudience = validAudiences.Count > 0,
+                ValidAudiences = validAudiences.Count > 0 ? validAudiences : null,
                 RequireExpirationTime = true,
                 ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
+                ClockSkew = TimeSpan.FromMinutes(1)
             };
             builder.Services.AddSingleton(gatewayValidation);
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -211,7 +214,10 @@ namespace Welco.API
                 });
             });
 
-            builder.Services.AddHttpClient("InsecureClient")
+            builder.Services.AddHttpClient("InsecureClient", client =>
+                {
+                    client.Timeout = TimeSpan.FromSeconds(3);
+                })
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
                 {
                     ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
@@ -320,6 +326,14 @@ namespace Welco.API
                 // Dedicated Scalar Documentation pages for individual microservices
                 foreach (var doc in microserviceDocRoutes)
                 {
+                    var docServiceName = doc.ServiceName;
+                    endpoints.MapGet(doc.DocRoute, async (HttpContext httpContext, Welco.API.Services.OpenApiAggregatorService aggregator, CancellationToken ct) =>
+                    {
+                        var gatewayBaseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
+                        var json = await aggregator.GetServiceOpenApiAsync(docServiceName, gatewayBaseUrl, ct);
+                        return Results.Content(json, "application/json");
+                    });
+
                     endpoints.MapScalarApiReference(doc.ScalarRoute, options =>
                     {
                         options.WithTitle(doc.DisplayName)

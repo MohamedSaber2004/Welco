@@ -86,17 +86,20 @@ namespace Auth.Services.API
                 ? jwtSettings.Secret
                 : "V5B?*77+gzD_pk+2!%ORg<i)<D$DH+Xf.nECc?];2l;";
 
+            var validIssuers = jwtSettings.GetAllValidIssuers().ToList();
+            var validAudiences = jwtSettings.GetAllValidAudiences().ToList();
+
             var tokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-                ValidateIssuer = !string.IsNullOrWhiteSpace(jwtSettings.Issuer),
-                ValidIssuer = !string.IsNullOrWhiteSpace(jwtSettings.Issuer) ? jwtSettings.Issuer : null,
-                ValidateAudience = !string.IsNullOrWhiteSpace(jwtSettings.Audience),
-                ValidAudience = !string.IsNullOrWhiteSpace(jwtSettings.Audience) ? jwtSettings.Audience : null,
+                ValidateIssuer = validIssuers.Count > 0,
+                ValidIssuers = validIssuers.Count > 0 ? validIssuers : null,
+                ValidateAudience = validAudiences.Count > 0,
+                ValidAudiences = validAudiences.Count > 0 ? validAudiences : null,
                 RequireExpirationTime = true,
                 ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero,
+                ClockSkew = TimeSpan.FromMinutes(1),
             };
             builder.Services.AddSingleton(tokenValidationParameters);
 

@@ -16,15 +16,18 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ICurrentUserService _currentUserService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<GetUserProfileQueryHandler> _logger;
 
         public GetUserProfileQueryHandler(
             UserManager<ApplicationUser> userManager,
             ICurrentUserService currentUserService,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            ILogger<GetUserProfileQueryHandler> logger)
         {
             _userManager = userManager;
             _currentUserService = currentUserService;
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
         public async Task<Result<UserProfileDto>> Handle(GetUserProfileQuery request, CancellationToken cancellationToken)
@@ -47,30 +50,38 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            var addressRepo = _unitOfWork.GetRepository<UserAddress, Guid>();
-            var addresses = await addressRepo
-                .GetAll(a => a.UserId == user.Id && !a.IsDeleted)
-                .Select(a => new UserAddressDto
-                {
-                    Id = a.Id,
-                    UserId = a.UserId,
-                    CountryId = a.CountryId,
-                    CountryNameEn = a.Country != null ? a.Country.NameEn : null,
-                    CountryNameAr = a.Country != null ? a.Country.NameAr : null,
-                    CityId = a.CityId,
-                    CityNameEn = a.City != null ? a.City.NameEn : null,
-                    CityNameAr = a.City != null ? a.City.NameAr : null,
-                    ZoneId = a.ZoneId,
-                    ZoneNameEn = a.Zone != null ? a.Zone.NameEn : null,
-                    ZoneNameAr = a.Zone != null ? a.Zone.NameAr : null,
-                    Street = a.Street,
-                    Building = a.Building,
-                    Floor = a.Floor,
-                    Apartment = a.Apartment,
-                    CreatedAt = a.CreatedAt,
-                    UpdatedAt = a.UpdatedAt
-                })
-                .ToListAsync(cancellationToken);
+            var addresses = new List<UserAddressDto>();
+            try
+            {
+                var addressRepo = _unitOfWork.GetRepository<UserAddress, Guid>();
+                addresses = await addressRepo
+                    .GetAll(a => a.UserId == user.Id && !a.IsDeleted)
+                    .Select(a => new UserAddressDto
+                    {
+                        Id = a.Id,
+                        UserId = a.UserId,
+                        CountryId = a.CountryId,
+                        CountryNameEn = a.Country != null ? a.Country.NameEn : null,
+                        CountryNameAr = a.Country != null ? a.Country.NameAr : null,
+                        CityId = a.CityId,
+                        CityNameEn = a.City != null ? a.City.NameEn : null,
+                        CityNameAr = a.City != null ? a.City.NameAr : null,
+                        ZoneId = a.ZoneId,
+                        ZoneNameEn = a.Zone != null ? a.Zone.NameEn : null,
+                        ZoneNameAr = a.Zone != null ? a.Zone.NameAr : null,
+                        Street = a.Street,
+                        Building = a.Building,
+                        Floor = a.Floor,
+                        Apartment = a.Apartment,
+                        CreatedAt = a.CreatedAt,
+                        UpdatedAt = a.UpdatedAt
+                    })
+                    .ToListAsync(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to load addresses for user {UserId}", user.Id);
+            }
 
             var profile = new UserProfileDto
             {

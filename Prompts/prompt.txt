@@ -1,6 +1,11 @@
-        public string? PostalCode { get; set; }
-        public string AddressType { get; set; } = "Home";
-        public bool IsDefault { get; set; } = false;
-        public double? Latitude { get; set; }
-        public double? Longitude { get; set; }
-        public string? AdditionalDirections { get; set; }
+{
+  "isSuccess": false,
+  "statusCode": 401,
+  "message": "\u063A\u064A\u0631 \u0645\u0635\u0631\u062D \u0644\u0643 \u0628\u062A\u0646\u0641\u064A\u0630 \u0647\u0630\u0627 \u0627\u0644\u0625\u062C\u0631\u0627\u0621.",
+  "errors": [
+    "\u063A\u064A\u0631 \u0645\u0635\u0631\u062D \u0644\u0643 \u0628\u062A\u0646\u0641\u064A\u0630 \u0647\u0630\u0627 \u0627\u0644\u0625\u062C\u0631\u0627\u0621."
+  ],
+  "data": null
+}
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MzRmODljMy0zNWRiLTQ3MTAtOWRjZi0wOGRmMDQyZjNmY2MiLCJlbWFpbCI6Im1tbXM3Nzk5MEBnbWFpbC5jb20iLCJqdGkiOiJiYmUyOGRlZi1kMTRlLTQ0YzEtODFjYi0xYWY3MDcxZjY0MWYiLCJGdWxsTmFtZSI6Ik1vaGFtZWQgU2FiZXIiLCJVc2VyVHlwZXMiOiIyIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiRG9jdG9yIiwicm9sZSI6IkRvY3RvciIsImV4cCI6MTc4ODAzMzc5NCwiaXNzIjoiaHR0cDovL3dlbGNvLWF1dGhzZXJ2aWNlLnJ1bmFzcC5uZXQvIiwiYXVkIjoiaHR0cDovL3dlbGNvLWF1dGhzZXJ2aWNlLnJ1bmFzcC5uZXQvIn0.hfrBgfmSDmHWuTSkGJcdZfzmC9aYsWESsmsYb0A1cCU

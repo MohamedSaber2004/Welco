@@ -68,17 +68,20 @@ namespace UserManamgent.Service.API
             var jwtSettingsTmp = new JwtSettings();
             builder.Configuration.GetSection(JwtSettings.SectionName).Bind(jwtSettingsTmp);
             var umSecret = !string.IsNullOrWhiteSpace(jwtSettingsTmp.Secret) && jwtSettingsTmp.Secret.Length >= 32 ? jwtSettingsTmp.Secret : "V5B?*77+gzD_pk+2!%ORg<i)<D$DH+Xf.nECc?];2l;";
+            var validIssuers = jwtSettingsTmp.GetAllValidIssuers().ToList();
+            var validAudiences = jwtSettingsTmp.GetAllValidAudiences().ToList();
+
             var umValidation = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(umSecret)),
-                ValidateIssuer = !string.IsNullOrWhiteSpace(jwtSettingsTmp.Issuer),
-                ValidIssuer = string.IsNullOrWhiteSpace(jwtSettingsTmp.Issuer) ? null : jwtSettingsTmp.Issuer,
-                ValidateAudience = !string.IsNullOrWhiteSpace(jwtSettingsTmp.Audience),
-                ValidAudience = string.IsNullOrWhiteSpace(jwtSettingsTmp.Audience) ? null : jwtSettingsTmp.Audience,
+                ValidateIssuer = validIssuers.Count > 0,
+                ValidIssuers = validIssuers.Count > 0 ? validIssuers : null,
+                ValidateAudience = validAudiences.Count > 0,
+                ValidAudiences = validAudiences.Count > 0 ? validAudiences : null,
                 RequireExpirationTime = true,
                 ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
+                ClockSkew = TimeSpan.FromMinutes(1)
             };
             builder.Services.AddSingleton(umValidation);
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o =>
