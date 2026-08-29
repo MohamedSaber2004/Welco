@@ -64,11 +64,44 @@ namespace Welco.API
                     .AddJsonFile("ocelot.global.json", optional: true, reloadOnChange: true)
                     .AddJsonFile($"ocelot.global.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
-                foreach (var file in Directory.GetFiles(ocelotDir, $"*.{env.EnvironmentName}.json"))
+                // FIX: Multiple AddJsonFile calls with "Routes" arrays overwrite each other (last file wins).
+                // Merge all route files into one in-memory JSON so Ocelot sees every route (auth + user-management).
+                var routeFiles = Directory.GetFiles(ocelotDir, $"*.{env.EnvironmentName}.json")
+                    .Where(f => !Path.GetFileName(f).StartsWith("ocelot.global.", StringComparison.OrdinalIgnoreCase)
+                             && !Path.GetFileName(f).StartsWith("ocelot.merged.", StringComparison.OrdinalIgnoreCase))
+                    .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+                    .ToArray();
+                if (routeFiles.Length > 0)
                 {
-                    if (!Path.GetFileName(file).StartsWith("ocelot.global."))
+                    var allRoutes = new List<object?>();
+                    foreach (var file in routeFiles)
                     {
-                        builder.Configuration.AddJsonFile(file, optional: false, reloadOnChange: true);
+                        try
+                        {
+                            var json = File.ReadAllText(file);
+                            using var doc = System.Text.Json.JsonDocument.Parse(json);
+                            if (doc.RootElement.TryGetProperty("Routes", out var routes) && routes.ValueKind == System.Text.Json.JsonValueKind.Array)
+                            {
+                                foreach (var route in routes.EnumerateArray())
+                                {
+                                    var obj = System.Text.Json.JsonSerializer.Deserialize<object>(route.GetRawText());
+                                    if (obj != null) allRoutes.Add(obj);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Warning(ex, "Failed to merge Ocelot file {File}", file);
+                        }
+                    }
+                    if (allRoutes.Count > 0)
+                    {
+                        var mergedPath = Path.Combine(ocelotDir, $"ocelot.merged.{env.EnvironmentName}.json");
+                        var mergedPayload = new { Routes = allRoutes };
+                        var mergedJson = System.Text.Json.JsonSerializer.Serialize(mergedPayload, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                        try { File.WriteAllText(mergedPath, mergedJson); } catch (Exception ex) { Log.Warning(ex, "Failed to write merged Ocelot file"); }
+                        builder.Configuration.AddJsonFile(mergedPath, optional: false, reloadOnChange: false);
+                        Log.Information("Merged {Count} Ocelot routes from {Files} into {Merged}", allRoutes.Count, string.Join(", ", routeFiles.Select(Path.GetFileName)), Path.GetFileName(mergedPath));
                     }
                 }
             }
