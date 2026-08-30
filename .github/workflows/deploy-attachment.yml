@@ -1,0 +1,43 @@
+name: Deploy Attachment Microservice to MonsterASP
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'Attachment.Services.API/**'
+      - 'Welco.Shared/**'
+      - '.github/workflows/deploy-attachment.yml'
+      - '.github/workflows/ftp-deploy.py'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Attachment Service
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish Attachment Microservice
+        run: |
+          dotnet publish "Attachment.Services.API/Attachment.Services.API.csproj" \
+            -c Release \
+            -o ./publish/attachment
+
+      - name: Deploy to MonsterASP via FTP
+        env:
+          FTP_SERVER: ${{ secrets.ATTACHMENT_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.ATTACHMENT_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.ATTACHMENT_FTP_PASSWORD }}
+          LOCAL_DIR: ./publish/attachment
+          REMOTE_DIR: /wwwroot
+        run: python .github/workflows/ftp-deploy.py
