@@ -11,6 +11,7 @@ namespace Welco.Shared.Common.Interfaces
         DbSet<City> Cities { get; }
         DbSet<Zone> Zones { get; }
         DbSet<UserAddress> UserAddresses { get; }
+        DbSet<Provider> Providers { get; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

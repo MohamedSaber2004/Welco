@@ -152,5 +152,20 @@
     "CityIdRequired": "City ID is required.",
     "ZoneIdRequired": "Zone ID is required.",
     "AlreadyExists": "Zone already exists."
+  },
+  "Provider": {
+    "Created": "Provider created successfully.",
+    "Updated": "Provider updated successfully.",
+    "Deleted": "Provider deleted successfully.",
+    "NotFound": "Provider not found.",
+    "Fetched": "Provider retrieved successfully.",
+    "ListFetched": "Providers retrieved successfully.",
+    "CommercialNameRequired": "Commercial name is required.",
+    "EmailRequired": "Email is required.",
+    "EmailInvalid": "Invalid email format.",
+    "PasswordRequired": "Password is required.",
+    "PasswordTooShort": "Password must be at least 6 characters long.",
+    "CommercialRegistrationNumberAlreadyExists": "Commercial registration number already exists.",
+    "ProviderIdRequired": "Provider ID is required."
   }
 }

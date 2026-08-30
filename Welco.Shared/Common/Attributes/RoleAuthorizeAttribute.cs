@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +41,20 @@ namespace Welco.Shared.Common.Attributes
             if (hasAllowAnonymous)
             {
                 return;
+            }
+
+            // UseAuthentication() only registers middleware; the JWT handler is not invoked until
+            // AuthenticateAsync() is called (normally by [Authorize]). AddIdentity() (via
+            // AddWelcoIdentity) also registers cookie auth and makes Identity.Application the default
+            // scheme, so we must authenticate against the Bearer scheme explicitly to populate
+            // HttpContext.User from the JWT regardless of the configured default scheme.
+            if (context.HttpContext.User?.Identity == null || !context.HttpContext.User.Identity.IsAuthenticated)
+            {
+                var authenticateResult = await context.HttpContext.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
+                if (authenticateResult.Succeeded)
+                {
+                    context.HttpContext.User = authenticateResult.Principal;
+                }
             }
 
             var user = context.HttpContext.User;

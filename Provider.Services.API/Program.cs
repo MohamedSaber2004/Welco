@@ -10,7 +10,7 @@ using Welco.Shared.Common.Middlewares;
 using Welco.Shared.Localization;
 using Welco.Shared.OpenApi;
 
-namespace UserManamgent.Service.API
+namespace Provider.Services.API
 {
     public class Program
     {
@@ -57,8 +57,11 @@ namespace UserManamgent.Service.API
             builder.Services.AddWelcoSharedDependencies(builder.Configuration);
             builder.Services.AddWelcoIdentity(builder.Configuration);
 
+            // JWT — Gateway (Welco.API) is the primary entry-point validator; downstream services
+            // re-validate the same Auth-issued token so RoleAuthorize/CurrentUser work locally.
             builder.Services.AddWelcoJwtAuthentication(builder.Configuration);
 
+            // MediatR + FluentValidation — CQRS (Auth service is sole issuer; Gateway validates JWT)
             builder.Services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
@@ -102,7 +105,7 @@ namespace UserManamgent.Service.API
             app.MapOpenApi();
             app.MapScalarApiReference(options =>
             {
-                options.WithTitle("User Management Microservice API")
+                options.WithTitle("Provider Microservice API")
                        .WithTheme(ScalarTheme.Moon);
             });
             app.MapControllers();

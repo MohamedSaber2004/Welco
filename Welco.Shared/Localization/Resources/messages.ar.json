@@ -152,5 +152,20 @@
     "CityIdRequired": "معرف المدينة مطلوب.",
     "ZoneIdRequired": "معرف المنطقة مطلوب.",
     "AlreadyExists": "المنطقة موجودة بالفعل."
+  },
+  "Provider": {
+    "Created": "تم إنشاء المورد بنجاح.",
+    "Updated": "تم تحديث بيانات المورد بنجاح.",
+    "Deleted": "تم حذف المورد بنجاح.",
+    "NotFound": "المورد غير موجود.",
+    "Fetched": "تم استرجاع بيانات المورد بنجاح.",
+    "ListFetched": "تم استرجاع قائمة الموردين بنجاح.",
+    "CommercialNameRequired": "الاسم التجاري مطلوب.",
+    "EmailRequired": "البريد الإلكتروني مطلوب.",
+    "EmailInvalid": "صيغة البريد الإلكتروني غير صحيحة.",
+    "PasswordRequired": "كلمة المرور مطلوبة.",
+    "PasswordTooShort": "يجب ألا تقل كلمة المرور عن 6 أحرف.",
+    "CommercialRegistrationNumberAlreadyExists": "رقم السجل التجاري موجود بالفعل.",
+    "ProviderIdRequired": "معرف المورد مطلوب."
   }
 }

@@ -22,6 +22,7 @@ namespace Welco.Shared.Persistance
         public DbSet<City> Cities => Set<City>();
         public DbSet<Zone> Zones => Set<Zone>();
         public DbSet<UserAddress> UserAddresses => Set<UserAddress>();
+        public DbSet<Provider> Providers => Set<Provider>();
 
         public WelcoDbContext(DbContextOptions<WelcoDbContext> options, ICurrentUserService? currentUserService = null)
             : base(options)

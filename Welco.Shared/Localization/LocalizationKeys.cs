@@ -173,5 +173,22 @@ namespace Welco.Shared.Localization
             public const string ZoneIdRequired = "Zone.ZoneIdRequired";
             public const string AlreadyExists = "Zone.AlreadyExists";
         }
+
+        public static class Provider
+        {
+            public const string Created = "Provider.Created";
+            public const string Updated = "Provider.Updated";
+            public const string Deleted = "Provider.Deleted";
+            public const string NotFound = "Provider.NotFound";
+            public const string Fetched = "Provider.Fetched";
+            public const string ListFetched = "Provider.ListFetched";
+            public const string CommercialNameRequired = "Provider.CommercialNameRequired";
+            public const string EmailRequired = "Provider.EmailRequired";
+            public const string EmailInvalid = "Provider.EmailInvalid";
+            public const string PasswordRequired = "Provider.PasswordRequired";
+            public const string PasswordTooShort = "Provider.PasswordTooShort";
+            public const string CommercialRegistrationNumberAlreadyExists = "Provider.CommercialRegistrationNumberAlreadyExists";
+            public const string ProviderIdRequired = "Provider.ProviderIdRequired";
+        }
     }
 }
