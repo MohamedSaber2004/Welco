@@ -190,5 +190,19 @@ namespace Welco.Shared.Localization
             public const string CommercialRegistrationNumberAlreadyExists = "Provider.CommercialRegistrationNumberAlreadyExists";
             public const string ProviderIdRequired = "Provider.ProviderIdRequired";
         }
+
+        public static class AttachmentMessages
+        {
+            public const string FileEmpty = "Attachments.FileEmpty";
+            public const string InvalidFormat = "Attachments.InvalidFormat";
+            public const string InvalidFileType = "Attachments.InvalidFileType";
+            public const string InvalidPlace = "Attachments.InvalidPlace";
+            public const string FileTooLarge = "Attachments.FileTooLarge";
+            public const string NoMediaProvided = "Attachments.NoMediaProvided";
+            public const string UploadFailed = "Attachments.UploadFailed";
+            public const string FileUploaded = "Attachments.FileUploaded";
+            public const string FileNotFound = "Attachments.FileNotFound";
+            public const string FileDeleted = "Attachments.FileDeleted";
+        }
     }
 }

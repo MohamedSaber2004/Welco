@@ -18,6 +18,7 @@ namespace Welco.Shared.Localization
             services.AddSingleton<ILocalizationProvider, JsonLocalizationProvider>();
             services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
             services.AddTransient<IStringLocalizer, JsonStringLocalizer>();
+            services.AddTransient(typeof(IStringLocalizer<>), typeof(JsonStringLocalizer<>));
 
             services.Configure<RequestLocalizationOptions>(options =>
             {

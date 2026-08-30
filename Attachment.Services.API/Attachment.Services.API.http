@@ -1,6 +1,0 @@
-@Attachment.Services.API_HostAddress = http://localhost:5121
-
-GET {{Attachment.Services.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

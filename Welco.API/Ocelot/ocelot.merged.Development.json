@@ -1,6 +1,73 @@
 {
   "Routes": [
     {
+      "DownstreamPathTemplate": "/api/v1/attachments/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7180
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/attachments/{everything}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/files/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7180
+        }
+      ],
+      "UpstreamPathTemplate": "/files/{everything}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/openapi/v1.json",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7180
+        }
+      ],
+      "UpstreamPathTemplate": "/api/docs/attachment/openapi.json",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/scalar/v1",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7180
+        }
+      ],
+      "UpstreamPathTemplate": "/api/docs/attachment",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
       "DownstreamPathTemplate": "/api/v1/auth/profile",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [

@@ -167,5 +167,17 @@
     "PasswordTooShort": "يجب ألا تقل كلمة المرور عن 6 أحرف.",
     "CommercialRegistrationNumberAlreadyExists": "رقم السجل التجاري موجود بالفعل.",
     "ProviderIdRequired": "معرف المورد مطلوب."
+  },
+  "Attachments": {
+    "FileEmpty": "الملف فارغ.",
+    "InvalidFormat": "صيغة الملف غير مدعومة.",
+    "InvalidFileType": "نوع الملف غير مدعوم.",
+    "InvalidPlace": "موقع الرفع غير صالح.",
+    "FileTooLarge": "حجم الملف يتجاوز الحد الأقصى المسموح به.",
+    "NoMediaProvided": "لم يتم تقديم أي ملفات وسائط.",
+    "UploadFailed": "فشل رفع الملف.",
+    "FileUploaded": "تم رفع الملف بنجاح.",
+    "FileNotFound": "الملف غير موجود.",
+    "FileDeleted": "تم حذف الملف بنجاح."
   }
 }

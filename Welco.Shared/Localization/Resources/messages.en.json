@@ -167,5 +167,17 @@
     "PasswordTooShort": "Password must be at least 6 characters long.",
     "CommercialRegistrationNumberAlreadyExists": "Commercial registration number already exists.",
     "ProviderIdRequired": "Provider ID is required."
+  },
+  "Attachments": {
+    "FileEmpty": "The file is empty.",
+    "InvalidFormat": "The file format is not supported.",
+    "InvalidFileType": "The file type is not supported.",
+    "InvalidPlace": "The upload location is not valid.",
+    "FileTooLarge": "The file exceeds the maximum allowed size.",
+    "NoMediaProvided": "No media files were provided.",
+    "UploadFailed": "Failed to upload the file.",
+    "FileUploaded": "File uploaded successfully.",
+    "FileNotFound": "File not found.",
+    "FileDeleted": "File deleted successfully."
   }
 }
