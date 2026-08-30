@@ -14,6 +14,7 @@ using Welco.Shared.Common.Behaviors;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Middlewares;
 using Welco.Shared.Common.Options;
+using Welco.Shared.Domain.Models;
 using Welco.Shared.Localization;
 using Welco.Shared.Localization.Interfaces;
 using Welco.Shared.OpenApi;
@@ -156,8 +157,10 @@ namespace Auth.Services.API
                 try
                 {
                     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
                     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
                     await RoleSeeder.SeedRolesAsync(roleManager, logger);
+                    await UserSeeder.SeedUsersAsync(userManager, logger);
                 }
                 catch (Exception)
                 {
