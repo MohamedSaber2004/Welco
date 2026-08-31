@@ -1,0 +1,43 @@
+name: Deploy Product Microservice to MonsterASP
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'Product.Services.API/**'
+      - 'Welco.Shared/**'
+      - '.github/workflows/deploy-product.yml'
+      - '.github/workflows/ftp-deploy.py'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Product Service
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish Product Microservice
+        run: |
+          dotnet publish "Product.Services.API/Product.Services.API.csproj" \
+            -c Release \
+            -o ./publish/product
+
+      - name: Deploy to MonsterASP via FTP
+        env:
+          FTP_SERVER: ${{ secrets.PRODUCT_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.PRODUCT_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.PRODUCT_FTP_PASSWORD }}
+          LOCAL_DIR: ./publish/product
+          REMOTE_DIR: /wwwroot
+        run: python .github/workflows/ftp-deploy.py

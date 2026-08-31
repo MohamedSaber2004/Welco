@@ -24,7 +24,9 @@ namespace Welco.Shared.Domain.Models
         public string? EmailConfirmationOtp { get; set; }
         public DateTime? EmailConfirmationOtpExpiry { get; set; }
         public AppLanguage Language { get; set; }
-        public UserType UserType { get; set; } = UserType.Doctor;
+        public UserType UserType { get; set; } = UserType.OrganizationUser;
+        public Guid? CompanyId { get; set; }
+        public virtual Company? Company { get; set; }
 
         public virtual ICollection<UserAddress> Addresses { get; set; } = new List<UserAddress>();
 

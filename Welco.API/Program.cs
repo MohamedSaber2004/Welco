@@ -223,6 +223,8 @@ namespace Welco.API
                     ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
                 });
             builder.Services.AddSingleton<Welco.API.Services.OpenApiAggregatorService>();
+            builder.Services.AddHostedService<Welco.API.Services.OpenApiCacheWarmer>();
+            builder.Services.Configure<OpenApiAggregatorOptions>(builder.Configuration.GetSection(OpenApiAggregatorOptions.SectionName));
 
             builder.Services.AddOcelot(builder.Configuration);
             builder.Services.AddConfiguredOpenApi();

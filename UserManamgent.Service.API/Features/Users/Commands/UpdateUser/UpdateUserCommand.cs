@@ -12,6 +12,7 @@ namespace UserManamgent.Service.API.Features.Users.Commands.UpdateUser
         public string? PhoneNumber { get; set; }
         public string? ProfilePictureName { get; set; }
         public UserType? UserType { get; set; }
+        public Guid? CompanyId { get; set; }
         public bool? IsActive { get; set; }
     }
 }

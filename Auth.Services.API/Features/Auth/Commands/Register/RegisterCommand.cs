@@ -11,7 +11,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
         public string Password { get; set; } = string.Empty;
         public string ConfirmPassword { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }
-        public UserType UserType { get; set; } = UserType.Doctor;
+        public UserType UserType { get; set; } = UserType.OrganizationUser;
         public AppLanguage Language { get; set; } = AppLanguage.En;
     }
 }

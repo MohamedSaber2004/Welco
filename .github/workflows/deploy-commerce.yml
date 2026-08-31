@@ -1,0 +1,43 @@
+name: Deploy Commerce Microservice to MonsterASP
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'Commerce.Services.API/**'
+      - 'Welco.Shared/**'
+      - '.github/workflows/deploy-commerce.yml'
+      - '.github/workflows/ftp-deploy.py'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Commerce Service
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish Commerce Microservice
+        run: |
+          dotnet publish "Commerce.Services.API/Commerce.Services.API.csproj" \
+            -c Release \
+            -o ./publish/commerce
+
+      - name: Deploy to MonsterASP via FTP
+        env:
+          FTP_SERVER: ${{ secrets.COMMERCE_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.COMMERCE_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.COMMERCE_FTP_PASSWORD }}
+          LOCAL_DIR: ./publish/commerce
+          REMOTE_DIR: /wwwroot
+        run: python .github/workflows/ftp-deploy.py

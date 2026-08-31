@@ -23,7 +23,7 @@ namespace UserManamgent.Service.API.Controllers
         }
 
         [HttpGet]
-        [RoleAuthorize(UserType.Doctor, UserType.Admin)]
+        [AllowAnonymous]
         [Route(UserManagementApiRoutes.Countries.GetAll)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
@@ -33,7 +33,7 @@ namespace UserManamgent.Service.API.Controllers
         }
 
         [HttpGet]
-        [RoleAuthorize(UserType.Doctor, UserType.Admin)]
+        [AllowAnonymous]
         [Route(UserManagementApiRoutes.Countries.GetById)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

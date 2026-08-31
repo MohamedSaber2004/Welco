@@ -21,13 +21,13 @@ namespace Attachment.Services.API.Infrastructure
         public async Task<(bool Uploaded, string Result)> UploadAudio(IFormFile file, int Place)
         {
             if (file == null || file.Length == 0)
-                return (false, _localizer["Attachments:FileEmpty"]);
+                return (false, _localizer[LocalizationKeys.AttachmentMessages.FileEmpty]);
 
             if (!IsValidAudio(file))
-                return (false, _localizer["Attachments:InvalidFormat"]);
+                return (false, _localizer[LocalizationKeys.AttachmentMessages.InvalidFormat]);
 
             if (file.Length > MaxAudioSizeBytes)
-                return (false, _localizer["Attachments:FileTooLarge"]);
+                return (false, _localizer[LocalizationKeys.AttachmentMessages.FileTooLarge]);
 
             var (uploaded, result) = await _baseFileService.UploadFileAsync(file, FilePathHelper.GetFolderPath(Place));
             if (uploaded)

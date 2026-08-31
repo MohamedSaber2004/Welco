@@ -91,6 +91,7 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                 PhoneNumber = user.PhoneNumber,
                 ProfilePictureName = user.ProfilePictureName,
                 UserType = user.UserType,
+                CompanyId = user.CompanyId,
                 Language = user.Language,
                 IsEmailConfirmed = user.EmailConfirmed,
                 CreatedAt = user.CreatedAt,

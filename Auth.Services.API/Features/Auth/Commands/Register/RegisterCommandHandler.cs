@@ -7,6 +7,7 @@ using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Options;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Domain.Models;
+using Welco.Shared.Enums;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
 

@@ -174,23 +174,6 @@ namespace Welco.Shared.Localization
             public const string AlreadyExists = "Zone.AlreadyExists";
         }
 
-        public static class Provider
-        {
-            public const string Created = "Provider.Created";
-            public const string Updated = "Provider.Updated";
-            public const string Deleted = "Provider.Deleted";
-            public const string NotFound = "Provider.NotFound";
-            public const string Fetched = "Provider.Fetched";
-            public const string ListFetched = "Provider.ListFetched";
-            public const string CommercialNameRequired = "Provider.CommercialNameRequired";
-            public const string EmailRequired = "Provider.EmailRequired";
-            public const string EmailInvalid = "Provider.EmailInvalid";
-            public const string PasswordRequired = "Provider.PasswordRequired";
-            public const string PasswordTooShort = "Provider.PasswordTooShort";
-            public const string CommercialRegistrationNumberAlreadyExists = "Provider.CommercialRegistrationNumberAlreadyExists";
-            public const string ProviderIdRequired = "Provider.ProviderIdRequired";
-        }
-
         public static class Certification
         {
             public const string Created = "Certification.Created";
@@ -208,6 +191,157 @@ namespace Welco.Shared.Localization
             public const string IssueDateInFuture = "Certification.IssueDateInFuture";
             public const string ExpiryDateBeforeIssueDate = "Certification.ExpiryDateBeforeIssueDate";
             public const string CertificationIdRequired = "Certification.CertificationIdRequired";
+        }
+
+        public static class Category
+        {
+            public const string Created = "Category.Created";
+            public const string Updated = "Category.Updated";
+            public const string Deleted = "Category.Deleted";
+            public const string NotFound = "Category.NotFound";
+            public const string Fetched = "Category.Fetched";
+            public const string ListFetched = "Category.ListFetched";
+            public const string NameEnRequired = "Category.NameEnRequired";
+            public const string NameArRequired = "Category.NameArRequired";
+            public const string ParentCategoryNotFound = "Category.ParentCategoryNotFound";
+            public const string CategoryIdRequired = "Category.CategoryIdRequired";
+            public const string ProvidersFetched = "Category.ProvidersFetched";
+            public const string ProductsFetched = "Category.ProductsFetched";
+        }
+
+        public static class Currency
+        {
+            public const string Created = "Currency.Created";
+            public const string Updated = "Currency.Updated";
+            public const string Deleted = "Currency.Deleted";
+            public const string NotFound = "Currency.NotFound";
+            public const string Fetched = "Currency.Fetched";
+            public const string ListFetched = "Currency.ListFetched";
+            public const string NameEnRequired = "Currency.NameEnRequired";
+            public const string NameArRequired = "Currency.NameArRequired";
+            public const string CodeRequired = "Currency.CodeRequired";
+            public const string SymbolRequired = "Currency.SymbolRequired";
+            public const string CodeAlreadyExists = "Currency.CodeAlreadyExists";
+            public const string CurrencyIdRequired = "Currency.CurrencyIdRequired";
+        }
+
+        public static class Product
+        {
+            public const string Created = "Product.Created";
+            public const string Updated = "Product.Updated";
+            public const string Deleted = "Product.Deleted";
+            public const string NotFound = "Product.NotFound";
+            public const string Fetched = "Product.Fetched";
+            public const string ListFetched = "Product.ListFetched";
+            public const string NameEnRequired = "Product.NameEnRequired";
+            public const string NameArRequired = "Product.NameArRequired";
+            public const string SkuRequired = "Product.SkuRequired";
+            public const string SkuAlreadyExists = "Product.SkuAlreadyExists";
+            public const string SlugRequired = "Product.SlugRequired";
+            public const string SlugAlreadyExists = "Product.SlugAlreadyExists";
+            public const string PriceRequired = "Product.PriceRequired";
+            public const string PricePositive = "Product.PricePositive";
+            public const string StockNotNegative = "Product.StockNotNegative";
+            public const string CategoryRequired = "Product.CategoryRequired";
+            public const string CategoryNotFound = "Product.CategoryNotFound";
+            public const string ProductIdRequired = "Product.ProductIdRequired";
+        }
+
+        public static class Company
+        {
+            public const string Created = "Company.Created";
+            public const string Updated = "Company.Updated";
+            public const string Deleted = "Company.Deleted";
+            public const string NotFound = "Company.NotFound";
+            public const string Fetched = "Company.Fetched";
+            public const string ListFetched = "Company.ListFetched";
+            public const string NameRequired = "Company.NameRequired";
+            public const string TypeRequired = "Company.TypeRequired";
+            public const string CountryRequired = "Company.CountryRequired";
+            public const string TierLevelInvalid = "Company.TierLevelInvalid";
+            public const string CompanyIdRequired = "Company.CompanyIdRequired";
+        }
+
+        public static class Cart
+        {
+            public const string Created = "Cart.Created";
+            public const string NotFound = "Cart.NotFound";
+            public const string Fetched = "Cart.Fetched";
+            public const string ListFetched = "Cart.ListFetched";
+            public const string Cleared = "Cart.Cleared";
+            public const string ItemAdded = "Cart.ItemAdded";
+            public const string ItemUpdated = "Cart.ItemUpdated";
+            public const string ItemRemoved = "Cart.ItemRemoved";
+            public const string ItemNotFound = "Cart.ItemNotFound";
+            public const string CartIdRequired = "Cart.CartIdRequired";
+            public const string UserIdRequired = "Cart.UserIdRequired";
+            public const string SessionIdRequired = "Cart.SessionIdRequired";
+            public const string CartItemIdRequired = "Cart.CartItemIdRequired";
+            public const string QuantityPositive = "Cart.QuantityPositive";
+            public const string PriceNotNegative = "Cart.PriceNotNegative";
+            public const string UserIdOrSessionRequired = "Cart.UserIdOrSessionRequired";
+        }
+
+        public static class Order
+        {
+            public const string Created = "Order.Created";
+            public const string NotFound = "Order.NotFound";
+            public const string Fetched = "Order.Fetched";
+            public const string ListFetched = "Order.ListFetched";
+            public const string Updated = "Order.Updated";
+            public const string InvalidStatus = "Order.InvalidStatus";
+            public const string ItemsRequired = "Order.ItemsRequired";
+            public const string QuantityPositive = "Order.QuantityPositive";
+            public const string PriceNotNegative = "Order.PriceNotNegative";
+            public const string OrderIdRequired = "Order.OrderIdRequired";
+            public const string StatusRequired = "Order.StatusRequired";
+        }
+
+        public static class Document
+        {
+            public const string Created = "Document.Created";
+            public const string Deleted = "Document.Deleted";
+            public const string Fetched = "Document.Fetched";
+            public const string ListFetched = "Document.ListFetched";
+            public const string NotFound = "Document.NotFound";
+            public const string TitleRequired = "Document.TitleRequired";
+            public const string DocTypeRequired = "Document.DocTypeRequired";
+            public const string FileUrlRequired = "Document.FileUrlRequired";
+            public const string FileSizeNotNegative = "Document.FileSizeNotNegative";
+            public const string DocumentIdRequired = "Document.DocumentIdRequired";
+        }
+
+        public static class LandingPage
+        {
+            public const string Created = "LandingPage.Created";
+            public const string Fetched = "LandingPage.Fetched";
+            public const string ListFetched = "LandingPage.ListFetched";
+            public const string NotFound = "LandingPage.NotFound";
+            public const string SlugAlreadyExists = "LandingPage.SlugAlreadyExists";
+            public const string SlugRequired = "LandingPage.SlugRequired";
+            public const string TypeRequired = "LandingPage.TypeRequired";
+            public const string HeroTitleRequired = "LandingPage.HeroTitleRequired";
+        }
+
+        public static class RFQ
+        {
+            public const string Created = "RFQ.Created";
+            public const string Updated = "RFQ.Updated";
+            public const string Fetched = "RFQ.Fetched";
+            public const string ListFetched = "RFQ.ListFetched";
+            public const string NotFound = "RFQ.NotFound";
+            public const string InvalidStatus = "RFQ.InvalidStatus";
+            public const string ItemsRequired = "RFQ.ItemsRequired";
+        }
+
+        public static class Quote
+        {
+            public const string Created = "Quote.Created";
+            public const string Fetched = "Quote.Fetched";
+            public const string ListFetched = "Quote.ListFetched";
+            public const string NotFound = "Quote.NotFound";
+            public const string Approved = "Quote.Approved";
+            public const string Declined = "Quote.Declined";
         }
 
         public static class AttachmentMessages

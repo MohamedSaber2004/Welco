@@ -104,7 +104,7 @@ namespace Welco.Shared.Persistance.Seeding
                 }
             }
 
-            return UserType.Doctor;
+            return UserType.OrganizationUser;
         }
 
         private static string? ReadJson(string? jsonFilePath)

@@ -10,6 +10,7 @@ namespace Welco.Shared.Common.DTOs.UserManagement
         public string? PhoneNumber { get; set; }
         public string? ProfilePictureName { get; set; }
         public UserType UserType { get; set; }
+        public Guid? CompanyId { get; set; }
         public AppLanguage Language { get; set; }
         public bool IsActive { get; set; }
         public bool IsEmailConfirmed { get; set; }

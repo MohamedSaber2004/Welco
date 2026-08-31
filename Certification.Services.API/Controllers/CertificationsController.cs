@@ -6,9 +6,11 @@ using Certification.Services.API.Features.Certifications.Queries.GetCertificatio
 using Certification.Services.API.Features.Certifications.Queries.GetCertifications;
 using Certification.Services.API.Features.Certifications.Queries.ShowCertification;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Welco.Shared.Common.Attributes;
 using Welco.Shared.Controllers;
+using Welco.Shared.Enums;
 
 namespace Certification.Services.API.Controllers
 {
@@ -28,6 +30,7 @@ namespace Certification.Services.API.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route(CertificationApiRoutes.Certifications.GetAll)]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll([FromQuery] GetCertificationsQuery query, CancellationToken cancellationToken)
         {
@@ -43,6 +46,7 @@ namespace Certification.Services.API.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route(CertificationApiRoutes.Certifications.GetById)]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken cancellationToken)
@@ -59,6 +63,7 @@ namespace Certification.Services.API.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route(CertificationApiRoutes.Certifications.Show)]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Show([FromRoute] Guid id, CancellationToken cancellationToken)
@@ -75,6 +80,7 @@ namespace Certification.Services.API.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route(CertificationApiRoutes.Certifications.Create)]
+        [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -93,6 +99,7 @@ namespace Certification.Services.API.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route(CertificationApiRoutes.Certifications.Update)]
+        [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -112,6 +119,7 @@ namespace Certification.Services.API.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route(CertificationApiRoutes.Certifications.Delete)]
+        [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken cancellationToken)

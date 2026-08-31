@@ -54,6 +54,7 @@ namespace UserManamgent.Service.API.Features.Users.Queries.GetUsers
                         PhoneNumber = u.PhoneNumber,
                         ProfilePictureName = u.ProfilePictureName,
                         UserType = u.UserType,
+                        CompanyId = u.CompanyId,
                         Language = u.Language,
                         IsActive = u.IsActive,
                         IsEmailConfirmed = u.EmailConfirmed,

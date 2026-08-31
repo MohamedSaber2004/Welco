@@ -1,0 +1,43 @@
+name: Deploy Content Microservice to MonsterASP
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'Content.Services.API/**'
+      - 'Welco.Shared/**'
+      - '.github/workflows/deploy-content.yml'
+      - '.github/workflows/ftp-deploy.py'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Content Service
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish Content Microservice
+        run: |
+          dotnet publish "Content.Services.API/Content.Services.API.csproj" \
+            -c Release \
+            -o ./publish/content
+
+      - name: Deploy to MonsterASP via FTP
+        env:
+          FTP_SERVER: ${{ secrets.CONTENT_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.CONTENT_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.CONTENT_FTP_PASSWORD }}
+          LOCAL_DIR: ./publish/content
+          REMOTE_DIR: /wwwroot
+        run: python .github/workflows/ftp-deploy.py

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Welco.Shared.Common.DTOs.UserManagement;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Domain.Models;
+using Welco.Shared.Enums;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
 
@@ -48,6 +49,11 @@ namespace UserManamgent.Service.API.Features.Users.Commands.UpdateUser
                 user.ProfilePictureName = request.ProfilePictureName;
             }
 
+            if (request.CompanyId.HasValue)
+            {
+                user.CompanyId = request.CompanyId.Value;
+            }
+
             if (request.IsActive.HasValue)
             {
                 if (request.IsActive.Value)
@@ -86,6 +92,7 @@ namespace UserManamgent.Service.API.Features.Users.Commands.UpdateUser
                 PhoneNumber = user.PhoneNumber,
                 ProfilePictureName = user.ProfilePictureName,
                 UserType = user.UserType,
+                CompanyId = user.CompanyId,
                 Language = user.Language,
                 IsActive = user.IsActive,
                 IsEmailConfirmed = user.EmailConfirmed,

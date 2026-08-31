@@ -1,5 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.Options;
+using Welco.API.Options;
 
 namespace Welco.API.Services
 {
@@ -8,15 +10,18 @@ namespace Welco.API.Services
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IWebHostEnvironment _env;
         private readonly ILogger<OpenApiAggregatorService> _logger;
+        private readonly OpenApiAggregatorOptions _options;
 
         public OpenApiAggregatorService(
             IHttpClientFactory httpClientFactory,
             IWebHostEnvironment env,
-            ILogger<OpenApiAggregatorService> logger)
+            ILogger<OpenApiAggregatorService> logger,
+            IOptions<OpenApiAggregatorOptions> options)
         {
             _httpClientFactory = httpClientFactory;
             _env = env;
             _logger = logger;
+            _options = options.Value;
         }
 
         public async Task<string> GetAggregatedOpenApiAsync(string gatewayBaseUrl, CancellationToken cancellationToken = default)
@@ -28,52 +33,7 @@ namespace Welco.API.Services
                 try { Directory.CreateDirectory(cacheDir); } catch { /* ignore */ }
             }
 
-            var downstreamEndpoints = new List<(string ServiceName, string Url)>();
-
-            if (Directory.Exists(ocelotDir))
-            {
-                var files = Directory.GetFiles(ocelotDir, $"ocelot.*.{_env.EnvironmentName}.json");
-                foreach (var file in files)
-                {
-                    var fileName = Path.GetFileName(file);
-                    if (!fileName.StartsWith("ocelot.global.", StringComparison.OrdinalIgnoreCase)
-                        && !fileName.StartsWith("ocelot.merged.", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var parts = fileName.Split('.');
-                        if (parts.Length >= 3)
-                        {
-                            var serviceName = parts[1];
-                            try
-                            {
-                                var jsonContent = await File.ReadAllTextAsync(file, cancellationToken);
-                                using var doc = JsonDocument.Parse(jsonContent);
-                                if (doc.RootElement.TryGetProperty("Routes", out var routes))
-                                {
-                                    foreach (var route in routes.EnumerateArray())
-                                    {
-                                        if (route.TryGetProperty("DownstreamPathTemplate", out var downstreamPath) &&
-                                            downstreamPath.GetString() == "/openapi/v1.json" &&
-                                            route.TryGetProperty("DownstreamScheme", out var scheme) &&
-                                            route.TryGetProperty("DownstreamHostAndPorts", out var hostAndPorts))
-                                        {
-                                            var firstHost = hostAndPorts[0];
-                                            var host = firstHost.GetProperty("Host").GetString();
-                                            var port = firstHost.GetProperty("Port").GetInt32();
-                                            var url = $"{scheme.GetString()}://{host}:{port}/openapi/v1.json";
-                                            downstreamEndpoints.Add((serviceName, url));
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger.LogWarning(ex, "Failed to parse Ocelot file {File}", file);
-                            }
-                        }
-                    }
-                }
-            }
+            var downstreamEndpoints = await GetDownstreamOpenApiEndpointsAsync(cancellationToken);
 
             var mergedDoc = new JsonObject
             {
@@ -115,71 +75,11 @@ namespace Welco.API.Services
             var mergedTags = mergedDoc["tags"]!.AsArray();
             var existingTags = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            var httpClient = _httpClientFactory.CreateClient("InsecureClient");
-
-            var fetchTasks = downstreamEndpoints.Select(async endpoint =>
+            var fetchTasks = downstreamEndpoints.Select(endpoint =>
             {
                 var (serviceName, url) = endpoint;
                 var cacheFile = Path.Combine(cacheDir, $"openapi.{serviceName}.json");
-
-                try
-                {
-                    using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                    linkedCts.CancelAfter(TimeSpan.FromSeconds(2));
-
-                    var response = await httpClient.GetAsync(url, linkedCts.Token);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync(linkedCts.Token);
-                        try
-                        {
-                            await File.WriteAllTextAsync(cacheFile, content, cancellationToken);
-                        }
-                        catch
-                        {
-                            // ignore file caching errors
-                        }
-
-                        var serviceNode = JsonNode.Parse(content);
-                        if (serviceNode is JsonObject serviceObj)
-                        {
-                            return serviceObj;
-                        }
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Failed to fetch OpenAPI schema from {Url}. Status: {StatusCode}", url, response.StatusCode);
-                    }
-                }
-                catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
-                {
-                    _logger.LogWarning("Timed out fetching OpenAPI schema from {Url} (downstream service may not be running).", url);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Could not reach downstream service at {Url}", url);
-                }
-
-                // Fallback to cached schema on disk if available
-                if (File.Exists(cacheFile))
-                {
-                    try
-                    {
-                        var cachedContent = await File.ReadAllTextAsync(cacheFile, cancellationToken);
-                        var cachedNode = JsonNode.Parse(cachedContent);
-                        if (cachedNode is JsonObject cachedObj)
-                        {
-                            _logger.LogInformation("Using cached OpenAPI specification for '{ServiceName}'.", serviceName);
-                            return cachedObj;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Failed to load cached OpenAPI specification for '{ServiceName}'.", serviceName);
-                    }
-                }
-
-                return null;
+                return FetchOpenApiWithCacheAsync(serviceName, url, cacheFile, cancellationToken);
             });
 
             var fetchedDocs = await Task.WhenAll(fetchTasks);
@@ -242,61 +142,18 @@ namespace Welco.API.Services
             var cacheDir = Path.Combine(ocelotDir, "Cache");
             var cacheFile = Path.Combine(cacheDir, $"openapi.{targetServiceName}.json");
 
-            string? endpointUrl = null;
-            if (Directory.Exists(ocelotDir))
-            {
-                var files = Directory.GetFiles(ocelotDir, $"ocelot.{targetServiceName}.{_env.EnvironmentName}.json");
-                if (files.Length > 0)
-                {
-                    try
-                    {
-                        var jsonContent = await File.ReadAllTextAsync(files[0], cancellationToken);
-                        using var doc = JsonDocument.Parse(jsonContent);
-                        if (doc.RootElement.TryGetProperty("Routes", out var routes))
-                        {
-                            foreach (var route in routes.EnumerateArray())
-                            {
-                                if (route.TryGetProperty("DownstreamPathTemplate", out var downstreamPath) &&
-                                    downstreamPath.GetString() == "/openapi/v1.json" &&
-                                    route.TryGetProperty("DownstreamScheme", out var scheme) &&
-                                    route.TryGetProperty("DownstreamHostAndPorts", out var hostAndPorts))
-                                {
-                                    var firstHost = hostAndPorts[0];
-                                    var host = firstHost.GetProperty("Host").GetString();
-                                    var port = firstHost.GetProperty("Port").GetInt32();
-                                    endpointUrl = $"{scheme.GetString()}://{host}:{port}/openapi/v1.json";
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Failed to parse Ocelot file for {ServiceName}", targetServiceName);
-                    }
-                }
-            }
+            var endpoints = await GetDownstreamOpenApiEndpointsAsync(cancellationToken);
+            var endpointUrl = endpoints.FirstOrDefault(e => string.Equals(e.ServiceName, targetServiceName, StringComparison.OrdinalIgnoreCase)).Url;
 
             if (!string.IsNullOrEmpty(endpointUrl))
             {
                 try
                 {
-                    var httpClient = _httpClientFactory.CreateClient("InsecureClient");
-                    using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                    linkedCts.CancelAfter(TimeSpan.FromSeconds(2));
-
-                    var response = await httpClient.GetAsync(endpointUrl, linkedCts.Token);
-                    if (response.IsSuccessStatusCode)
+                    if (!Directory.Exists(cacheDir)) Directory.CreateDirectory(cacheDir);
+                    var serviceObj = await FetchOpenApiWithCacheAsync(targetServiceName, endpointUrl, cacheFile, cancellationToken);
+                    if (serviceObj != null)
                     {
-                        var content = await response.Content.ReadAsStringAsync(linkedCts.Token);
-                        try
-                        {
-                            if (!Directory.Exists(cacheDir)) Directory.CreateDirectory(cacheDir);
-                            await File.WriteAllTextAsync(cacheFile, content, cancellationToken);
-                        }
-                        catch { /* ignore */ }
-
-                        return AdjustServiceOpenApi(content, gatewayBaseUrl);
+                        return AdjustServiceOpenApi(serviceObj.ToJsonString(), gatewayBaseUrl);
                     }
                 }
                 catch (Exception ex)
@@ -319,6 +176,145 @@ namespace Welco.API.Services
             }
 
             return "{}";
+        }
+
+        public async Task WarmUpAsync(CancellationToken cancellationToken = default)
+        {
+            var ocelotDir = Path.Combine(_env.ContentRootPath, "Ocelot");
+            var cacheDir = Path.Combine(ocelotDir, "Cache");
+            if (!Directory.Exists(cacheDir))
+            {
+                try { Directory.CreateDirectory(cacheDir); } catch { /* ignore */ }
+            }
+
+            var endpoints = await GetDownstreamOpenApiEndpointsAsync(cancellationToken);
+            foreach (var (serviceName, url) in endpoints)
+            {
+                var cacheFile = Path.Combine(cacheDir, $"openapi.{serviceName}.json");
+                _logger.LogInformation("Pre-warming OpenAPI schema for '{ServiceName}' from {Url}", serviceName, url);
+                await FetchOpenApiWithCacheAsync(serviceName, url, cacheFile, cancellationToken);
+            }
+        }
+
+        public async Task<IReadOnlyList<(string ServiceName, string Url)>> GetDownstreamOpenApiEndpointsAsync(CancellationToken cancellationToken = default)
+        {
+            var ocelotDir = Path.Combine(_env.ContentRootPath, "Ocelot");
+            var downstreamEndpoints = new List<(string ServiceName, string Url)>();
+
+            if (!Directory.Exists(ocelotDir)) return downstreamEndpoints;
+
+            var files = Directory.GetFiles(ocelotDir, $"ocelot.*.{_env.EnvironmentName}.json");
+            foreach (var file in files)
+            {
+                var fileName = Path.GetFileName(file);
+                if (fileName.StartsWith("ocelot.global.", StringComparison.OrdinalIgnoreCase)
+                    || fileName.StartsWith("ocelot.merged.", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var parts = fileName.Split('.');
+                if (parts.Length < 3) continue;
+
+                var serviceName = parts[1];
+                try
+                {
+                    var jsonContent = await File.ReadAllTextAsync(file, cancellationToken);
+                    using var doc = JsonDocument.Parse(jsonContent);
+                    if (!doc.RootElement.TryGetProperty("Routes", out var routes)) continue;
+
+                    foreach (var route in routes.EnumerateArray())
+                    {
+                        if (route.TryGetProperty("DownstreamPathTemplate", out var downstreamPath) &&
+                            downstreamPath.GetString() == "/openapi/v1.json" &&
+                            route.TryGetProperty("DownstreamScheme", out var scheme) &&
+                            route.TryGetProperty("DownstreamHostAndPorts", out var hostAndPorts))
+                        {
+                            var firstHost = hostAndPorts[0];
+                            var host = firstHost.GetProperty("Host").GetString();
+                            var port = firstHost.GetProperty("Port").GetInt32();
+                            var url = $"{scheme.GetString()}://{host}:{port}/openapi/v1.json";
+                            downstreamEndpoints.Add((serviceName, url));
+                            break;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to parse Ocelot file {File}", file);
+                }
+            }
+
+            return downstreamEndpoints;
+        }
+
+        private async Task<JsonObject?> FetchOpenApiWithCacheAsync(string serviceName, string url, string cacheFile, CancellationToken cancellationToken)
+        {
+            var httpClient = _httpClientFactory.CreateClient("InsecureClient");
+            var attempts = Math.Max(1, _options.RetryCount + 1);
+
+            for (var attempt = 1; attempt <= attempts; attempt++)
+            {
+                try
+                {
+                    using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                    linkedCts.CancelAfter(TimeSpan.FromSeconds(Math.Max(1, _options.TimeoutSeconds)));
+
+                    var response = await httpClient.GetAsync(url, linkedCts.Token);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync(linkedCts.Token);
+                        try
+                        {
+                            if (!Directory.Exists(Path.GetDirectoryName(cacheFile))) Directory.CreateDirectory(Path.GetDirectoryName(cacheFile)!);
+                            await File.WriteAllTextAsync(cacheFile, content, cancellationToken);
+                        }
+                        catch
+                        {
+                            // ignore file caching errors
+                        }
+
+                        var serviceNode = JsonNode.Parse(content);
+                        if (serviceNode is JsonObject serviceObj)
+                        {
+                            return serviceObj;
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Failed to fetch OpenAPI schema from {Url}. Status: {StatusCode}", url, response.StatusCode);
+                    }
+                }
+                catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+                {
+                    _logger.LogWarning("Timed out fetching OpenAPI schema from {Url} (attempt {Attempt}/{Attempts}; downstream service may not be running).", url, attempt, attempts);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Could not reach downstream service at {Url} (attempt {Attempt}/{Attempts})", url, attempt, attempts);
+                }
+            }
+
+            // Fallback to cached schema on disk if available
+            if (File.Exists(cacheFile))
+            {
+                try
+                {
+                    var cachedContent = await File.ReadAllTextAsync(cacheFile, cancellationToken);
+                    var cachedNode = JsonNode.Parse(cachedContent);
+                    if (cachedNode is JsonObject cachedObj)
+                    {
+                        _logger.LogInformation("Using cached OpenAPI specification for '{ServiceName}'.", serviceName);
+                        return cachedObj;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to load cached OpenAPI specification for '{ServiceName}'.", serviceName);
+                }
+            }
+
+            return null;
         }
 
         private static string AdjustServiceOpenApi(string openApiJson, string gatewayBaseUrl)

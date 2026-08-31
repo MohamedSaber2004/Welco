@@ -23,7 +23,7 @@ namespace UserManamgent.Service.API.Controllers
         }
 
         [HttpGet]
-        [RoleAuthorize(UserType.Doctor, UserType.Admin)]
+        [AllowAnonymous]
         [Route(UserManagementApiRoutes.Zones.GetAll)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll([FromQuery] Guid? cityId, CancellationToken cancellationToken)
@@ -33,7 +33,7 @@ namespace UserManamgent.Service.API.Controllers
         }
 
         [HttpGet]
-        [RoleAuthorize(UserType.Doctor, UserType.Admin)]
+        [AllowAnonymous]
         [Route(UserManagementApiRoutes.Zones.GetByCity)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetByCity([FromRoute] Guid cityId, CancellationToken cancellationToken)
@@ -43,7 +43,7 @@ namespace UserManamgent.Service.API.Controllers
         }
 
         [HttpGet]
-        [RoleAuthorize(UserType.Doctor, UserType.Admin)]
+        [AllowAnonymous]
         [Route(UserManagementApiRoutes.Zones.GetById)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

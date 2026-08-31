@@ -22,8 +22,35 @@ namespace Welco.Shared.Persistance
         public DbSet<City> Cities => Set<City>();
         public DbSet<Zone> Zones => Set<Zone>();
         public DbSet<UserAddress> UserAddresses => Set<UserAddress>();
-        public DbSet<Provider> Providers => Set<Provider>();
         public DbSet<Certification> Certifications => Set<Certification>();
+        public DbSet<Category> Categories => Set<Category>();
+        public DbSet<Product> Products => Set<Product>();
+        public DbSet<Currency> Currencies => Set<Currency>();
+        public DbSet<Company> Companies => Set<Company>();
+        public DbSet<ProductSpecification> ProductSpecifications => Set<ProductSpecification>();
+        public DbSet<ProductMedia> ProductMedias => Set<ProductMedia>();
+        public DbSet<ProductProcedureTag> ProductProcedureTags => Set<ProductProcedureTag>();
+        public DbSet<UserProductInteraction> UserProductInteractions => Set<UserProductInteraction>();
+        public DbSet<Cart> Carts => Set<Cart>();
+        public DbSet<CartItem> CartItems => Set<CartItem>();
+        public DbSet<Order> Orders => Set<Order>();
+        public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+        public DbSet<Invoice> Invoices => Set<Invoice>();
+        public DbSet<RFQ> RFQs => Set<RFQ>();
+        public DbSet<RFQItem> RFQItems => Set<RFQItem>();
+        public DbSet<Quote> Quotes => Set<Quote>();
+        public DbSet<QuoteItem> QuoteItems => Set<QuoteItem>();
+        public DbSet<ProductInquiry> ProductInquiries => Set<ProductInquiry>();
+        public DbSet<DistributorApplication> DistributorApplications => Set<DistributorApplication>();
+        public DbSet<Document> Documents => Set<Document>();
+        public DbSet<LandingPage> LandingPages => Set<LandingPage>();
+        public DbSet<HelpCategory> HelpCategories => Set<HelpCategory>();
+        public DbSet<HelpArticle> HelpArticles => Set<HelpArticle>();
+        public DbSet<FAQItem> FAQItems => Set<FAQItem>();
+        public DbSet<TradeShowEvent> TradeShowEvents => Set<TradeShowEvent>();
+        public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
+        public DbSet<Notification> Notifications => Set<Notification>();
+        public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
         public WelcoDbContext(DbContextOptions<WelcoDbContext> options, ICurrentUserService? currentUserService = null)
             : base(options)
@@ -34,24 +61,28 @@ namespace Welco.Shared.Persistance
         public override int SaveChanges()
         {
             ApplyAuditInformation();
+            CaptureAuditEntries();
             return base.SaveChanges();
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
             ApplyAuditInformation();
+            CaptureAuditEntries();
             return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             ApplyAuditInformation();
+            CaptureAuditEntries();
             return await base.SaveChangesAsync(cancellationToken);
         }
 
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
             ApplyAuditInformation();
+            CaptureAuditEntries();
             return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
         }
 
@@ -144,6 +175,45 @@ namespace Welco.Shared.Persistance
                             break;
                     }
                 }
+            }
+        }
+
+        private void CaptureAuditEntries()
+        {
+            var currentUserId = _currentUserService?.UserId != null && _currentUserService.UserId != Guid.Empty
+                ? _currentUserService.UserId.ToString()
+                : (!string.IsNullOrWhiteSpace(_currentUserService?.Email) ? _currentUserService.Email : "System");
+
+            foreach (var entry in ChangeTracker.Entries().ToList())
+            {
+                if (entry.State is not (EntityState.Added or EntityState.Modified or EntityState.Deleted))
+                    continue;
+
+                var entity = entry.Entity;
+                if (entity is AuditLog || entity is not (BaseEntity or ApplicationUser))
+                    continue;
+
+                var action = entry.State switch
+                {
+                    EntityState.Added => "Create",
+                    EntityState.Modified => "Update",
+                    EntityState.Deleted => "Delete",
+                    _ => "Unknown"
+                };
+
+                var idValue = entity.GetType().GetProperty("Id")?.GetValue(entity);
+
+                var audit = new AuditLog
+                {
+                    Id = Guid.NewGuid(),
+                    EntityName = entity.GetType().Name,
+                    EntityId = idValue?.ToString() ?? string.Empty,
+                    Action = action,
+                    PerformedBy = currentUserId
+                };
+                audit.MarkAsCreated(currentUserId);
+
+                AuditLogs.Add(audit);
             }
         }
     }

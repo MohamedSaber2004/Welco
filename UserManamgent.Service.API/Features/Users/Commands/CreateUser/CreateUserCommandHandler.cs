@@ -43,6 +43,7 @@ namespace UserManamgent.Service.API.Features.Users.Commands.CreateUser
                 UserType = request.UserType,
                 Language = AppLanguage.En,
                 ProfilePictureName = request.ProfilePictureName,
+                CompanyId = request.CompanyId,
                 IsActive = request.IsActive,
                 EmailConfirmed = true
             };
@@ -69,6 +70,7 @@ namespace UserManamgent.Service.API.Features.Users.Commands.CreateUser
                 PhoneNumber = user.PhoneNumber,
                 ProfilePictureName = user.ProfilePictureName,
                 UserType = user.UserType,
+                CompanyId = user.CompanyId,
                 Language = user.Language,
                 IsActive = user.IsActive,
                 IsEmailConfirmed = user.EmailConfirmed,

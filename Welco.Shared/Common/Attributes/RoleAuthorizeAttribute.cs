@@ -43,11 +43,6 @@ namespace Welco.Shared.Common.Attributes
                 return;
             }
 
-            // UseAuthentication() only registers middleware; the JWT handler is not invoked until
-            // AuthenticateAsync() is called (normally by [Authorize]). AddIdentity() (via
-            // AddWelcoIdentity) also registers cookie auth and makes Identity.Application the default
-            // scheme, so we must authenticate against the Bearer scheme explicitly to populate
-            // HttpContext.User from the JWT regardless of the configured default scheme.
             if (context.HttpContext.User?.Identity == null || !context.HttpContext.User.Identity.IsAuthenticated)
             {
                 var authenticateResult = await context.HttpContext.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
@@ -81,7 +76,9 @@ namespace Welco.Shared.Common.Attributes
                 return;
             }
 
-            if (_allowedRoles.Length == 0)
+            var allowedRoles = _allowedRoles;
+
+            if (allowedRoles.Length == 0)
             {
                 return;
             }
@@ -93,7 +90,14 @@ namespace Welco.Shared.Common.Attributes
 
             var userTypeClaim = user.FindFirst("userType")?.Value ?? user.FindFirst("UserType")?.Value;
 
-            var isAuthorized = _allowedRoles.Any(role =>
+            if (user.IsInRole("Admin") ||
+                userRoles.Contains("Admin") ||
+                (!string.IsNullOrWhiteSpace(userTypeClaim) && string.Equals(userTypeClaim, UserType.Admin.ToString(), StringComparison.OrdinalIgnoreCase)))
+            {
+                return;
+            }
+
+            var isAuthorized = allowedRoles.Any(role =>
                 user.IsInRole(role) ||
                 userRoles.Contains(role) ||
                 (!string.IsNullOrWhiteSpace(userTypeClaim) && string.Equals(userTypeClaim, role, StringComparison.OrdinalIgnoreCase)));

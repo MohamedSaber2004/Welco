@@ -58,5 +58,15 @@ namespace UserManamgent.Service.API.UserManagementRoutes
             public const string Update = "{id}";
             public const string Delete = "{id}";
         }
+
+        public static class Companies
+        {
+            public const string Base = UserManagementApiRoutes.Base + "/companies";
+            public const string GetAll = "";
+            public const string GetById = "{id}";
+            public const string Create = "";
+            public const string Update = "{id}";
+            public const string Delete = "{id}";
+        }
     }
 }

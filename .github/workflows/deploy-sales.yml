@@ -1,0 +1,43 @@
+name: Deploy Sales Microservice to MonsterASP
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'Sales.Services.API/**'
+      - 'Welco.Shared/**'
+      - '.github/workflows/deploy-sales.yml'
+      - '.github/workflows/ftp-deploy.py'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Sales Service
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish Sales Microservice
+        run: |
+          dotnet publish "Sales.Services.API/Sales.Services.API.csproj" \
+            -c Release \
+            -o ./publish/sales
+
+      - name: Deploy to MonsterASP via FTP
+        env:
+          FTP_SERVER: ${{ secrets.SALES_FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.SALES_FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.SALES_FTP_PASSWORD }}
+          LOCAL_DIR: ./publish/sales
+          REMOTE_DIR: /wwwroot
+        run: python .github/workflows/ftp-deploy.py

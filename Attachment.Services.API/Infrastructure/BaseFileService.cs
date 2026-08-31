@@ -29,7 +29,7 @@ namespace Attachment.Services.API.Infrastructure
         public async Task<(bool Uploaded, string Result)> UploadFileAsync(IFormFile file, string folderPath)
         {
             if (file == null || file.Length == 0)
-                return (false, _localizer["Attachments:FileEmpty"]);
+                return (false, _localizer[LocalizationKeys.AttachmentMessages.FileEmpty]);
 
             try
             {
@@ -54,7 +54,7 @@ namespace Attachment.Services.API.Infrastructure
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to upload file '{FileName}' to folder '{FolderPath}'", file.FileName, folderPath);
-                return (false, _localizer["Attachments:UploadFailed"]);
+                return (false, _localizer[LocalizationKeys.AttachmentMessages.UploadFailed]);
             }
         }
 
@@ -106,7 +106,7 @@ namespace Attachment.Services.API.Infrastructure
                 return Task.FromResult((true, relativePath));
             }
 
-            return Task.FromResult((false, _localizer["Attachments:FileNotFound"].Value));
+            return Task.FromResult((false, _localizer[LocalizationKeys.AttachmentMessages.FileNotFound].Value));
         }
 
         private string? GetSafeFilePath(string relativePath)

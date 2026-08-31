@@ -76,6 +76,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Login
                 Email = user.Email ?? string.Empty,
                 UserName = user.UserName,
                 UserType = user.UserType,
+                CompanyId = user.CompanyId,
                 Language = user.Language,
                 Roles = roles,
                 AccessToken = accessToken,
