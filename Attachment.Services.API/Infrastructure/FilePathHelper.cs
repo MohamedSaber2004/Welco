@@ -4,11 +4,6 @@ namespace Attachment.Services.API.Infrastructure
 {
     internal static class FilePathHelper
     {
-        public const long DefaultMaxFileSize = 10 * 1024 * 1024;
-        public const long MaxImageSize = 5 * 1024 * 1024;
-        public const long MaxVideoSize = 100 * 1024 * 1024;
-        public const long MaxAudioSize = 10 * 1024 * 1024;
-
         public static (int Place, string FileName) ParsePlace(string fileName, int defaultPlace)
         {
             if (!string.IsNullOrWhiteSpace(fileName) && fileName.Contains('_'))

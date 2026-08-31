@@ -6,6 +6,9 @@ namespace Attachment.Services.API.Infrastructure
 {
     public class ImageValidator : IImageValidator
     {
+        private const long MaxImageSizeBytes = 5 * 1024 * 1024;
+        private static readonly string[] AllowedImageExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+
         private readonly IBaseFileService _baseFileService;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IStringLocalizer<Messages> _localizer;
@@ -19,10 +22,13 @@ namespace Attachment.Services.API.Infrastructure
 
         public async Task<(bool Uploaded, string Result)> UploadImage(IFormFile file, int Place)
         {
+            if (file == null || file.Length == 0)
+                return (false, _localizer["Attachments:FileEmpty"]);
+
             if (!IsValidImage(file))
                 return (false, _localizer["Attachments:InvalidFormat"]);
 
-            if (file.Length > FilePathHelper.MaxImageSize)
+            if (file.Length > MaxImageSizeBytes)
                 return (false, _localizer["Attachments:FileTooLarge"]);
 
             var (uploaded, result) = await _baseFileService.UploadFileAsync(file, FilePathHelper.GetFolderPath(Place));
@@ -73,10 +79,10 @@ namespace Attachment.Services.API.Infrastructure
         public bool IsValidImage(IFormFile file)
         {
             if (file == null || file.Length == 0) return false;
+            if (file.Length > MaxImageSizeBytes) return false;
 
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
             var extension = Path.GetExtension(file.FileName).ToLower();
-            return allowedExtensions.Contains(extension);
+            return AllowedImageExtensions.Contains(extension);
         }
 
         public bool IsValidImage(string ImageName, string PlaceHolder)

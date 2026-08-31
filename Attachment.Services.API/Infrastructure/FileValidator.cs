@@ -6,6 +6,9 @@ namespace Attachment.Services.API.Infrastructure
 {
     public class FileValidator : IFileValidator
     {
+        private const long MaxFileSizeBytes = 10 * 1024 * 1024;
+        private static readonly string[] AllowedFileExtensions = { ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".txt", ".zip", ".rar" };
+
         private readonly IBaseFileService _baseFileService;
         private readonly IStringLocalizer<Messages> _localizer;
 
@@ -17,10 +20,13 @@ namespace Attachment.Services.API.Infrastructure
 
         public async Task<(bool Uploaded, string Result)> UploadFile(IFormFile file, int Place)
         {
+            if (file == null || file.Length == 0)
+                return (false, _localizer["Attachments:FileEmpty"]);
+
             if (!IsValidFile(file))
                 return (false, _localizer["Attachments:InvalidFormat"]);
 
-            if (file.Length > FilePathHelper.DefaultMaxFileSize)
+            if (file.Length > MaxFileSizeBytes)
                 return (false, _localizer["Attachments:FileTooLarge"]);
 
             var (uploaded, result) = await _baseFileService.UploadFileAsync(file, FilePathHelper.GetFolderPath(Place));
@@ -55,10 +61,10 @@ namespace Attachment.Services.API.Infrastructure
         public bool IsValidFile(IFormFile file)
         {
             if (file == null || file.Length == 0) return false;
+            if (file.Length > MaxFileSizeBytes) return false;
 
-            var allowedExtensions = new[] { ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".txt", ".zip", ".rar" };
             var extension = Path.GetExtension(file.FileName).ToLower();
-            return allowedExtensions.Contains(extension);
+            return AllowedFileExtensions.Contains(extension);
         }
 
         public async Task<(bool Success, string Result)> DownloadFile(int FilePlace, string FileName)

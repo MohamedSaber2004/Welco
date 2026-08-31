@@ -6,6 +6,9 @@ namespace Attachment.Services.API.Infrastructure
 {
     public class AudioValidator : IAudioValidator
     {
+        private const long MaxAudioSizeBytes = 10 * 1024 * 1024;
+        private static readonly string[] AllowedAudioExtensions = { ".mp3", ".wav", ".ogg", ".m4a", ".aac" };
+
         private readonly IBaseFileService _baseFileService;
         private readonly IStringLocalizer<Messages> _localizer;
 
@@ -17,10 +20,13 @@ namespace Attachment.Services.API.Infrastructure
 
         public async Task<(bool Uploaded, string Result)> UploadAudio(IFormFile file, int Place)
         {
+            if (file == null || file.Length == 0)
+                return (false, _localizer["Attachments:FileEmpty"]);
+
             if (!IsValidAudio(file))
                 return (false, _localizer["Attachments:InvalidFormat"]);
 
-            if (file.Length > FilePathHelper.MaxAudioSize)
+            if (file.Length > MaxAudioSizeBytes)
                 return (false, _localizer["Attachments:FileTooLarge"]);
 
             var (uploaded, result) = await _baseFileService.UploadFileAsync(file, FilePathHelper.GetFolderPath(Place));
@@ -55,10 +61,10 @@ namespace Attachment.Services.API.Infrastructure
         public bool IsValidAudio(IFormFile file)
         {
             if (file == null || file.Length == 0) return false;
+            if (file.Length > MaxAudioSizeBytes) return false;
 
-            var allowedExtensions = new[] { ".mp3", ".wav", ".ogg", ".m4a", ".aac" };
             var extension = Path.GetExtension(file.FileName).ToLower();
-            return allowedExtensions.Contains(extension);
+            return AllowedAudioExtensions.Contains(extension);
         }
     }
 }

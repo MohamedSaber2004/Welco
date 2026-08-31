@@ -6,6 +6,9 @@ namespace Attachment.Services.API.Infrastructure
 {
     public class VideoValidator : IVideoValidator
     {
+        private const long MaxVideoSizeBytes = 100 * 1024 * 1024;
+        private static readonly string[] AllowedVideoExtensions = { ".mp4", ".avi", ".mkv", ".mov", ".wmv" };
+
         private readonly IBaseFileService _baseFileService;
         private readonly IStringLocalizer<Messages> _localizer;
 
@@ -17,10 +20,13 @@ namespace Attachment.Services.API.Infrastructure
 
         public async Task<(bool Uploaded, string Result)> UploadVideo(IFormFile file, int Place)
         {
+            if (file == null || file.Length == 0)
+                return (false, _localizer["Attachments:FileEmpty"]);
+
             if (!IsValidVideo(file))
                 return (false, _localizer["Attachments:InvalidFormat"]);
 
-            if (file.Length > FilePathHelper.MaxVideoSize)
+            if (file.Length > MaxVideoSizeBytes)
                 return (false, _localizer["Attachments:FileTooLarge"]);
 
             var (uploaded, result) = await _baseFileService.UploadFileAsync(file, FilePathHelper.GetFolderPath(Place));
@@ -76,10 +82,10 @@ namespace Attachment.Services.API.Infrastructure
         public bool IsValidVideo(IFormFile file)
         {
             if (file == null || file.Length == 0) return false;
+            if (file.Length > MaxVideoSizeBytes) return false;
 
-            var allowedExtensions = new[] { ".mp4", ".avi", ".mkv", ".mov", ".wmv" };
             var extension = Path.GetExtension(file.FileName).ToLower();
-            return allowedExtensions.Contains(extension);
+            return AllowedVideoExtensions.Contains(extension);
         }
     }
 }
