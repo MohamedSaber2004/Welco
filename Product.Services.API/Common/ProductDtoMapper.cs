@@ -29,6 +29,7 @@ namespace Product.Services.API.Common
             IsActive = p.IsActive,
             CreatedAt = p.CreatedAt,
             UpdatedAt = p.UpdatedAt
+
         };
     }
 }
