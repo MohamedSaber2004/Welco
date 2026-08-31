@@ -191,6 +191,25 @@ namespace Welco.Shared.Localization
             public const string ProviderIdRequired = "Provider.ProviderIdRequired";
         }
 
+        public static class Certification
+        {
+            public const string Created = "Certification.Created";
+            public const string Updated = "Certification.Updated";
+            public const string Deleted = "Certification.Deleted";
+            public const string NotFound = "Certification.NotFound";
+            public const string Fetched = "Certification.Fetched";
+            public const string ListFetched = "Certification.ListFetched";
+            public const string CertificateNumberRequired = "Certification.CertificateNumberRequired";
+            public const string CertificateNumberAlreadyExists = "Certification.CertificateNumberAlreadyExists";
+            public const string TitleRequired = "Certification.TitleRequired";
+            public const string IssuedToRequired = "Certification.IssuedToRequired";
+            public const string IssuerRequired = "Certification.IssuerRequired";
+            public const string IssueDateRequired = "Certification.IssueDateRequired";
+            public const string IssueDateInFuture = "Certification.IssueDateInFuture";
+            public const string ExpiryDateBeforeIssueDate = "Certification.ExpiryDateBeforeIssueDate";
+            public const string CertificationIdRequired = "Certification.CertificationIdRequired";
+        }
+
         public static class AttachmentMessages
         {
             public const string FileEmpty = "Attachments.FileEmpty";

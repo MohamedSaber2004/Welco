@@ -168,6 +168,23 @@
     "CommercialRegistrationNumberAlreadyExists": "Commercial registration number already exists.",
     "ProviderIdRequired": "Provider ID is required."
   },
+  "Certification": {
+    "Created": "Certification created successfully.",
+    "Updated": "Certification updated successfully.",
+    "Deleted": "Certification deleted successfully.",
+    "NotFound": "Certification not found.",
+    "Fetched": "Certification retrieved successfully.",
+    "ListFetched": "Certifications retrieved successfully.",
+    "CertificateNumberRequired": "Certificate number is required.",
+    "CertificateNumberAlreadyExists": "Certificate number already exists.",
+    "TitleRequired": "Title is required.",
+    "IssuedToRequired": "Recipient name is required.",
+    "IssuerRequired": "Issuer is required.",
+    "IssueDateRequired": "Issue date is required.",
+    "IssueDateInFuture": "Issue date cannot be in the future.",
+    "ExpiryDateBeforeIssueDate": "Expiry date must be after the issue date.",
+    "CertificationIdRequired": "Certification ID is required."
+  },
   "Attachments": {
     "FileEmpty": "The file is empty.",
     "InvalidFormat": "The file format is not supported.",

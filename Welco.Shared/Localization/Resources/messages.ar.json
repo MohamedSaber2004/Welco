@@ -168,6 +168,23 @@
     "CommercialRegistrationNumberAlreadyExists": "رقم السجل التجاري موجود بالفعل.",
     "ProviderIdRequired": "معرف المورد مطلوب."
   },
+  "Certification": {
+    "Created": "تم إنشاء الشهادة بنجاح.",
+    "Updated": "تم تحديث الشهادة بنجاح.",
+    "Deleted": "تم حذف الشهادة بنجاح.",
+    "NotFound": "الشهادة غير موجودة.",
+    "Fetched": "تم استرجاع الشهادة بنجاح.",
+    "ListFetched": "تم استرجاع قائمة الشهادات بنجاح.",
+    "CertificateNumberRequired": "رقم الشهادة مطلوب.",
+    "CertificateNumberAlreadyExists": "رقم الشهادة موجود بالفعل.",
+    "TitleRequired": "العنوان مطلوب.",
+    "IssuedToRequired": "اسم المستلم مطلوب.",
+    "IssuerRequired": "الجهة المانحة مطلوبة.",
+    "IssueDateRequired": "تاريخ الإصدار مطلوب.",
+    "IssueDateInFuture": "لا يمكن أن يكون تاريخ الإصدار في المستقبل.",
+    "ExpiryDateBeforeIssueDate": "يجب أن يكون تاريخ الانتهاء بعد تاريخ الإصدار.",
+    "CertificationIdRequired": "معرف الشهادة مطلوب."
+  },
   "Attachments": {
     "FileEmpty": "الملف فارغ.",
     "InvalidFormat": "صيغة الملف غير مدعومة.",
