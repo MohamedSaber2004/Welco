@@ -46,7 +46,7 @@ namespace UserManamgent.Service.API.Features.Users.Commands.UpdateUser
 
             if (request.ProfilePictureName != null)
             {
-                user.ProfilePictureName = request.ProfilePictureName;
+                user.ProfilePictureName = string.IsNullOrWhiteSpace(request.ProfilePictureName) ? null : request.ProfilePictureName.Trim();
             }
 
             if (request.CompanyId.HasValue)

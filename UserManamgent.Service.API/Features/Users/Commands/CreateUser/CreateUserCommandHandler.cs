@@ -42,7 +42,7 @@ namespace UserManamgent.Service.API.Features.Users.Commands.CreateUser
                 PhoneNumber = request.PhoneNumber,
                 UserType = request.UserType,
                 Language = AppLanguage.En,
-                ProfilePictureName = request.ProfilePictureName,
+                ProfilePictureName = string.IsNullOrWhiteSpace(request.ProfilePictureName) ? null : request.ProfilePictureName.Trim(),
                 CompanyId = request.CompanyId,
                 IsActive = request.IsActive,
                 EmailConfirmed = true
