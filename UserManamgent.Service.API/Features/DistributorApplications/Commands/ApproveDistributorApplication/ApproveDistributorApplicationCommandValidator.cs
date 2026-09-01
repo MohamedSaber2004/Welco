@@ -7,7 +7,6 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
         public ApproveDistributorApplicationCommandValidator()
         {
             RuleFor(x => x.Id).NotEmpty();
-            RuleFor(x => x.TierLevel).InclusiveBetween(1, 5);
         }
     }
 }

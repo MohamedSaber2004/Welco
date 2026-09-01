@@ -43,8 +43,9 @@ namespace UserManamgent.Service.API.Controllers
         [HttpPut]
         [Route(UserManagementApiRoutes.DistributorApplications.Approve)]
         [RoleAuthorize(UserType.Admin)]
-        public async Task<IActionResult> Approve([FromRoute] Guid id, [FromBody] ApproveDistributorApplicationCommand cmd, CancellationToken ct)
+        public async Task<IActionResult> Approve([FromRoute] Guid id, [FromBody] ApproveDistributorApplicationCommand? cmd, CancellationToken ct)
         {
+            cmd ??= new ApproveDistributorApplicationCommand();
             cmd.Id = id;
             return ToActionResult(await _mediator.Send(cmd, ct));
         }
