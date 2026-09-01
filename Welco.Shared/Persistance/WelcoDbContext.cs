@@ -47,6 +47,7 @@ namespace Welco.Shared.Persistance
         public DbSet<HelpCategory> HelpCategories => Set<HelpCategory>();
         public DbSet<HelpArticle> HelpArticles => Set<HelpArticle>();
         public DbSet<FAQItem> FAQItems => Set<FAQItem>();
+        public DbSet<SupportTicket> SupportTickets => Set<SupportTicket>();
         public DbSet<TradeShowEvent> TradeShowEvents => Set<TradeShowEvent>();
         public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
         public DbSet<Notification> Notifications => Set<Notification>();

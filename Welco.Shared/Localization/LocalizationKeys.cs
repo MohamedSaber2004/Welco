@@ -324,6 +324,60 @@
             public const string DocumentIdRequired = "Document.DocumentIdRequired";
         }
 
+        public static class HelpCategory
+        {
+            public const string Created = "HelpCategory.Created";
+            public const string Updated = "HelpCategory.Updated";
+            public const string Deleted = "HelpCategory.Deleted";
+            public const string Fetched = "HelpCategory.Fetched";
+            public const string ListFetched = "HelpCategory.ListFetched";
+            public const string NotFound = "HelpCategory.NotFound";
+            public const string NameRequired = "HelpCategory.NameRequired";
+            public const string AlreadyExists = "HelpCategory.AlreadyExists";
+            public const string HelpCategoryIdRequired = "HelpCategory.HelpCategoryIdRequired";
+        }
+
+        public static class HelpArticle
+        {
+            public const string Created = "HelpArticle.Created";
+            public const string Updated = "HelpArticle.Updated";
+            public const string Deleted = "HelpArticle.Deleted";
+            public const string Fetched = "HelpArticle.Fetched";
+            public const string ListFetched = "HelpArticle.ListFetched";
+            public const string NotFound = "HelpArticle.NotFound";
+            public const string TitleRequired = "HelpArticle.TitleRequired";
+            public const string BodyRequired = "HelpArticle.BodyRequired";
+            public const string SlugRequired = "HelpArticle.SlugRequired";
+            public const string CategoryRequired = "HelpArticle.CategoryRequired";
+            public const string HelpArticleIdRequired = "HelpArticle.HelpArticleIdRequired";
+            public const string SlugAlreadyExists = "HelpArticle.SlugAlreadyExists";
+        }
+
+        public static class FAQ
+        {
+            public const string Created = "FAQ.Created";
+            public const string Updated = "FAQ.Updated";
+            public const string Deleted = "FAQ.Deleted";
+            public const string Fetched = "FAQ.Fetched";
+            public const string ListFetched = "FAQ.ListFetched";
+            public const string NotFound = "FAQ.NotFound";
+            public const string QuestionRequired = "FAQ.QuestionRequired";
+            public const string AnswerRequired = "FAQ.AnswerRequired";
+        }
+
+        public static class SupportTicket
+        {
+            public const string Created = "SupportTicket.Created";
+            public const string Fetched = "SupportTicket.Fetched";
+            public const string ListFetched = "SupportTicket.ListFetched";
+            public const string NotFound = "SupportTicket.NotFound";
+            public const string Updated = "SupportTicket.Updated";
+            public const string Closed = "SupportTicket.Closed";
+            public const string SubjectRequired = "SupportTicket.SubjectRequired";
+            public const string MessageRequired = "SupportTicket.MessageRequired";
+            public const string ReplyRequired = "SupportTicket.ReplyRequired";
+        }
+
         public static class LandingPage
         {
             public const string Created = "LandingPage.Created";

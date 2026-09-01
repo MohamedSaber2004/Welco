@@ -92,4 +92,19 @@ namespace Welco.Shared.Persistance.Configurations
             b.Property(x => x.CreatedBy).IsRequired();
         }
     }
+    public class SupportTicketConfiguration : IEntityTypeConfiguration<SupportTicket>
+    {
+        public void Configure(EntityTypeBuilder<SupportTicket> b)
+        {
+            b.ToTable("SupportTickets"); b.HasKey(x => x.Id);
+            b.Property(x => x.Subject).IsRequired().HasMaxLength(300);
+            b.Property(x => x.Message).IsRequired();
+            b.Property(x => x.Status).IsRequired().HasMaxLength(20);
+            b.Property(x => x.Reply).HasMaxLength(2000);
+            b.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+            b.HasIndex(x => x.UserId);
+            b.HasIndex(x => x.Status);
+            b.Property(x => x.CreatedBy).IsRequired();
+        }
+    }
 }

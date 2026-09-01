@@ -60,4 +60,15 @@ namespace Welco.Shared.Domain.Models
         public string Message { get; set; } = null!;
         public bool IsRead { get; set; }
     }
+    public class SupportTicket : BaseEntity<Guid>
+    {
+        public Guid UserId { get; set; }
+        public virtual ApplicationUser? User { get; set; }
+        public string Subject { get; set; } = null!;
+        public string Message { get; set; } = null!;
+        public string Status { get; set; } = "Open"; // Open, Answered, Closed
+        public string? Reply { get; set; }
+        public DateTime? RepliedAt { get; set; }
+        public Guid? RepliedBy { get; set; }
+    }
 }
