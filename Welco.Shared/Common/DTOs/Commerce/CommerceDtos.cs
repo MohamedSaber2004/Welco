@@ -28,6 +28,9 @@ namespace Welco.Shared.Common.DTOs.Commerce
         public Guid? CompanyId { get; set; }
         public Guid? CurrencyId { get; set; }
         public Guid? IncotermId { get; set; }
+        public string? IncotermCode { get; set; }
+        public string? CurrencyCode { get; set; }
+        public string? CurrencySymbol { get; set; }
         public decimal TotalAmount { get; set; }
         public List<OrderItemDto> Items { get; set; } = new();
         public bool IsActive { get; set; }

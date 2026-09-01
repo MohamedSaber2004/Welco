@@ -25,6 +25,7 @@ namespace Commerce.Services.API.CommerceRoutes
             public const string GetById = "{id}";
             public const string Create = "";
             public const string UpdateStatus = "{id}/status";
+            public const string Track = "track/{orderNumber}";
         }
     }
 }
