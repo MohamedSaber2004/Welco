@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -79,6 +79,15 @@ namespace Welco.Shared.Controllers
             var localizedErrors = result.Errors?
                 .Select(e => !string.IsNullOrWhiteSpace(e) ? Localize(e) : e)
                 .ToList();
+
+            var resultType = result.GetType();
+            if (resultType.IsGenericType && resultType.GetGenericTypeDefinition() == typeof(PaginatedResult<>))
+            {
+                return new ObjectResult(result)
+                {
+                    StatusCode = result.StatusCode
+                };
+            }
 
             var localizedResult = new Result<T>(
                 result.IsSuccess,

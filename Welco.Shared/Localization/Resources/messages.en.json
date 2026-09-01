@@ -1,4 +1,4 @@
-{
+﻿{
   "ActionResults": {
     "Ok": "Operation completed successfully.",
     "Created": "Resource created successfully.",
@@ -230,6 +230,16 @@
     "CountryRequired": "Country is required.",
     "TierLevelInvalid": "Tier level must be between 1 and 5.",
     "CompanyIdRequired": "Company ID is required."
+  },
+  "DistributorApplication": {
+    "Created": "Distributor application submitted successfully.",
+    "Approved": "Distributor application approved successfully.",
+    "Rejected": "Distributor application rejected successfully.",
+    "NotFound": "Distributor application not found.",
+    "Fetched": "Distributor application retrieved successfully.",
+    "ListFetched": "Distributor applications retrieved successfully.",
+    "AlreadyProcessed": "Application has already been processed.",
+    "ApplicationIdRequired": "Application ID is required."
   },
   "Cart": {
     "Created": "Cart created successfully.",
