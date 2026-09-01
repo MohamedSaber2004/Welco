@@ -63,10 +63,19 @@ namespace UserManamgent.Service.API.UserManagementRoutes
         {
             public const string Base = UserManagementApiRoutes.Base + "/companies";
             public const string GetAll = "";
+            public const string GetMyCompany = "my";
             public const string GetById = "{id}";
             public const string Create = "";
             public const string Update = "{id}";
             public const string Delete = "{id}";
+        }
+
+        public static class DistributorApplications
+        {
+            public const string Base = UserManagementApiRoutes.Base + "/distributor-applications";
+            public const string Create = "";
+            public const string GetAll = "";
+            public const string GetById = "{id}";
         }
     }
 }
