@@ -1,4 +1,4 @@
-namespace Welco.Shared.Localization
+﻿namespace Welco.Shared.Localization
 {
     public static class LocalizationKeys
     {
@@ -260,6 +260,19 @@ namespace Welco.Shared.Localization
             public const string CountryRequired = "Company.CountryRequired";
             public const string TierLevelInvalid = "Company.TierLevelInvalid";
             public const string CompanyIdRequired = "Company.CompanyIdRequired";
+        }
+
+        public static class DistributorApplication
+        {
+            public const string Created = "DistributorApplication.Created";
+            public const string Updated = "DistributorApplication.Updated";
+            public const string NotFound = "DistributorApplication.NotFound";
+            public const string Fetched = "DistributorApplication.Fetched";
+            public const string ListFetched = "DistributorApplication.ListFetched";
+            public const string Approved = "DistributorApplication.Approved";
+            public const string Rejected = "DistributorApplication.Rejected";
+            public const string AlreadyProcessed = "DistributorApplication.AlreadyProcessed";
+            public const string ApplicationIdRequired = "DistributorApplication.ApplicationIdRequired";
         }
 
         public static class Cart

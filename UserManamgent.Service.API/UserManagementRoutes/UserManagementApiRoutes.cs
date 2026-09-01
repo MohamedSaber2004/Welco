@@ -1,4 +1,4 @@
-namespace UserManamgent.Service.API.UserManagementRoutes
+﻿namespace UserManamgent.Service.API.UserManagementRoutes
 {
     public static class UserManagementApiRoutes
     {
@@ -76,6 +76,8 @@ namespace UserManamgent.Service.API.UserManagementRoutes
             public const string Create = "";
             public const string GetAll = "";
             public const string GetById = "{id}";
+            public const string Approve = "{id}/approve";
+            public const string Reject = "{id}/reject";
         }
     }
 }

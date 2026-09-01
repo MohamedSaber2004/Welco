@@ -1,4 +1,5 @@
-using MediatR;
+﻿using MediatR;
+using Welco.Shared.Common.DTOs.UserManagement;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Domain.Models;
@@ -20,7 +21,7 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Cr
 
         public async Task<Result<DistributorApplicationDto>> Handle(CreateDistributorApplicationCommand request, CancellationToken cancellationToken)
         {
-            // OrganizationUser or Admin allowed — WelcoStaff blocked via RoleAuthorize, but double-check
+            // OrganizationUser or Admin allowed â€” WelcoStaff blocked via RoleAuthorize, but double-check
             // Validate CountryId exists in DB (country found in database)
             var countryRepo = _unitOfWork.GetRepository<Country, Guid>();
             var country = await countryRepo.GetByIdAsync(request.CountryId, cancellationToken);
