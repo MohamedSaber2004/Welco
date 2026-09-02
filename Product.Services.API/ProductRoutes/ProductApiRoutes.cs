@@ -40,5 +40,14 @@ namespace Product.Services.API.ProductRoutes
             public const string Update = "{id}";
             public const string Delete = "{id}";
         }
+
+        public static class Wishlist
+        {
+            public const string Base = Root + "/" + Version + "/wishlist";
+            public const string GetAll = "";
+            public const string Add = "{productId}";
+            public const string Remove = "{productId}";
+            public const string Check = "{productId}/check";
+        }
     }
 }
