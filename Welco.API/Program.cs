@@ -64,8 +64,6 @@ namespace Welco.API
                     .AddJsonFile("ocelot.global.json", optional: true, reloadOnChange: true)
                     .AddJsonFile($"ocelot.global.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
-                // FIX: Multiple AddJsonFile calls with "Routes" arrays overwrite each other (last file wins).
-                // Merge all route files into one in-memory JSON so Ocelot sees every route (auth + user-management).
                 var routeFiles = Directory.GetFiles(ocelotDir, $"*.{env.EnvironmentName}.json")
                     .Where(f => !Path.GetFileName(f).StartsWith("ocelot.global.", StringComparison.OrdinalIgnoreCase)
                              && !Path.GetFileName(f).StartsWith("ocelot.merged.", StringComparison.OrdinalIgnoreCase))
@@ -73,20 +71,20 @@ namespace Welco.API
                     .ToArray();
                 if (routeFiles.Length > 0)
                 {
-                    var allRoutes = new List<object?>();
+                    var allRoutes = new List<System.Text.Json.Nodes.JsonNode?>();
                     foreach (var file in routeFiles)
                     {
                         try
                         {
                             var json = File.ReadAllText(file);
-                            using var doc = System.Text.Json.JsonDocument.Parse(json);
-                            if (doc.RootElement.TryGetProperty("Routes", out var routes) && routes.ValueKind == System.Text.Json.JsonValueKind.Array)
+                            var node = System.Text.Json.Nodes.JsonNode.Parse(json);
+                            if (node?["Routes"] is System.Text.Json.Nodes.JsonArray routes)
                             {
-                                foreach (var route in routes.EnumerateArray())
+                                foreach (var route in routes)
                                 {
-                                    var obj = System.Text.Json.JsonSerializer.Deserialize<object>(route.GetRawText());
-                                    if (obj != null) allRoutes.Add(obj);
+                                    if (route != null) allRoutes.Add(route.DeepClone());
                                 }
+                                Log.Information("Ocelot file {File} contributed {Count} routes", Path.GetFileName(file), routes.Count);
                             }
                         }
                         catch (Exception ex)
@@ -97,8 +95,8 @@ namespace Welco.API
                     if (allRoutes.Count > 0)
                     {
                         var mergedPath = Path.Combine(ocelotDir, $"ocelot.merged.{env.EnvironmentName}.json");
-                        var mergedPayload = new { Routes = allRoutes };
-                        var mergedJson = System.Text.Json.JsonSerializer.Serialize(mergedPayload, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                        var mergedPayload = new System.Text.Json.Nodes.JsonObject { ["Routes"] = new System.Text.Json.Nodes.JsonArray(allRoutes.ToArray()) };
+                        var mergedJson = mergedPayload.ToJsonString(new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
                         try { File.WriteAllText(mergedPath, mergedJson); } catch (Exception ex) { Log.Warning(ex, "Failed to write merged Ocelot file"); }
                         builder.Configuration.AddJsonFile(mergedPath, optional: false, reloadOnChange: false);
                         Log.Information("Merged {Count} Ocelot routes from {Files} into {Merged}", allRoutes.Count, string.Join(", ", routeFiles.Select(Path.GetFileName)), Path.GetFileName(mergedPath));
@@ -110,7 +108,6 @@ namespace Welco.API
             builder.Services.AddJsonLocalization();
             builder.Services.AddWelcoSharedDependencies();
 
-            // JWT — Gateway is the single entry point that validates Auth-issued tokens (Option 1)
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
             var jwtSettings = new JwtSettings();
             builder.Configuration.GetSection(JwtSettings.SectionName).Bind(jwtSettings);
@@ -307,7 +304,6 @@ namespace Welco.API
 #pragma warning disable ASP0014
             app.UseEndpoints(endpoints =>
             {
-                // Unified OpenAPI schema aggregating all microservices
                 endpoints.MapGet("/openapi/all.json", async (HttpContext httpContext, Welco.API.Services.OpenApiAggregatorService aggregator, CancellationToken ct) =>
                 {
                     var gatewayBaseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
@@ -317,7 +313,6 @@ namespace Welco.API
 
                 endpoints.MapGet("/", () => Results.Redirect("/scalar/v1"));
 
-                // Unified Scalar UI loading ALL microservices endpoints together
                 endpoints.MapScalarApiReference(options =>
                 {
                     options.WithTitle("Welco Microservices Platform API")
@@ -325,7 +320,6 @@ namespace Welco.API
                            .WithOpenApiRoutePattern("/openapi/all.json");
                 });
 
-                // Dedicated Scalar Documentation pages for individual microservices
                 foreach (var doc in microserviceDocRoutes)
                 {
                     var docServiceName = doc.ServiceName;
