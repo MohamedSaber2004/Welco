@@ -2,11 +2,11 @@ using MediatR;
 using Welco.Shared.Common.DTOs.UserManagement;
 using Welco.Shared.Results;
 
-namespace UserManamgent.Service.API.Features.Addresses.Commands.CreateAddress
+namespace UserManamgent.Service.API.Features.CompanyAddresses.Commands.CreateCompanyAddress
 {
-    public class CreateAddressCommand : IRequest<Result<UserAddressDto>>
+    public class CreateCompanyAddressCommand : IRequest<Result<CompanyAddressDto>>
     {
-        public Guid UserId { get; set; }
+        public Guid CompanyId { get; set; }
         public Guid CountryId { get; set; }
         public Guid CityId { get; set; }
         public Guid ZoneId { get; set; }

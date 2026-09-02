@@ -1,9 +1,9 @@
 namespace Welco.Shared.Common.DTOs.UserManagement
 {
-    public class UserAddressDto
+    public class CompanyAddressDto
     {
         public Guid Id { get; set; }
-        public Guid UserId { get; set; }
+        public Guid CompanyId { get; set; }
 
         public Guid CountryId { get; set; }
         public string? CountryNameEn { get; set; }

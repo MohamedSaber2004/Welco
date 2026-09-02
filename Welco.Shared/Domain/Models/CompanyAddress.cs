@@ -2,10 +2,10 @@ using Welco.Shared.Common.Classes;
 
 namespace Welco.Shared.Domain.Models
 {
-    public class UserAddress : BaseEntity<Guid>
+    public class CompanyAddress : BaseEntity<Guid>
     {
-        public Guid UserId { get; set; }
-        public virtual ApplicationUser User { get; set; } = null!;
+        public Guid CompanyId { get; set; }
+        public virtual Company Company { get; set; } = null!;
 
         public Guid CountryId { get; set; }
         public virtual Country Country { get; set; } = null!;
@@ -22,8 +22,8 @@ namespace Welco.Shared.Domain.Models
         public string? Apartment { get; set; }
         public bool IsDefault { get; set; }
 
-        public static UserAddress Create(
-            Guid userId,
+        public static CompanyAddress Create(
+            Guid companyId,
             Guid countryId,
             Guid cityId,
             Guid zoneId,
@@ -34,10 +34,10 @@ namespace Welco.Shared.Domain.Models
             string createdBy,
             bool isDefault = false)
         {
-            var address = new UserAddress
+            var address = new CompanyAddress
             {
                 Id = Guid.NewGuid(),
-                UserId = userId,
+                CompanyId = companyId,
                 CountryId = countryId,
                 CityId = cityId,
                 ZoneId = zoneId,

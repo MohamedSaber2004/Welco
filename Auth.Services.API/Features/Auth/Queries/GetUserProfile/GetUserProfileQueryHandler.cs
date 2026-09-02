@@ -55,7 +55,9 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
             {
                 var addressRepo = _unitOfWork.GetRepository<UserAddress, Guid>();
                 addresses = await addressRepo
-                    .GetAll(a => a.UserId == user.Id && !a.IsDeleted)
+                    .GetAllWithIncluding(a => a.UserId == user.Id && !a.IsDeleted, a => a.Country, a => a.City, a => a.Zone)
+                    .OrderByDescending(a => a.IsDefault)
+                    .ThenByDescending(a => a.CreatedAt)
                     .Select(a => new UserAddressDto
                     {
                         Id = a.Id,
@@ -63,6 +65,8 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                         CountryId = a.CountryId,
                         CountryNameEn = a.Country != null ? a.Country.NameEn : null,
                         CountryNameAr = a.Country != null ? a.Country.NameAr : null,
+                        CountryCode = a.Country != null ? a.Country.Code : null,
+                        CountryPhoneCode = a.Country != null ? a.Country.PhoneCode : null,
                         CityId = a.CityId,
                         CityNameEn = a.City != null ? a.City.NameEn : null,
                         CityNameAr = a.City != null ? a.City.NameAr : null,
@@ -73,6 +77,7 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                         Building = a.Building,
                         Floor = a.Floor,
                         Apartment = a.Apartment,
+                        IsDefault = a.IsDefault,
                         CreatedAt = a.CreatedAt,
                         UpdatedAt = a.UpdatedAt
                     })

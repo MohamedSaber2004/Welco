@@ -10,5 +10,6 @@ namespace Welco.Shared.Common.DTOs.Auth.Requests
         public string? Building { get; set; }
         public string? Floor { get; set; }
         public string? Apartment { get; set; }
+        public bool? IsDefault { get; set; }
     }
 }

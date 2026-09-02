@@ -36,6 +36,8 @@ namespace UserManamgent.Service.API.Features.Addresses.Queries.GetAddressById
                 CountryId = address.CountryId,
                 CountryNameEn = address.Country?.NameEn,
                 CountryNameAr = address.Country?.NameAr,
+                CountryCode = address.Country?.Code,
+                CountryPhoneCode = address.Country?.PhoneCode,
                 CityId = address.CityId,
                 CityNameEn = address.City?.NameEn,
                 CityNameAr = address.City?.NameAr,
@@ -46,6 +48,7 @@ namespace UserManamgent.Service.API.Features.Addresses.Queries.GetAddressById
                 Building = address.Building,
                 Floor = address.Floor,
                 Apartment = address.Apartment,
+                IsDefault = address.IsDefault,
                 CreatedAt = address.CreatedAt,
                 UpdatedAt = address.UpdatedAt
             };

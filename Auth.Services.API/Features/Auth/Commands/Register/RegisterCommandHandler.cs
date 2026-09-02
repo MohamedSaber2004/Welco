@@ -34,6 +34,48 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
 
         public async Task<Result<string>> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
+            // Validate phone -> Country linkage when phone is provided
+            if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
+            {
+                var phone = request.PhoneNumber.Trim();
+                // If frontend supplied PhoneCountryId, verify it exists and phone starts with its PhoneCode
+                if (request.PhoneCountryId.HasValue && request.PhoneCountryId.Value != Guid.Empty)
+                {
+                    var countryRepo = _unitOfWork.GetRepository<Country, Guid>();
+                    var phoneCountry = await countryRepo.GetByIdAsync(request.PhoneCountryId.Value, cancellationToken);
+                    if (phoneCountry == null || phoneCountry.IsDeleted)
+                    {
+                        return Result<string>.BadRequest(LocalizationKeys.Country.NotFound, new List<string> { LocalizationKeys.Country.NotFound });
+                    }
+                    if (!string.IsNullOrWhiteSpace(phoneCountry.PhoneCode))
+                    {
+                        var code = phoneCountry.PhoneCode.Trim();
+                        // Normalize: phone may be "+971 50..." or "+97150..."
+                        var normalized = phone.Replace(" ", "").Replace("-", "");
+                        var codeNorm = code.Replace(" ", "");
+                        if (!normalized.StartsWith(codeNorm, StringComparison.Ordinal))
+                        {
+                            return Result<string>.BadRequest(
+                                $"Phone number must start with country phone code {code} ({phoneCountry.NameEn})",
+                                new List<string> { $"Phone number must start with {code}" });
+                        }
+                    }
+                }
+                else
+                {
+                    // No explicit country — try to infer from prefix; if country exists with matching PhoneCode, accept; otherwise accept raw phone
+                    // This keeps backward compatibility for existing clients while enabling linkage when available
+                    var countryRepo = _unitOfWork.GetRepository<Country, Guid>();
+                    // Find country whose PhoneCode is prefix of phone (longest first)
+                    var allCountries = await countryRepo.GetAllListAsync(c => !c.IsDeleted && c.PhoneCode != null, cancellationToken);
+                    var matched = allCountries
+                        .Where(c => !string.IsNullOrWhiteSpace(c.PhoneCode) && phone.Replace(" ", "").StartsWith(c.PhoneCode!.Trim().Replace(" ", ""), StringComparison.Ordinal))
+                        .OrderByDescending(c => c.PhoneCode!.Length)
+                        .FirstOrDefault();
+                    // If matched, linkage is implicitly validated; no error otherwise (phone may be local)
+                }
+            }
+
             // Organization distributor must be approved before OrganizationUser can register
             if (request.UserType == UserType.OrganizationUser)
             {

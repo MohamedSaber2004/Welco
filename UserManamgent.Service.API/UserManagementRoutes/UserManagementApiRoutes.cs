@@ -70,6 +70,21 @@
             public const string Delete = "{id}";
         }
 
+        public static class CompanyAddresses
+        {
+            public const string Base = UserManagementApiRoutes.Base + "/companies/{companyId}/addresses";
+            public const string GetAll = "";
+            public const string GetById = "{addressId}";
+            public const string Create = "";
+            public const string Update = "{addressId}";
+            public const string Delete = "{addressId}";
+            // fallback direct route for delete/update without companyId
+            public const string DirectBase = UserManagementApiRoutes.Base + "/company-addresses";
+            public const string DirectGetById = "{id}";
+            public const string DirectUpdate = "{id}";
+            public const string DirectDelete = "{id}";
+        }
+
         public static class DistributorApplications
         {
             public const string Base = UserManagementApiRoutes.Base + "/distributor-applications";

@@ -6,28 +6,25 @@ using Welco.Shared.Domain.Models;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
 
-namespace UserManamgent.Service.API.Features.Addresses.Queries.GetUserAddresses
+namespace UserManamgent.Service.API.Features.CompanyAddresses.Queries.GetCompanyAddressById
 {
-    public class GetUserAddressesQueryHandler : IRequestHandler<GetUserAddressesQuery, Result<IReadOnlyList<UserAddressDto>>>
+    public class GetCompanyAddressByIdQueryHandler : IRequestHandler<GetCompanyAddressByIdQuery, Result<CompanyAddressDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public GetUserAddressesQueryHandler(IUnitOfWork unitOfWork)
+        public GetCompanyAddressByIdQueryHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Result<IReadOnlyList<UserAddressDto>>> Handle(GetUserAddressesQuery request, CancellationToken cancellationToken)
+        public async Task<Result<CompanyAddressDto>> Handle(GetCompanyAddressByIdQuery request, CancellationToken cancellationToken)
         {
-            var addressRepo = _unitOfWork.GetRepository<UserAddress, Guid>();
-            var addresses = await addressRepo
-                .GetAllWithIncluding(a => a.UserId == request.UserId && !a.IsDeleted, a => a.Country, a => a.City, a => a.Zone)
-                .OrderByDescending(a => a.IsDefault)
-                .ThenByDescending(a => a.CreatedAt)
-                .Select(a => new UserAddressDto
+            var repo = _unitOfWork.GetRepository<CompanyAddress, Guid>();
+            var address = await repo.GetAllWithIncluding(a => a.Id == request.Id && !a.IsDeleted, a => a.Country, a => a.City, a => a.Zone)
+                .Select(a => new CompanyAddressDto
                 {
                     Id = a.Id,
-                    UserId = a.UserId,
+                    CompanyId = a.CompanyId,
                     CountryId = a.CountryId,
                     CountryNameEn = a.Country != null ? a.Country.NameEn : null,
                     CountryNameAr = a.Country != null ? a.Country.NameAr : null,
@@ -47,9 +44,12 @@ namespace UserManamgent.Service.API.Features.Addresses.Queries.GetUserAddresses
                     CreatedAt = a.CreatedAt,
                     UpdatedAt = a.UpdatedAt
                 })
-                .ToListAsync(cancellationToken);
+                .FirstOrDefaultAsync(cancellationToken);
 
-            return Result<IReadOnlyList<UserAddressDto>>.Success(addresses, LocalizationKeys.UserAddress.AddressesFetched);
+            if (address == null)
+                return Result<CompanyAddressDto>.NotFound(LocalizationKeys.UserAddress.AddressNotFound);
+
+            return Result<CompanyAddressDto>.Success(address, LocalizationKeys.UserAddress.AddressesFetched);
         }
     }
 }

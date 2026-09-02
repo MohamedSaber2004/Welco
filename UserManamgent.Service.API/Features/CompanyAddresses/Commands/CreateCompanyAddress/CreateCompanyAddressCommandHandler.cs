@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Welco.Shared.Common.DTOs.UserManagement;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
@@ -7,60 +6,58 @@ using Welco.Shared.Domain.Models;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
 
-namespace UserManamgent.Service.API.Features.Addresses.Commands.CreateAddress
+namespace UserManamgent.Service.API.Features.CompanyAddresses.Commands.CreateCompanyAddress
 {
-    public class CreateAddressCommandHandler : IRequestHandler<CreateAddressCommand, Result<UserAddressDto>>
+    public class CreateCompanyAddressCommandHandler : IRequestHandler<CreateCompanyAddressCommand, Result<CompanyAddressDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly ICurrentUserService _currentUserService;
 
-        public CreateAddressCommandHandler(
+        public CreateCompanyAddressCommandHandler(
             IUnitOfWork unitOfWork,
-            UserManager<ApplicationUser> userManager,
             ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork;
-            _userManager = userManager;
             _currentUserService = currentUserService;
         }
 
-        public async Task<Result<UserAddressDto>> Handle(CreateAddressCommand request, CancellationToken cancellationToken)
+        public async Task<Result<CompanyAddressDto>> Handle(CreateCompanyAddressCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByIdAsync(request.UserId.ToString());
-            if (user == null || user.IsDeleted)
+            var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
+            var company = await companyRepo.GetByIdAsync(request.CompanyId, cancellationToken);
+            if (company == null || company.IsDeleted)
             {
-                return Result<UserAddressDto>.NotFound(LocalizationKeys.UserManagement.UserNotFound);
+                return Result<CompanyAddressDto>.NotFound(LocalizationKeys.Company.NotFound);
             }
 
             var countryRepo = _unitOfWork.GetRepository<Country, Guid>();
             var country = await countryRepo.GetByIdAsync(request.CountryId, cancellationToken);
             if (country == null || country.IsDeleted)
             {
-                return Result<UserAddressDto>.NotFound(LocalizationKeys.Country.NotFound);
+                return Result<CompanyAddressDto>.NotFound(LocalizationKeys.Country.NotFound);
             }
 
             var cityRepo = _unitOfWork.GetRepository<City, Guid>();
             var city = await cityRepo.GetByIdAsync(request.CityId, cancellationToken);
             if (city == null || city.IsDeleted || city.CountryId != request.CountryId)
             {
-                return Result<UserAddressDto>.NotFound(LocalizationKeys.City.NotFound);
+                return Result<CompanyAddressDto>.NotFound(LocalizationKeys.City.NotFound);
             }
 
             var zoneRepo = _unitOfWork.GetRepository<Zone, Guid>();
             var zone = await zoneRepo.GetByIdAsync(request.ZoneId, cancellationToken);
             if (zone == null || zone.IsDeleted || zone.CityId != request.CityId)
             {
-                return Result<UserAddressDto>.NotFound(LocalizationKeys.Zone.NotFound);
+                return Result<CompanyAddressDto>.NotFound(LocalizationKeys.Zone.NotFound);
             }
 
             var currentUserId = _currentUserService.UserId != Guid.Empty
                 ? _currentUserService.UserId.ToString()
                 : "System";
 
-            var addressRepo = _unitOfWork.GetRepository<UserAddress, Guid>();
-            // Clean multi-address: if IsDefault or first address, ensure single default per user
-            var existing = await addressRepo.GetAllListAsync(a => a.UserId == request.UserId && !a.IsDeleted, cancellationToken);
+            var addressRepo = _unitOfWork.GetRepository<CompanyAddress, Guid>();
+            // Support many addresses same country or across countries — each has own CountryId
+            var existing = await addressRepo.GetAllListAsync(a => a.CompanyId == request.CompanyId && !a.IsDeleted, cancellationToken);
             var isFirst = !existing.Any();
             var shouldBeDefault = request.IsDefault || isFirst;
 
@@ -73,8 +70,8 @@ namespace UserManamgent.Service.API.Features.Addresses.Commands.CreateAddress
                 }
             }
 
-            var address = UserAddress.Create(
-                request.UserId,
+            var address = CompanyAddress.Create(
+                request.CompanyId,
                 request.CountryId,
                 request.CityId,
                 request.ZoneId,
@@ -88,10 +85,10 @@ namespace UserManamgent.Service.API.Features.Addresses.Commands.CreateAddress
             await addressRepo.AddAsync(address, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var addressDto = new UserAddressDto
+            var dto = new CompanyAddressDto
             {
                 Id = address.Id,
-                UserId = address.UserId,
+                CompanyId = address.CompanyId,
                 CountryId = address.CountryId,
                 CountryNameEn = country.NameEn,
                 CountryNameAr = country.NameAr,
@@ -112,7 +109,7 @@ namespace UserManamgent.Service.API.Features.Addresses.Commands.CreateAddress
                 UpdatedAt = address.UpdatedAt
             };
 
-            return Result<UserAddressDto>.Created(addressDto, LocalizationKeys.UserAddress.AddressCreated);
+            return Result<CompanyAddressDto>.Created(dto, LocalizationKeys.UserAddress.AddressCreated);
         }
     }
 }

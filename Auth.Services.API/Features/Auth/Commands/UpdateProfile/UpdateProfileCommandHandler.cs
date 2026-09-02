@@ -143,7 +143,9 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                     }
                 }
 
-                // Update existing or create new addresses
+                // Update existing or create new addresses — supports many same/different country with IsDefault
+                var newAddresses = new List<UserAddress>();
+                var hasExplicitDefault = request.Addresses.Any(a => a.IsDefault == true);
                 foreach (var addrDto in request.Addresses)
                 {
                     if (addrDto.Id.HasValue && addrDto.Id.Value != Guid.Empty)
@@ -157,11 +159,13 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                             addrDto.Building,
                             addrDto.Floor,
                             addrDto.Apartment,
-                            currentUserId);
+                            currentUserId,
+                            addrDto.IsDefault);
                         addressRepo.Update(existing);
                     }
                     else
                     {
+                        var isDefaultForNew = addrDto.IsDefault ?? false;
                         var newAddress = UserAddress.Create(
                             userId,
                             addrDto.CountryId,
@@ -171,8 +175,62 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                             addrDto.Building,
                             addrDto.Floor,
                             addrDto.Apartment,
-                            currentUserId);
+                            currentUserId,
+                            isDefaultForNew);
                         await addressRepo.AddAsync(newAddress, cancellationToken);
+                        newAddresses.Add(newAddress);
+                    }
+                }
+
+                // Enforce single default per user (clean multi-address)
+                if (hasExplicitDefault)
+                {
+                    // Find last incoming with IsDefault == true as the intended default
+                    var defaultDto = request.Addresses.LastOrDefault(a => a.IsDefault == true);
+                    Guid? defaultId = defaultDto?.Id;
+                    // Resolve default entity (existing updated or newly created)
+                    UserAddress? intendedDefault = null;
+                    if (defaultDto != null)
+                    {
+                        if (defaultDto.Id.HasValue && defaultDto.Id.Value != Guid.Empty)
+                        {
+                            intendedDefault = existingAddresses.FirstOrDefault(a => a.Id == defaultDto.Id.Value);
+                        }
+                        else
+                        {
+                            // New address default — find by matching street/country (last new with IsDefault true)
+                            intendedDefault = newAddresses.LastOrDefault(a => a.IsDefault);
+                        }
+                    }
+                    // Clear all other defaults for this user
+                    var allRemaining = existingAddresses.Where(a => incomingAddressIds.Contains(a.Id) || newAddresses.Contains(a)).Concat(newAddresses).ToList();
+                    // Actually collect all tracked remaining: existing not deleted + new
+                    var remainingForDefault = new List<UserAddress>();
+                    remainingForDefault.AddRange(existingAddresses.Where(a => incomingAddressIds.Contains(a.Id)));
+                    remainingForDefault.AddRange(newAddresses);
+                    foreach (var addr in remainingForDefault)
+                    {
+                        if (intendedDefault != null && addr.Id == intendedDefault.Id)
+                        {
+                            if (!addr.IsDefault) { addr.IsDefault = true; addr.MarkAsUpdated(currentUserId); }
+                        }
+                        else
+                        {
+                            if (addr.IsDefault) { addr.IsDefault = false; addr.MarkAsUpdated(currentUserId); }
+                        }
+                    }
+                }
+                else
+                {
+                    // No explicit default in payload — ensure at least one default remains (first address becomes default if none)
+                    var remaining = new List<UserAddress>();
+                    remaining.AddRange(existingAddresses.Where(a => incomingAddressIds.Contains(a.Id)));
+                    remaining.AddRange(newAddresses);
+                    if (remaining.Any() && !remaining.Any(a => a.IsDefault))
+                    {
+                        var first = remaining.OrderBy(a => a.CreatedAt).First();
+                        first.IsDefault = true;
+                        first.MarkAsUpdated(currentUserId);
                     }
                 }
 
@@ -180,7 +238,9 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
             }
 
             var addresses = await addressRepo
-                .GetAll(a => a.UserId == userId && !a.IsDeleted)
+                .GetAllWithIncluding(a => a.UserId == userId && !a.IsDeleted, a => a.Country, a => a.City, a => a.Zone)
+                .OrderByDescending(a => a.IsDefault)
+                .ThenByDescending(a => a.CreatedAt)
                 .Select(a => new UserAddressDto
                 {
                     Id = a.Id,
@@ -188,6 +248,8 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                     CountryId = a.CountryId,
                     CountryNameEn = a.Country != null ? a.Country.NameEn : null,
                     CountryNameAr = a.Country != null ? a.Country.NameAr : null,
+                    CountryCode = a.Country != null ? a.Country.Code : null,
+                    CountryPhoneCode = a.Country != null ? a.Country.PhoneCode : null,
                     CityId = a.CityId,
                     CityNameEn = a.City != null ? a.City.NameEn : null,
                     CityNameAr = a.City != null ? a.City.NameAr : null,
@@ -198,6 +260,7 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                     Building = a.Building,
                     Floor = a.Floor,
                     Apartment = a.Apartment,
+                    IsDefault = a.IsDefault,
                     CreatedAt = a.CreatedAt,
                     UpdatedAt = a.UpdatedAt
                 })

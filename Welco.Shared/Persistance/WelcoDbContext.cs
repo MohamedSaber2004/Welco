@@ -22,6 +22,7 @@ namespace Welco.Shared.Persistance
         public DbSet<City> Cities => Set<City>();
         public DbSet<Zone> Zones => Set<Zone>();
         public DbSet<UserAddress> UserAddresses => Set<UserAddress>();
+        public DbSet<CompanyAddress> CompanyAddresses => Set<CompanyAddress>();
         public DbSet<Certification> Certifications => Set<Certification>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Product> Products => Set<Product>();

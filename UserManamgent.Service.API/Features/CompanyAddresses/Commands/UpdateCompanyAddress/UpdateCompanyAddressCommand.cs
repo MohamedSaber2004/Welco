@@ -2,9 +2,9 @@ using MediatR;
 using Welco.Shared.Common.DTOs.UserManagement;
 using Welco.Shared.Results;
 
-namespace UserManamgent.Service.API.Features.Addresses.Commands.UpdateAddress
+namespace UserManamgent.Service.API.Features.CompanyAddresses.Commands.UpdateCompanyAddress
 {
-    public class UpdateAddressCommand : IRequest<Result<UserAddressDto>>
+    public class UpdateCompanyAddressCommand : IRequest<Result<CompanyAddressDto>>
     {
         public Guid Id { get; set; }
         public Guid? CountryId { get; set; }

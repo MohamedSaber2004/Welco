@@ -31,6 +31,14 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
             RuleFor(x => x.Language)
                 .IsInEnum().WithMessage(LocalizationKeys.Auth.LanguageRequired);
 
+            RuleFor(x => x.PhoneNumber)
+                .MaximumLength(20).WithMessage("Phone number is too long")
+                .Matches(@"^\+?[0-9\s\-]{6,20}$").When(x => !string.IsNullOrWhiteSpace(x.PhoneNumber))
+                .WithMessage("Phone number must be 6-20 digits, may start with +");
+
+            RuleFor(x => x.PhoneCountryId)
+                .Must(id => id == null || id != Guid.Empty).WithMessage(LocalizationKeys.Country.NotFound);
+
             RuleFor(x => x).CustomAsync(async (command, context, ct) =>
             {
                 if (string.IsNullOrWhiteSpace(command.Email))

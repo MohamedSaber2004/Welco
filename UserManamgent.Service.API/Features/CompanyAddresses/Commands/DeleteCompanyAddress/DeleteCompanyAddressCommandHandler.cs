@@ -5,14 +5,14 @@ using Welco.Shared.Domain.Models;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
 
-namespace UserManamgent.Service.API.Features.Addresses.Commands.DeleteAddress
+namespace UserManamgent.Service.API.Features.CompanyAddresses.Commands.DeleteCompanyAddress
 {
-    public class DeleteAddressCommandHandler : IRequestHandler<DeleteAddressCommand, Result<string>>
+    public class DeleteCompanyAddressCommandHandler : IRequestHandler<DeleteCompanyAddressCommand, Result<string>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICurrentUserService _currentUserService;
 
-        public DeleteAddressCommandHandler(
+        public DeleteCompanyAddressCommandHandler(
             IUnitOfWork unitOfWork,
             ICurrentUserService currentUserService)
         {
@@ -20,14 +20,12 @@ namespace UserManamgent.Service.API.Features.Addresses.Commands.DeleteAddress
             _currentUserService = currentUserService;
         }
 
-        public async Task<Result<string>> Handle(DeleteAddressCommand request, CancellationToken cancellationToken)
+        public async Task<Result<string>> Handle(DeleteCompanyAddressCommand request, CancellationToken cancellationToken)
         {
-            var addressRepo = _unitOfWork.GetRepository<UserAddress, Guid>();
-            var address = await addressRepo.GetByIdAsync(request.Id, cancellationToken);
+            var repo = _unitOfWork.GetRepository<CompanyAddress, Guid>();
+            var address = await repo.GetByIdAsync(request.Id, cancellationToken);
             if (address == null || address.IsDeleted)
-            {
                 return Result<string>.NotFound(LocalizationKeys.UserAddress.AddressNotFound);
-            }
 
             var wasDefault = address.IsDefault;
             var currentUserId = _currentUserService.UserId != Guid.Empty
@@ -35,12 +33,11 @@ namespace UserManamgent.Service.API.Features.Addresses.Commands.DeleteAddress
                 : "System";
 
             address.MarkAsDeleted(currentUserId);
-            addressRepo.Update(address);
+            repo.Update(address);
 
-            // If deleted was default, promote most recent remaining as new default
             if (wasDefault)
             {
-                var remaining = await addressRepo.GetAllListAsync(a => a.UserId == address.UserId && a.Id != address.Id && !a.IsDeleted, cancellationToken);
+                var remaining = await repo.GetAllListAsync(a => a.CompanyId == address.CompanyId && a.Id != address.Id && !a.IsDeleted, cancellationToken);
                 var next = remaining.OrderByDescending(a => a.CreatedAt).FirstOrDefault();
                 if (next != null)
                 {
@@ -50,7 +47,6 @@ namespace UserManamgent.Service.API.Features.Addresses.Commands.DeleteAddress
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-
             return Result<string>.Success(address.Id.ToString(), LocalizationKeys.UserAddress.AddressDeleted);
         }
     }

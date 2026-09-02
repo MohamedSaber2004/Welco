@@ -7,14 +7,14 @@ using Welco.Shared.Domain.Models;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
 
-namespace UserManamgent.Service.API.Features.Addresses.Commands.UpdateAddress
+namespace UserManamgent.Service.API.Features.CompanyAddresses.Commands.UpdateCompanyAddress
 {
-    public class UpdateAddressCommandHandler : IRequestHandler<UpdateAddressCommand, Result<UserAddressDto>>
+    public class UpdateCompanyAddressCommandHandler : IRequestHandler<UpdateCompanyAddressCommand, Result<CompanyAddressDto>>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICurrentUserService _currentUserService;
 
-        public UpdateAddressCommandHandler(
+        public UpdateCompanyAddressCommandHandler(
             IUnitOfWork unitOfWork,
             ICurrentUserService currentUserService)
         {
@@ -22,13 +22,13 @@ namespace UserManamgent.Service.API.Features.Addresses.Commands.UpdateAddress
             _currentUserService = currentUserService;
         }
 
-        public async Task<Result<UserAddressDto>> Handle(UpdateAddressCommand request, CancellationToken cancellationToken)
+        public async Task<Result<CompanyAddressDto>> Handle(UpdateCompanyAddressCommand request, CancellationToken cancellationToken)
         {
-            var addressRepo = _unitOfWork.GetRepository<UserAddress, Guid>();
+            var addressRepo = _unitOfWork.GetRepository<CompanyAddress, Guid>();
             var address = await addressRepo.GetByIdAsync(request.Id, cancellationToken);
             if (address == null || address.IsDeleted)
             {
-                return Result<UserAddressDto>.NotFound(LocalizationKeys.UserAddress.AddressNotFound);
+                return Result<CompanyAddressDto>.NotFound(LocalizationKeys.UserAddress.AddressNotFound);
             }
 
             var targetCountryId = request.CountryId ?? address.CountryId;
@@ -40,9 +40,7 @@ namespace UserManamgent.Service.API.Features.Addresses.Commands.UpdateAddress
                 var countryRepo = _unitOfWork.GetRepository<Country, Guid>();
                 var country = await countryRepo.GetByIdAsync(request.CountryId.Value, cancellationToken);
                 if (country == null || country.IsDeleted)
-                {
-                    return Result<UserAddressDto>.NotFound(LocalizationKeys.Country.NotFound);
-                }
+                    return Result<CompanyAddressDto>.NotFound(LocalizationKeys.Country.NotFound);
             }
 
             if (request.CityId.HasValue || request.CountryId.HasValue)
@@ -50,9 +48,7 @@ namespace UserManamgent.Service.API.Features.Addresses.Commands.UpdateAddress
                 var cityRepo = _unitOfWork.GetRepository<City, Guid>();
                 var city = await cityRepo.GetByIdAsync(targetCityId, cancellationToken);
                 if (city == null || city.IsDeleted || city.CountryId != targetCountryId)
-                {
-                    return Result<UserAddressDto>.NotFound(LocalizationKeys.City.NotFound);
-                }
+                    return Result<CompanyAddressDto>.NotFound(LocalizationKeys.City.NotFound);
             }
 
             if (request.ZoneId.HasValue || request.CityId.HasValue)
@@ -60,19 +56,16 @@ namespace UserManamgent.Service.API.Features.Addresses.Commands.UpdateAddress
                 var zoneRepo = _unitOfWork.GetRepository<Zone, Guid>();
                 var zone = await zoneRepo.GetByIdAsync(targetZoneId, cancellationToken);
                 if (zone == null || zone.IsDeleted || zone.CityId != targetCityId)
-                {
-                    return Result<UserAddressDto>.NotFound(LocalizationKeys.Zone.NotFound);
-                }
+                    return Result<CompanyAddressDto>.NotFound(LocalizationKeys.Zone.NotFound);
             }
 
             var currentUserId = _currentUserService.UserId != Guid.Empty
                 ? _currentUserService.UserId.ToString()
                 : "System";
 
-            // If setting as default, clear other defaults for same user (clean multi-address)
             if (request.IsDefault == true)
             {
-                var others = await addressRepo.GetAllListAsync(a => a.UserId == address.UserId && a.Id != address.Id && !a.IsDeleted && a.IsDefault, cancellationToken);
+                var others = await addressRepo.GetAllListAsync(a => a.CompanyId == address.CompanyId && a.Id != address.Id && !a.IsDeleted && a.IsDefault, cancellationToken);
                 foreach (var o in others)
                 {
                     o.IsDefault = false;
@@ -94,25 +87,25 @@ namespace UserManamgent.Service.API.Features.Addresses.Commands.UpdateAddress
             addressRepo.Update(address);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var updatedAddress = await addressRepo
+            var updated = await addressRepo
                 .GetAllWithIncluding(a => a.Id == address.Id, a => a.Country, a => a.City, a => a.Zone)
                 .FirstOrDefaultAsync(cancellationToken);
 
-            var addressDto = new UserAddressDto
+            var dto = new CompanyAddressDto
             {
                 Id = address.Id,
-                UserId = address.UserId,
+                CompanyId = address.CompanyId,
                 CountryId = address.CountryId,
-                CountryNameEn = updatedAddress?.Country?.NameEn,
-                CountryNameAr = updatedAddress?.Country?.NameAr,
-                CountryCode = updatedAddress?.Country?.Code,
-                CountryPhoneCode = updatedAddress?.Country?.PhoneCode,
+                CountryNameEn = updated?.Country?.NameEn,
+                CountryNameAr = updated?.Country?.NameAr,
+                CountryCode = updated?.Country?.Code,
+                CountryPhoneCode = updated?.Country?.PhoneCode,
                 CityId = address.CityId,
-                CityNameEn = updatedAddress?.City?.NameEn,
-                CityNameAr = updatedAddress?.City?.NameAr,
+                CityNameEn = updated?.City?.NameEn,
+                CityNameAr = updated?.City?.NameAr,
                 ZoneId = address.ZoneId,
-                ZoneNameEn = updatedAddress?.Zone?.NameEn,
-                ZoneNameAr = updatedAddress?.Zone?.NameAr,
+                ZoneNameEn = updated?.Zone?.NameEn,
+                ZoneNameAr = updated?.Zone?.NameAr,
                 Street = address.Street,
                 Building = address.Building,
                 Floor = address.Floor,
@@ -122,7 +115,7 @@ namespace UserManamgent.Service.API.Features.Addresses.Commands.UpdateAddress
                 UpdatedAt = address.UpdatedAt
             };
 
-            return Result<UserAddressDto>.Success(addressDto, LocalizationKeys.UserAddress.AddressUpdated);
+            return Result<CompanyAddressDto>.Success(dto, LocalizationKeys.UserAddress.AddressUpdated);
         }
     }
 }

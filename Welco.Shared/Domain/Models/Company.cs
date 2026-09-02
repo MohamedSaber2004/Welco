@@ -14,6 +14,7 @@ namespace Welco.Shared.Domain.Models
         public Guid? AccountManagerId { get; set; }
         public virtual ApplicationUser? AccountManager { get; set; }
         public virtual ICollection<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
+        public virtual ICollection<CompanyAddress> Addresses { get; set; } = new List<CompanyAddress>();
 
         public static Company Create(
             string name,

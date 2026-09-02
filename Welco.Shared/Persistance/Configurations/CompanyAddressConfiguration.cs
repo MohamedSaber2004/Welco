@@ -4,11 +4,11 @@ using Welco.Shared.Domain.Models;
 
 namespace Welco.Shared.Persistance.Configurations
 {
-    public class UserAddressConfiguration : IEntityTypeConfiguration<UserAddress>
+    public class CompanyAddressConfiguration : IEntityTypeConfiguration<CompanyAddress>
     {
-        public void Configure(EntityTypeBuilder<UserAddress> builder)
+        public void Configure(EntityTypeBuilder<CompanyAddress> builder)
         {
-            builder.ToTable("UserAddresses");
+            builder.ToTable("CompanyAddresses");
 
             builder.HasKey(x => x.Id);
 
@@ -32,9 +32,9 @@ namespace Welco.Shared.Persistance.Configurations
             builder.Property(x => x.CreatedBy)
                 .IsRequired();
 
-            builder.HasOne(x => x.User)
-                .WithMany(u => u.Addresses)
-                .HasForeignKey(x => x.UserId)
+            builder.HasOne(x => x.Company)
+                .WithMany()
+                .HasForeignKey(x => x.CompanyId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(x => x.Country)
@@ -51,6 +51,9 @@ namespace Welco.Shared.Persistance.Configurations
                 .WithMany()
                 .HasForeignKey(x => x.ZoneId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(x => x.CompanyId);
+            builder.HasIndex(x => x.CountryId);
         }
     }
 }

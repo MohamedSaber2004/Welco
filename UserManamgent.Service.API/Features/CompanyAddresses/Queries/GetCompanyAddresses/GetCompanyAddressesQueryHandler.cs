@@ -6,28 +6,33 @@ using Welco.Shared.Domain.Models;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
 
-namespace UserManamgent.Service.API.Features.Addresses.Queries.GetUserAddresses
+namespace UserManamgent.Service.API.Features.CompanyAddresses.Queries.GetCompanyAddresses
 {
-    public class GetUserAddressesQueryHandler : IRequestHandler<GetUserAddressesQuery, Result<IReadOnlyList<UserAddressDto>>>
+    public class GetCompanyAddressesQueryHandler : IRequestHandler<GetCompanyAddressesQuery, Result<IReadOnlyList<CompanyAddressDto>>>
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public GetUserAddressesQueryHandler(IUnitOfWork unitOfWork)
+        public GetCompanyAddressesQueryHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Result<IReadOnlyList<UserAddressDto>>> Handle(GetUserAddressesQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IReadOnlyList<CompanyAddressDto>>> Handle(GetCompanyAddressesQuery request, CancellationToken cancellationToken)
         {
-            var addressRepo = _unitOfWork.GetRepository<UserAddress, Guid>();
-            var addresses = await addressRepo
-                .GetAllWithIncluding(a => a.UserId == request.UserId && !a.IsDeleted, a => a.Country, a => a.City, a => a.Zone)
+            var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
+            var company = await companyRepo.GetByIdAsync(request.CompanyId, cancellationToken);
+            if (company == null || company.IsDeleted)
+                return Result<IReadOnlyList<CompanyAddressDto>>.NotFound(LocalizationKeys.Company.NotFound);
+
+            var repo = _unitOfWork.GetRepository<CompanyAddress, Guid>();
+            var addresses = await repo
+                .GetAllWithIncluding(a => a.CompanyId == request.CompanyId && !a.IsDeleted, a => a.Country, a => a.City, a => a.Zone)
                 .OrderByDescending(a => a.IsDefault)
                 .ThenByDescending(a => a.CreatedAt)
-                .Select(a => new UserAddressDto
+                .Select(a => new CompanyAddressDto
                 {
                     Id = a.Id,
-                    UserId = a.UserId,
+                    CompanyId = a.CompanyId,
                     CountryId = a.CountryId,
                     CountryNameEn = a.Country != null ? a.Country.NameEn : null,
                     CountryNameAr = a.Country != null ? a.Country.NameAr : null,
@@ -49,7 +54,7 @@ namespace UserManamgent.Service.API.Features.Addresses.Queries.GetUserAddresses
                 })
                 .ToListAsync(cancellationToken);
 
-            return Result<IReadOnlyList<UserAddressDto>>.Success(addresses, LocalizationKeys.UserAddress.AddressesFetched);
+            return Result<IReadOnlyList<CompanyAddressDto>>.Success(addresses, LocalizationKeys.UserAddress.AddressesFetched);
         }
     }
 }
