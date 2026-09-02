@@ -34,7 +34,7 @@ namespace UserManamgent.Service.API.Features.Countries.Commands.UpdateCountry
                 ? _currentUserService.UserId.ToString()
                 : "System";
 
-            country.Update(request.NameEn, request.NameAr, request.Code, currentUserId);
+            country.Update(request.NameEn, request.NameAr, request.Code, request.PhoneCode, currentUserId);
             countryRepo.Update(country);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -44,6 +44,7 @@ namespace UserManamgent.Service.API.Features.Countries.Commands.UpdateCountry
                 NameEn = country.NameEn,
                 NameAr = country.NameAr,
                 Code = country.Code,
+                PhoneCode = country.PhoneCode,
                 IsActive = country.IsActive,
                 CreatedAt = country.CreatedAt
             };

@@ -1,10 +1,50 @@
 {
   "Routes": [
     {
+      "DownstreamPathTemplate": "/api/v1/user-management/countries",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "localhost", "Port": 7204 }],
+      "UpstreamPathTemplate": "/api/v1/user-management/countries",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
       "DownstreamPathTemplate": "/api/v1/user-management/countries/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [{ "Host": "localhost", "Port": 7204 }],
       "UpstreamPathTemplate": "/api/v1/user-management/countries/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/user-management/cities",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "localhost", "Port": 7204 }],
+      "UpstreamPathTemplate": "/api/v1/user-management/cities",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/user-management/cities/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "localhost", "Port": 7204 }],
+      "UpstreamPathTemplate": "/api/v1/user-management/cities/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/user-management/zones",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "localhost", "Port": 7204 }],
+      "UpstreamPathTemplate": "/api/v1/user-management/zones",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/user-management/zones/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "localhost", "Port": 7204 }],
+      "UpstreamPathTemplate": "/api/v1/user-management/zones/{everything}",
       "UpstreamHttpMethod": [ "GET" ],
       "DangerousAcceptAnyServerCertificateValidator": true
     },

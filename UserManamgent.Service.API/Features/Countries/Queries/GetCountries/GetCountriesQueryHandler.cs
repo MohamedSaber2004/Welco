@@ -29,6 +29,7 @@ namespace UserManamgent.Service.API.Features.Countries.Queries.GetCountries
                     NameEn = c.NameEn,
                     NameAr = c.NameAr,
                     Code = c.Code,
+                    PhoneCode = c.PhoneCode,
                     IsActive = c.IsActive,
                     CreatedAt = c.CreatedAt
                 })

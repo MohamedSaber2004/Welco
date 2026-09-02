@@ -41,6 +41,7 @@ namespace UserManamgent.Service.API.Features.Countries.Commands.CreateCountry
                 request.NameEn.Trim(),
                 request.NameAr.Trim(),
                 request.Code?.Trim(),
+                request.PhoneCode?.Trim(),
                 currentUserId);
 
             await countryRepo.AddAsync(country, cancellationToken);
@@ -52,6 +53,7 @@ namespace UserManamgent.Service.API.Features.Countries.Commands.CreateCountry
                 NameEn = country.NameEn,
                 NameAr = country.NameAr,
                 Code = country.Code,
+                PhoneCode = country.PhoneCode,
                 IsActive = country.IsActive,
                 CreatedAt = country.CreatedAt
             };

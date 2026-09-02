@@ -10,5 +10,6 @@ namespace UserManamgent.Service.API.Features.Countries.Commands.UpdateCountry
         public string? NameEn { get; set; }
         public string? NameAr { get; set; }
         public string? Code { get; set; }
+        public string? PhoneCode { get; set; }
     }
 }

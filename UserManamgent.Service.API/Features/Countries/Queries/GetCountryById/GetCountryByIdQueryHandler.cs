@@ -31,6 +31,7 @@ namespace UserManamgent.Service.API.Features.Countries.Queries.GetCountryById
                 NameEn = country.NameEn,
                 NameAr = country.NameAr,
                 Code = country.Code,
+                PhoneCode = country.PhoneCode,
                 IsActive = country.IsActive,
                 CreatedAt = country.CreatedAt
             };

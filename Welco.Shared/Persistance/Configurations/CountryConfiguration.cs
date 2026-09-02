@@ -23,6 +23,9 @@ namespace Welco.Shared.Persistance.Configurations
             builder.Property(x => x.Code)
                 .HasMaxLength(10);
 
+            builder.Property(x => x.PhoneCode)
+                .HasMaxLength(15);
+
             builder.Property(x => x.CreatedBy)
                 .IsRequired();
 
