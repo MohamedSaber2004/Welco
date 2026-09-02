@@ -37,7 +37,6 @@ namespace Certification.Services.API
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
-
             if (env.IsDevelopment() || env.EnvironmentName == "Test")
             {
                 var appAssembly = Assembly.Load(new AssemblyName(env.ApplicationName));
