@@ -33,7 +33,7 @@ namespace Welco.Shared.Persistance.Configurations
                 .IsRequired();
 
             builder.HasOne(x => x.Company)
-                .WithMany()
+                .WithMany(c => c.Addresses)
                 .HasForeignKey(x => x.CompanyId)
                 .OnDelete(DeleteBehavior.Cascade);
 
