@@ -1,17 +1,57 @@
 {
   "Routes": [
     {
+      "DownstreamPathTemplate": "/api/v1/user-management/countries",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-user.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/user-management/countries",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
       "DownstreamPathTemplate": "/api/v1/user-management/countries/{everything}",
       "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [{ "Host": "welco-content.runasp.net", "Port": 443 }],
+      "DownstreamHostAndPorts": [{ "Host": "welco-user.runasp.net", "Port": 443 }],
       "UpstreamPathTemplate": "/api/v1/user-management/countries/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/user-management/cities",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-user.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/user-management/cities",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/user-management/cities/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-user.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/user-management/cities/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/user-management/zones",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-user.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/user-management/zones",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/user-management/zones/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-user.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/user-management/zones/{everything}",
       "UpstreamHttpMethod": [ "GET" ],
       "DangerousAcceptAnyServerCertificateValidator": true
     },
     {
       "DownstreamPathTemplate": "/api/v1/user-management/distributor-applications",
       "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [{ "Host": "welco-content.runasp.net", "Port": 443 }],
+      "DownstreamHostAndPorts": [{ "Host": "welco-user.runasp.net", "Port": 443 }],
       "UpstreamPathTemplate": "/api/v1/user-management/distributor-applications",
       "UpstreamHttpMethod": [ "POST" ],
       "DangerousAcceptAnyServerCertificateValidator": true
@@ -21,7 +61,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "welco-content.runasp.net",
+          "Host": "welco-user.runasp.net",
           "Port": 443
         }
       ],
@@ -31,8 +71,6 @@
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
       },
-      "DangerousAcceptAnyServerCertificateValidator": true
-    },
       "DangerousAcceptAnyServerCertificateValidator": true
     },
     {
