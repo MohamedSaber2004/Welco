@@ -94,5 +94,12 @@
             public const string Approve = "{id}/approve";
             public const string Reject = "{id}/reject";
         }
+
+        public static class AuditLogs
+        {
+            public const string Base = UserManagementApiRoutes.Base + "/audit-logs";
+            public const string GetAll = "";
+            public const string GetById = "{id}";
+        }
     }
 }

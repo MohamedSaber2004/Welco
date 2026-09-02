@@ -322,5 +322,13 @@
     "FileUploaded": "File uploaded successfully.",
     "FileNotFound": "File not found.",
     "FileDeleted": "File deleted successfully."
+  },
+  "AuditLog": {
+    "ListFetched": "Audit logs fetched successfully.",
+    "NotFound": "Audit log not found.",
+    "EntityNameRequired": "Entity name is required.",
+    "ActionRequired": "Action is required.",
+    "PageNumberPositive": "Page number must be positive.",
+    "PageSizeRange": "Page size must be between 1 and 100."
   }
 }

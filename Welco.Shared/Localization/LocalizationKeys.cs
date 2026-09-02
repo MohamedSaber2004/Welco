@@ -446,5 +446,15 @@
             public const string FileNotFound = "Attachments.FileNotFound";
             public const string FileDeleted = "Attachments.FileDeleted";
         }
+
+        public static class AuditLog
+        {
+            public const string ListFetched = "AuditLog.ListFetched";
+            public const string NotFound = "AuditLog.NotFound";
+            public const string EntityNameRequired = "AuditLog.EntityNameRequired";
+            public const string ActionRequired = "AuditLog.ActionRequired";
+            public const string PageNumberPositive = "AuditLog.PageNumberPositive";
+            public const string PageSizeRange = "AuditLog.PageSizeRange";
+        }
     }
 }
