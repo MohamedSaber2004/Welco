@@ -7,6 +7,7 @@ using Product.Services.API.Features.Products.Commands.DeleteProduct;
 using Product.Services.API.Features.Products.Commands.UpdateProduct;
 using Product.Services.API.Features.Products.Queries.GetProductById;
 using Product.Services.API.Features.Products.Queries.GetProducts;
+using Product.Services.API.Features.Products.Queries.GetProductVideos;
 using Product.Services.API.Features.Products.Queries.ShowProduct;
 using Product.Services.API.ProductRoutes;
 using Welco.Shared.Common.Attributes;
@@ -70,6 +71,19 @@ namespace Product.Services.API.Controllers
         public async Task<IActionResult> Show([FromRoute] Guid id, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new ShowProductQuery { Id = id }, cancellationToken);
+            return ToActionResult(result);
+        }
+
+        /// <summary>
+        /// Get Product Videos (real media)
+        /// </summary>
+        [HttpGet]
+        [Route(ProductApiRoutes.Products.GetVideos)]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetVideos([FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetProductVideosQuery { ProductId = id }, cancellationToken);
             return ToActionResult(result);
         }
 
