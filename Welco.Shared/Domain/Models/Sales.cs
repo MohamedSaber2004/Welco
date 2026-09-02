@@ -58,9 +58,11 @@ namespace Welco.Shared.Domain.Models
         public Guid CountryId { get; set; }
         public virtual Country? Country { get; set; }
         public string SalesVolumeBand { get; set; } = null!;
+        public string? CategoryInterest { get; set; }
         public string? Website { get; set; }
         public string ContactPerson { get; set; } = null!;
         public string ContactEmail { get; set; } = null!;
+        public string? Phone { get; set; }
         public DistributorApplicationStatus Status { get; set; } = DistributorApplicationStatus.Pending;
     }
 }

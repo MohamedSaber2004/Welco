@@ -11,6 +11,7 @@ using Sales.Services.API.Features.RFQs.Commands.UpdateRFQStatus;
 using Sales.Services.API.Features.RFQs.Queries.GetRFQById;
 using Sales.Services.API.Features.RFQs.Queries.GetRFQs;
 using Sales.Services.API.SalesRoutes;
+using Sales.Services.API.Features.ProductInquiries.Commands.CreateProductInquiry;
 using Welco.Shared.Common.Attributes;
 using Welco.Shared.Controllers;
 using Welco.Shared.Enums;
@@ -37,5 +38,13 @@ namespace Sales.Services.API.Controllers
         [HttpPost][RoleAuthorize(UserType.WelcoStaff, UserType.Admin)] public async Task<IActionResult> Create([FromBody] CreateQuoteCommand c, CancellationToken ct) => ToActionResult(await _mediator.Send(c, ct));
         [HttpPost][Route(SalesApiRoutes.Quotes.Approve)][RoleAuthorize(UserType.OrganizationUser, UserType.Admin)] public async Task<IActionResult> Approve([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new ApproveQuoteCommand { Id = id }, ct));
         [HttpPost][Route(SalesApiRoutes.Quotes.Decline)][RoleAuthorize(UserType.OrganizationUser, UserType.Admin)] public async Task<IActionResult> Decline([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new DeclineQuoteCommand { Id = id }, ct));
+    }
+    [Route(SalesApiRoutes.ProductInquiries.Base)]
+    public class ProductInquiriesController : AppControllerBase
+    {
+        public ProductInquiriesController(IMediator mediator) : base(mediator) { }
+        [HttpPost]
+        [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+        public async Task<IActionResult> Create([FromBody] CreateProductInquiryCommand c, CancellationToken ct) => ToActionResult(await _mediator.Send(c, ct));
     }
 }

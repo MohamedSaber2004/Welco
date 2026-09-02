@@ -53,8 +53,33 @@ namespace Product.Services.API.Features.Products.Queries.GetProducts
                 query = query.Where(p => p.IsActive == request.IsActive.Value);
             }
 
+            if (request.PriceMin.HasValue)
+                query = query.Where(p => p.Price >= request.PriceMin.Value);
+
+            if (request.PriceMax.HasValue)
+                query = query.Where(p => p.Price <= request.PriceMax.Value);
+
+            if (request.InStockOnly == true)
+                query = query.Where(p => p.Stock > 0);
+
+            if (request.CurrencyId.HasValue)
+                query = query.Where(p => p.CurrencyId == request.CurrencyId.Value);
+
+            // sorting
+            if (!string.IsNullOrWhiteSpace(request.SortBy))
+            {
+                var s = request.SortBy.Trim().ToLowerInvariant();
+                if (s == "price-asc") query = query.OrderBy(p => p.Price);
+                else if (s == "price-desc") query = query.OrderByDescending(p => p.Price);
+                else if (s == "newest") query = query.OrderByDescending(p => p.CreatedAt);
+                else query = query.OrderByDescending(p => p.CreatedAt);
+            }
+            else
+            {
+                query = query.OrderByDescending(p => p.CreatedAt);
+            }
+
             return await query
-                .OrderByDescending(p => p.CreatedAt)
                 .ToPaginatedListAsync(
                     ProductDtoMapper.Projection,
                     request.PageNumber,

@@ -23,7 +23,32 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [{ "Host": "content.welco.internal", "Port": 443 }],
       "UpstreamPathTemplate": "/api/v1/help/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": false
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/help/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "content.welco.internal", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/help/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer", "AllowedScopes": [] },
+      "DangerousAcceptAnyServerCertificateValidator": false
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/trade-shows/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "content.welco.internal", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/trade-shows/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": false
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/trade-shows/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "content.welco.internal", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/trade-shows/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer", "AllowedScopes": [] },
       "DangerousAcceptAnyServerCertificateValidator": false
     },

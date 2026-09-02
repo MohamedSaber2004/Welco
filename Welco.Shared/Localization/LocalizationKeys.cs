@@ -414,6 +414,25 @@
             public const string Declined = "Quote.Declined";
         }
 
+        public static class Content
+        {
+            public const string Created = "Content.Created";
+            public const string ListFetched = "Content.ListFetched";
+            public const string Fetched = "Content.Fetched";
+            public const string Deleted = "Content.Deleted";
+            public const string NotFound = "Content.NotFound";
+        }
+        public static class TradeShow
+        {
+            public const string Created = "TradeShow.Created";
+            public const string ListFetched = "TradeShow.ListFetched";
+            public const string Fetched = "TradeShow.Fetched";
+        }
+        public static class ProductInquiry
+        {
+            public const string Created = "ProductInquiry.Created";
+            public const string ListFetched = "ProductInquiry.ListFetched";
+        }
         public static class AttachmentMessages
         {
             public const string FileEmpty = "Attachments.FileEmpty";

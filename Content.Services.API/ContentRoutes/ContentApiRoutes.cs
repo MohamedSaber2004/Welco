@@ -63,5 +63,6 @@ namespace Content.Services.API.ContentRoutes
             public const string Reply = "{id}/reply";
             public const string Close = "{id}/close";
         }
+        public const string TradeShowsBase = Root + "/" + Version + "/trade-shows";
     }
 }

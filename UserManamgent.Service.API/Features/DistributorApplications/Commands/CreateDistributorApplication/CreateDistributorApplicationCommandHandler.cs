@@ -40,9 +40,11 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Cr
                 CompanyName = request.CompanyName.Trim(),
                 CountryId = request.CountryId,
                 SalesVolumeBand = string.IsNullOrWhiteSpace(request.SalesVolumeBand) ? "Not specified" : request.SalesVolumeBand.Trim(),
+                CategoryInterest = string.IsNullOrWhiteSpace(request.CategoryInterest) ? null : request.CategoryInterest.Trim(),
                 Website = string.IsNullOrWhiteSpace(request.Website) ? null : request.Website.Trim(),
                 ContactPerson = request.ContactPerson.Trim(),
                 ContactEmail = request.Email.Trim(),
+                Phone = string.IsNullOrWhiteSpace(request.Phone) ? null : request.Phone.Trim(),
                 Status = DistributorApplicationStatus.Pending,
             };
             app.MarkAsCreated(currentUserId);
@@ -58,9 +60,11 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Cr
                 CountryId = app.CountryId,
                 CountryNameEn = country.NameEn,
                 SalesVolumeBand = app.SalesVolumeBand,
+                CategoryInterest = app.CategoryInterest,
                 Website = app.Website,
                 ContactPerson = app.ContactPerson,
                 ContactEmail = app.ContactEmail,
+                Phone = app.Phone,
                 Status = app.Status.ToString(),
                 CreatedAt = app.CreatedAt
             };

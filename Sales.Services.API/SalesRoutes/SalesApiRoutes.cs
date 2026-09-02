@@ -23,5 +23,11 @@ namespace Sales.Services.API.SalesRoutes
             public const string Approve = "{id}/approve";
             public const string Decline = "{id}/decline";
         }
+        public const string ProductInquiriesBase = Root + "/" + Version + "/product-inquiries";
+        public static class ProductInquiries
+        {
+            public const string Base = ProductInquiriesBase;
+            public const string Create = "";
+        }
     }
 }

@@ -23,4 +23,5 @@ namespace Welco.Shared.Common.DTOs.Sales
         public DateTime CreatedAt { get; set; }
     }
     public class QuoteItemDto { public Guid Id { get; set; } public Guid QuoteId { get; set; } public Guid ProductId { get; set; } public int Quantity { get; set; } public decimal UnitPrice { get; set; } }
+    public class ProductInquiryDto { public Guid Id { get; set; } public Guid ProductId { get; set; } public string Name { get; set; } = string.Empty; public string Organization { get; set; } = string.Empty; public string Message { get; set; } = string.Empty; public string? Email { get; set; } public DateTime CreatedAt { get; set; } }
 }

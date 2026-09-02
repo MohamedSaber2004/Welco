@@ -15,5 +15,10 @@ namespace Product.Services.API.Features.Products.Queries.GetProducts
         public decimal? LengthMax { get; set; }
         public Guid? CategoryId { get; set; }
         public bool? IsActive { get; set; }
+        public decimal? PriceMin { get; set; }
+        public decimal? PriceMax { get; set; }
+        public bool? InStockOnly { get; set; }
+        public Guid? CurrencyId { get; set; }
+        public string? SortBy { get; set; } // price-asc, price-desc, newest, rating
     }
 }
