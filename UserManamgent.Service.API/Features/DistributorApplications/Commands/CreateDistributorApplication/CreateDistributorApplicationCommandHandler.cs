@@ -39,7 +39,7 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Cr
                 Id = Guid.NewGuid(),
                 CompanyName = request.CompanyName.Trim(),
                 CountryId = request.CountryId,
-                SalesVolumeBand = request.SalesVolumeBand.Trim(),
+                SalesVolumeBand = string.IsNullOrWhiteSpace(request.SalesVolumeBand) ? "Not specified" : request.SalesVolumeBand.Trim(),
                 Website = string.IsNullOrWhiteSpace(request.Website) ? null : request.Website.Trim(),
                 ContactPerson = request.ContactPerson.Trim(),
                 ContactEmail = request.Email.Trim(),

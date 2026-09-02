@@ -12,16 +12,15 @@ using Welco.Shared.Enums;
 
 namespace UserManamgent.Service.API.Controllers
 {
-    [RoleAuthorize]
     [Route(UserManagementApiRoutes.DistributorApplications.Base)]
     public class DistributorApplicationsController : AppControllerBase
     {
         public DistributorApplicationsController(IMediator mediator) : base(mediator) { }
 
-        // POST /api/v1/user-management/distributor-applications — OrganizationUser + Admin
+        // POST /api/v1/user-management/distributor-applications — Guest + OrganizationUser + Admin (must apply before registration)
         [HttpPost]
         [Route(UserManagementApiRoutes.DistributorApplications.Create)]
-        [RoleAuthorize(UserType.OrganizationUser, UserType.Admin)]
+        [Microsoft.AspNetCore.Authorization.AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateDistributorApplicationCommand cmd, CancellationToken ct)
             => ToActionResult(await _mediator.Send(cmd, ct));
 

@@ -1,16 +1,36 @@
 {
   "Routes": [
     {
+      "DownstreamPathTemplate": "/api/v1/user-management/countries/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "content.welco.internal", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/user-management/countries/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": false
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/user-management/distributor-applications",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "content.welco.internal", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/user-management/distributor-applications",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DangerousAcceptAnyServerCertificateValidator": false
+    },
+    {
       "DownstreamPathTemplate": "/api/v1/user-management/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "user.welco.internal",
+          "Host": "content.welco.internal",
           "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/user-management/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
       "DangerousAcceptAnyServerCertificateValidator": false
     },
     {

@@ -4,6 +4,7 @@ using Welco.Shared.Common.DTOs.Auth.Responses;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Domain.Models;
+using Welco.Shared.Enums;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
 
@@ -49,6 +50,37 @@ namespace Auth.Services.API.Features.Auth.Commands.Login
                 return Result<AuthResponseDto>.Unauthorized(
                     LocalizationKeys.Auth.EmailNotConfirmed,
                     new List<string> { LocalizationKeys.Auth.EmailNotConfirmed });
+            }
+
+            // Distributor gate: OrganizationUser must have approved Company/DistributorApplication
+            if (user.UserType == UserType.OrganizationUser)
+            {
+                if (user.CompanyId.HasValue)
+                {
+                    var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
+                    var company = await companyRepo.GetByIdAsync(user.CompanyId.Value, cancellationToken);
+                    if (company == null || company.IsDeleted || company.Status != CompanyStatus.Approved)
+                    {
+                        return Result<AuthResponseDto>.Unauthorized(
+                            LocalizationKeys.DistributorApplication.CompanyNotApproved,
+                            new List<string> { LocalizationKeys.DistributorApplication.PendingApproval });
+                    }
+                }
+                else
+                {
+                    var distRepo = _unitOfWork.GetRepository<DistributorApplication, Guid>();
+                    var hasApproved = await distRepo.ExistsAsync(
+                        d => !d.IsDeleted && d.ContactEmail.ToLower() == (user.Email ?? "").Trim().ToLower() && d.Status == DistributorApplicationStatus.Approved,
+                        cancellationToken);
+                    if (!hasApproved)
+                    {
+                        var hasPending = await distRepo.ExistsAsync(
+                            d => !d.IsDeleted && d.ContactEmail.ToLower() == (user.Email ?? "").Trim().ToLower() && d.Status == DistributorApplicationStatus.Pending,
+                            cancellationToken);
+                        var key = hasPending ? LocalizationKeys.DistributorApplication.PendingApproval : LocalizationKeys.DistributorApplication.NotApplied;
+                        return Result<AuthResponseDto>.Unauthorized(key, new List<string> { key });
+                    }
+                }
             }
 
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);

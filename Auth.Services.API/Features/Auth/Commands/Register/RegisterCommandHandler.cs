@@ -18,19 +18,41 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailService _emailService;
         private readonly EmailSettings _emailSettings;
+        private readonly IUnitOfWork _unitOfWork;
 
         public RegisterCommandHandler(
             UserManager<ApplicationUser> userManager,
             IEmailService emailService,
-            IOptions<EmailSettings> emailSettings)
+            IOptions<EmailSettings> emailSettings,
+            IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _emailService = emailService;
             _emailSettings = emailSettings.Value;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Result<string>> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
+            // Organization distributor must be approved before OrganizationUser can register
+            if (request.UserType == UserType.OrganizationUser)
+            {
+                var distRepo = _unitOfWork.GetRepository<DistributorApplication, Guid>();
+                var hasApproved = await distRepo.ExistsAsync(
+                    d => !d.IsDeleted && d.ContactEmail.ToLower() == request.Email.Trim().ToLower() && d.Status == DistributorApplicationStatus.Approved,
+                    cancellationToken);
+                if (!hasApproved)
+                {
+                    // Also check if an existing approved Company already linked by email domain? Fallback: check Company by contact email via DistributorApplication pending
+                    var hasPending = await distRepo.ExistsAsync(
+                        d => !d.IsDeleted && d.ContactEmail.ToLower() == request.Email.Trim().ToLower() && d.Status == DistributorApplicationStatus.Pending,
+                        cancellationToken);
+                    if (hasPending)
+                        return Result<string>.BadRequest(LocalizationKeys.DistributorApplication.PendingApproval, new List<string> { LocalizationKeys.DistributorApplication.PendingApproval });
+                    return Result<string>.BadRequest(LocalizationKeys.DistributorApplication.NotApplied, new List<string> { LocalizationKeys.DistributorApplication.NotApplied });
+                }
+            }
+
             var expiryMinutes = _emailSettings.VerificationCodeExpiryMinutes > 0 ? _emailSettings.VerificationCodeExpiryMinutes : 10;
             var emailOtp = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
 

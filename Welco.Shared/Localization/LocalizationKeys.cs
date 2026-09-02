@@ -273,6 +273,9 @@
             public const string Rejected = "DistributorApplication.Rejected";
             public const string AlreadyProcessed = "DistributorApplication.AlreadyProcessed";
             public const string ApplicationIdRequired = "DistributorApplication.ApplicationIdRequired";
+            public const string PendingApproval = "DistributorApplication.PendingApproval";
+            public const string NotApplied = "DistributorApplication.NotApplied";
+            public const string CompanyNotApproved = "DistributorApplication.CompanyNotApproved";
         }
 
         public static class Cart

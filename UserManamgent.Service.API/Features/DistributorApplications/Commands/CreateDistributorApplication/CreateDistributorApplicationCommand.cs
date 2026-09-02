@@ -8,7 +8,7 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Cr
     {
         public string CompanyName { get; set; } = string.Empty;
         public Guid CountryId { get; set; }
-        public string SalesVolumeBand { get; set; } = string.Empty;
+        public string? SalesVolumeBand { get; set; }
         public string? CategoryInterest { get; set; }
         public string? Website { get; set; }
         public string ContactPerson { get; set; } = string.Empty;

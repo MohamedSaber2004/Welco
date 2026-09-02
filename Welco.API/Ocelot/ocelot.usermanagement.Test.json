@@ -1,11 +1,27 @@
 {
   "Routes": [
     {
+      "DownstreamPathTemplate": "/api/v1/user-management/countries/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-content.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/user-management/countries/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/user-management/distributor-applications",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-content.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/user-management/distributor-applications",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
       "DownstreamPathTemplate": "/api/v1/user-management/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "welco-user.runasp.net",
+          "Host": "welco-content.runasp.net",
           "Port": 443
         }
       ],
@@ -15,6 +31,8 @@
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
       },
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
       "DangerousAcceptAnyServerCertificateValidator": true
     },
     {
