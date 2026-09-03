@@ -17,10 +17,10 @@ namespace UserManamgent.Service.API.Controllers
     {
         public DistributorApplicationsController(IMediator mediator) : base(mediator) { }
 
-        // POST /api/v1/user-management/distributor-applications — Guest + OrganizationUser + Admin (must apply before registration)
+        // POST /api/v1/user-management/distributor-applications — OrganizationUser + Admin (WelcoStaff blocked)
         [HttpPost]
         [Route(UserManagementApiRoutes.DistributorApplications.Create)]
-        [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+        [RoleAuthorize]
         public async Task<IActionResult> Create([FromBody] CreateDistributorApplicationCommand cmd, CancellationToken ct)
             => ToActionResult(await _mediator.Send(cmd, ct));
 
@@ -60,3 +60,6 @@ namespace UserManamgent.Service.API.Controllers
         }
     }
 }
+
+
+

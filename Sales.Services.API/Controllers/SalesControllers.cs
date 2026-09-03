@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sales.Services.API.Features.Quotes.Commands.ApproveQuote;
@@ -44,7 +44,8 @@ namespace Sales.Services.API.Controllers
     {
         public ProductInquiriesController(IMediator mediator) : base(mediator) { }
         [HttpPost]
-        [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+        [RoleAuthorize]
         public async Task<IActionResult> Create([FromBody] CreateProductInquiryCommand c, CancellationToken ct) => ToActionResult(await _mediator.Send(c, ct));
     }
 }
+
