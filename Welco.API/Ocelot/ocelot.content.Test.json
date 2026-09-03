@@ -5,7 +5,15 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [{ "Host": "welco-content.runasp.net", "Port": 443 }],
       "UpstreamPathTemplate": "/api/v1/documents/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/documents/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-content.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/documents/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer", "AllowedScopes": [] },
       "DangerousAcceptAnyServerCertificateValidator": true
     },
@@ -14,7 +22,15 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [{ "Host": "welco-content.runasp.net", "Port": 443 }],
       "UpstreamPathTemplate": "/api/v1/landing-pages/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/landing-pages/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-content.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/landing-pages/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer", "AllowedScopes": [] },
       "DangerousAcceptAnyServerCertificateValidator": true
     },
@@ -57,7 +73,15 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [{ "Host": "welco-content.runasp.net", "Port": 443 }],
       "UpstreamPathTemplate": "/api/v1/support/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/support/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-content.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/support/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer", "AllowedScopes": [] },
       "DangerousAcceptAnyServerCertificateValidator": true
     },
