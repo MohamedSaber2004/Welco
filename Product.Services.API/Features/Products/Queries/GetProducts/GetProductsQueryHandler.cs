@@ -34,7 +34,7 @@ namespace Product.Services.API.Features.Products.Queries.GetProducts
             }
 
             if (!string.IsNullOrWhiteSpace(request.Sku))
-                query = query.Where(p => p.Sku.ToLower() == request.Sku.Trim().ToLower());
+                query = query.Where(p => p.Sku.ToLower().Contains(request.Sku.Trim().ToLower()));
 
             if (!string.IsNullOrWhiteSpace(request.Material))
                 query = query.Where(p => p.Material != null && p.Material.ToLower() == request.Material.Trim().ToLower());
