@@ -2,11 +2,11 @@
   "Routes": [
     {
       "DownstreamPathTemplate": "/api/v1/attachments/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7180
+          "Host": "attachment.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/attachments/{everything}",
@@ -24,11 +24,11 @@
     },
     {
       "DownstreamPathTemplate": "/files/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7180
+          "Host": "attachment.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/files/{everything}",
@@ -39,11 +39,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/auth/profile",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7203
+          "Host": "auth.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/auth/profile",
@@ -59,11 +59,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/auth/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7203
+          "Host": "auth.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/auth/{everything}",
@@ -76,42 +76,12 @@
       "DangerousAcceptAnyServerCertificateValidator": false
     },
     {
-      "DownstreamPathTemplate": "/openapi/v1.json",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7203
-        }
-      ],
-      "UpstreamPathTemplate": "/api/docs/auth/openapi.json",
-      "UpstreamHttpMethod": [
-        "GET"
-      ],
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
-      "DownstreamPathTemplate": "/scalar/v1",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7203
-        }
-      ],
-      "UpstreamPathTemplate": "/api/docs/auth",
-      "UpstreamHttpMethod": [
-        "GET"
-      ],
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
       "DownstreamPathTemplate": "/api/v1/certifications/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7101
+          "Host": "certification.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/certifications/{everything}",
@@ -122,11 +92,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/certifications/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7101
+          "Host": "certification.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/certifications/{everything}",
@@ -142,42 +112,12 @@
       "DangerousAcceptAnyServerCertificateValidator": false
     },
     {
-      "DownstreamPathTemplate": "/openapi/v1.json",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7101
-        }
-      ],
-      "UpstreamPathTemplate": "/api/docs/certification/openapi.json",
-      "UpstreamHttpMethod": [
-        "GET"
-      ],
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
-      "DownstreamPathTemplate": "/scalar/v1",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7101
-        }
-      ],
-      "UpstreamPathTemplate": "/api/docs/certification",
-      "UpstreamHttpMethod": [
-        "GET"
-      ],
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
       "DownstreamPathTemplate": "/api/v1/carts/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7045
+          "Host": "commerce.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/carts/{everything}",
@@ -195,11 +135,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/orders/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7045
+          "Host": "commerce.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/orders/{everything}",
@@ -216,42 +156,12 @@
       "DangerousAcceptAnyServerCertificateValidator": false
     },
     {
-      "DownstreamPathTemplate": "/openapi/v1.json",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7045
-        }
-      ],
-      "UpstreamPathTemplate": "/api/docs/commerce/openapi.json",
-      "UpstreamHttpMethod": [
-        "GET"
-      ],
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
-      "DownstreamPathTemplate": "/scalar/v1",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7045
-        }
-      ],
-      "UpstreamPathTemplate": "/api/docs/commerce",
-      "UpstreamHttpMethod": [
-        "GET"
-      ],
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
       "DownstreamPathTemplate": "/api/v1/documents/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7047
+          "Host": "content.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/documents/{everything}",
@@ -262,11 +172,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/documents/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7047
+          "Host": "content.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/documents/{everything}",
@@ -283,11 +193,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/landing-pages/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7047
+          "Host": "content.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/landing-pages/{everything}",
@@ -298,11 +208,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/landing-pages/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7047
+          "Host": "content.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/landing-pages/{everything}",
@@ -319,11 +229,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/help/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7047
+          "Host": "content.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/help/{everything}",
@@ -334,11 +244,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/help/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7047
+          "Host": "content.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/help/{everything}",
@@ -355,11 +265,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/trade-shows/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7047
+          "Host": "content.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/trade-shows/{everything}",
@@ -370,11 +280,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/trade-shows/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7047
+          "Host": "content.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/trade-shows/{everything}",
@@ -391,11 +301,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/support/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7047
+          "Host": "content.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/support/{everything}",
@@ -406,11 +316,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/support/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7047
+          "Host": "content.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/support/{everything}",
@@ -423,45 +333,15 @@
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
       },
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
-      "DownstreamPathTemplate": "/openapi/v1.json",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7047
-        }
-      ],
-      "UpstreamPathTemplate": "/api/docs/content/openapi.json",
-      "UpstreamHttpMethod": [
-        "GET"
-      ],
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
-      "DownstreamPathTemplate": "/scalar/v1",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7047
-        }
-      ],
-      "UpstreamPathTemplate": "/api/docs/content",
-      "UpstreamHttpMethod": [
-        "GET"
-      ],
       "DangerousAcceptAnyServerCertificateValidator": false
     },
     {
       "DownstreamPathTemplate": "/api/v1/categories/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7054
+          "Host": "product.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/categories/{everything}",
@@ -472,11 +352,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/categories/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7054
+          "Host": "product.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/categories/{everything}",
@@ -493,11 +373,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/products/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7054
+          "Host": "product.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/products/{everything}",
@@ -508,11 +388,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/products/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7054
+          "Host": "product.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/products/{everything}",
@@ -529,11 +409,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/currencies/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7054
+          "Host": "product.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/currencies/{everything}",
@@ -550,42 +430,52 @@
       "DangerousAcceptAnyServerCertificateValidator": false
     },
     {
-      "DownstreamPathTemplate": "/openapi/v1.json",
-      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/v1/wishlist",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7054
+          "Host": "product.welco.internal",
+          "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/api/docs/product/openapi.json",
+      "UpstreamPathTemplate": "/api/v1/wishlist",
       "UpstreamHttpMethod": [
         "GET"
       ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
       "DangerousAcceptAnyServerCertificateValidator": false
     },
     {
-      "DownstreamPathTemplate": "/scalar/v1",
-      "DownstreamScheme": "http",
+      "DownstreamPathTemplate": "/api/v1/wishlist/{everything}",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7054
+          "Host": "product.welco.internal",
+          "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/api/docs/product",
+      "UpstreamPathTemplate": "/api/v1/wishlist/{everything}",
       "UpstreamHttpMethod": [
-        "GET"
+        "GET",
+        "POST",
+        "DELETE"
       ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
       "DangerousAcceptAnyServerCertificateValidator": false
     },
     {
       "DownstreamPathTemplate": "/api/v1/rfqs/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7046
+          "Host": "sales.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/rfqs/{everything}",
@@ -603,11 +493,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/product-inquiries/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7046
+          "Host": "sales.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/product-inquiries/{everything}",
@@ -618,11 +508,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/quotes/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7046
+          "Host": "sales.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/quotes/{everything}",
@@ -639,42 +529,12 @@
       "DangerousAcceptAnyServerCertificateValidator": false
     },
     {
-      "DownstreamPathTemplate": "/openapi/v1.json",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7046
-        }
-      ],
-      "UpstreamPathTemplate": "/api/docs/sales/openapi.json",
-      "UpstreamHttpMethod": [
-        "GET"
-      ],
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
-      "DownstreamPathTemplate": "/scalar/v1",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7046
-        }
-      ],
-      "UpstreamPathTemplate": "/api/docs/sales",
-      "UpstreamHttpMethod": [
-        "GET"
-      ],
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
       "DownstreamPathTemplate": "/api/v1/user-management/countries",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7204
+          "Host": "usermanagement.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/user-management/countries",
@@ -685,11 +545,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/user-management/countries/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7204
+          "Host": "usermanagement.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/user-management/countries/{everything}",
@@ -700,11 +560,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/user-management/cities",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7204
+          "Host": "usermanagement.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/user-management/cities",
@@ -715,11 +575,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/user-management/cities/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7204
+          "Host": "usermanagement.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/user-management/cities/{everything}",
@@ -730,11 +590,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/user-management/zones",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7204
+          "Host": "usermanagement.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/user-management/zones",
@@ -745,11 +605,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/user-management/zones/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7204
+          "Host": "usermanagement.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/user-management/zones/{everything}",
@@ -760,11 +620,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/user-management/distributor-applications",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7204
+          "Host": "usermanagement.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/user-management/distributor-applications",
@@ -775,11 +635,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/v1/user-management/{everything}",
-      "DownstreamScheme": "http",
+      "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 7204
+          "Host": "usermanagement.welco.internal",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/user-management/{everything}",
@@ -793,36 +653,6 @@
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
       },
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
-      "DownstreamPathTemplate": "/openapi/v1.json",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7204
-        }
-      ],
-      "UpstreamPathTemplate": "/api/docs/usermanagement/openapi.json",
-      "UpstreamHttpMethod": [
-        "GET"
-      ],
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
-      "DownstreamPathTemplate": "/scalar/v1",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7204
-        }
-      ],
-      "UpstreamPathTemplate": "/api/docs/usermanagement",
-      "UpstreamHttpMethod": [
-        "GET"
-      ],
       "DangerousAcceptAnyServerCertificateValidator": false
     }
   ]
