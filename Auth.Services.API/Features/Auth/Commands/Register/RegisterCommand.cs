@@ -20,5 +20,12 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
         public string? PhoneCountryCode { get; set; }
         public UserType UserType { get; set; } = UserType.OrganizationUser;
         public AppLanguage Language { get; set; } = AppLanguage.En;
+
+        // Distributor application — unified registration (OrganizationUser)
+        public string? CompanyName { get; set; }
+        public Guid? DistributorCountryId { get; set; }
+        public string? SalesVolumeBand { get; set; }
+        public string? CategoryInterest { get; set; }
+        public string? Website { get; set; }
     }
 }

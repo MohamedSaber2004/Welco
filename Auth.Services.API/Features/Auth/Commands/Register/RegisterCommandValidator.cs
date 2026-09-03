@@ -2,6 +2,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Welco.Shared.Domain.Models;
 using Welco.Shared.Localization;
+using Welco.Shared.Enums;
 using Welco.Shared.Results;
 
 namespace Auth.Services.API.Features.Auth.Commands.Register
@@ -38,6 +39,22 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
 
             RuleFor(x => x.PhoneCountryId)
                 .Must(id => id == null || id != Guid.Empty).WithMessage(LocalizationKeys.Country.NotFound);
+
+            // Unified distributor fields — required for OrganizationUser
+            RuleFor(x => x.CompanyName)
+                .NotEmpty().WithMessage(LocalizationKeys.Company.NameRequired)
+                .When(x => x.UserType == UserType.OrganizationUser);
+            RuleFor(x => x.DistributorCountryId)
+                .NotEmpty().WithMessage(LocalizationKeys.Country.CountryIdRequired)
+                .Must(id => id == null || id != Guid.Empty).WithMessage(LocalizationKeys.Country.CountryIdRequired)
+                .When(x => x.UserType == UserType.OrganizationUser);
+            RuleFor(x => x.SalesVolumeBand)
+                .NotEmpty().WithMessage("Sales volume is required")
+                .When(x => x.UserType == UserType.OrganizationUser);
+            RuleFor(x => x.Website)
+                .Must(url => string.IsNullOrWhiteSpace(url) || Uri.TryCreate(url, UriKind.Absolute, out _))
+                .WithMessage("Website must be a valid URL")
+                .When(x => !string.IsNullOrWhiteSpace(x.Website));
 
             RuleFor(x => x).CustomAsync(async (command, context, ct) =>
             {

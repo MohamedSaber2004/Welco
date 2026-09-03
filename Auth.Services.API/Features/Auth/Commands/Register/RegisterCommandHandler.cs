@@ -76,23 +76,47 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
                 }
             }
 
-            // Organization distributor must be approved before OrganizationUser can register
+            // Unified flow: OrganizationUser must supply company/distributor fields.
+            // If already has an application for this email, block duplicates; otherwise create Pending application with the same UoW.
+            DistributorApplication? pendingApp = null;
             if (request.UserType == UserType.OrganizationUser)
             {
+                if (string.IsNullOrWhiteSpace(request.CompanyName) || request.DistributorCountryId == null || request.DistributorCountryId == Guid.Empty || string.IsNullOrWhiteSpace(request.SalesVolumeBand))
+                    return Result<string>.BadRequest(LocalizationKeys.Company.NameRequired, new List<string> { LocalizationKeys.Company.NameRequired });
+
+                var cRepo = _unitOfWork.GetRepository<Country, Guid>();
+                var distCountry = await cRepo.GetByIdAsync(request.DistributorCountryId.Value, cancellationToken);
+                if (distCountry == null || distCountry.IsDeleted)
+                    return Result<string>.NotFound(LocalizationKeys.Country.NotFound, new List<string> { LocalizationKeys.Country.NotFound });
+
                 var distRepo = _unitOfWork.GetRepository<DistributorApplication, Guid>();
                 var hasApproved = await distRepo.ExistsAsync(
                     d => !d.IsDeleted && d.ContactEmail.ToLower() == request.Email.Trim().ToLower() && d.Status == DistributorApplicationStatus.Approved,
                     cancellationToken);
-                if (!hasApproved)
+                if (hasApproved)
+                    return Result<string>.BadRequest("An approved distributor application already exists for this email", new List<string> { "An approved distributor application already exists for this email" });
+
+                var hasPending = await distRepo.ExistsAsync(
+                    d => !d.IsDeleted && d.ContactEmail.ToLower() == request.Email.Trim().ToLower() && d.Status == DistributorApplicationStatus.Pending,
+                    cancellationToken);
+                if (hasPending)
+                    return Result<string>.BadRequest(LocalizationKeys.DistributorApplication.PendingApproval, new List<string> { LocalizationKeys.DistributorApplication.PendingApproval });
+
+                pendingApp = new DistributorApplication
                 {
-                    // Also check if an existing approved Company already linked by email domain? Fallback: check Company by contact email via DistributorApplication pending
-                    var hasPending = await distRepo.ExistsAsync(
-                        d => !d.IsDeleted && d.ContactEmail.ToLower() == request.Email.Trim().ToLower() && d.Status == DistributorApplicationStatus.Pending,
-                        cancellationToken);
-                    if (hasPending)
-                        return Result<string>.BadRequest(LocalizationKeys.DistributorApplication.PendingApproval, new List<string> { LocalizationKeys.DistributorApplication.PendingApproval });
-                    return Result<string>.BadRequest(LocalizationKeys.DistributorApplication.NotApplied, new List<string> { LocalizationKeys.DistributorApplication.NotApplied });
-                }
+                    Id = Guid.NewGuid(),
+                    CompanyName = request.CompanyName!.Trim(),
+                    CountryId = request.DistributorCountryId.Value,
+                    SalesVolumeBand = request.SalesVolumeBand!.Trim(),
+                    CategoryInterest = string.IsNullOrWhiteSpace(request.CategoryInterest) ? null : request.CategoryInterest.Trim(),
+                    Website = string.IsNullOrWhiteSpace(request.Website) ? null : request.Website.Trim(),
+                    ContactPerson = request.FullName.Trim(),
+                    ContactEmail = request.Email.Trim(),
+                    Phone = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim(),
+                    Status = DistributorApplicationStatus.Pending,
+                };
+                pendingApp.MarkAsCreated(request.Email.Trim());
+                await distRepo.AddAsync(pendingApp, cancellationToken);
             }
 
             var expiryMinutes = _emailSettings.VerificationCodeExpiryMinutes > 0 ? _emailSettings.VerificationCodeExpiryMinutes : 10;
@@ -112,6 +136,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
                 EmailConfirmationOtpExpiry = DateTime.UtcNow.AddMinutes(expiryMinutes)
             };
 
+            // Persist both user and pending distributor application atomically
             var createResult = await _userManager.CreateAsync(user, request.Password);
             if (!createResult.Succeeded)
             {
