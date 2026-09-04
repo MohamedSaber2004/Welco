@@ -5,7 +5,7 @@
                        "DownstreamScheme":  "https",
                        "DownstreamHostAndPorts":  [
                                                       {
-                                                          "Host":  "sales.welco.internal",
+                                                          "Host":  "welco-sales.runasp.net",
                                                           "Port":  443
                                                       }
                                                   ],
@@ -29,7 +29,7 @@
                        "DownstreamScheme":  "https",
                        "DownstreamHostAndPorts":  [
                                                       {
-                                                          "Host":  "sales.welco.internal",
+                                                          "Host":  "welco-sales.runasp.net",
                                                           "Port":  443
                                                       }
                                                   ],
@@ -53,7 +53,7 @@
                        "DownstreamScheme":  "https",
                        "DownstreamHostAndPorts":  [
                                                       {
-                                                          "Host":  "sales.welco.internal",
+                                                          "Host":  "welco-sales.runasp.net",
                                                           "Port":  443
                                                       }
                                                   ],
@@ -74,7 +74,7 @@
                        "DownstreamScheme":  "https",
                        "DownstreamHostAndPorts":  [
                                                       {
-                                                          "Host":  "sales.welco.internal",
+                                                          "Host":  "welco-sales.runasp.net",
                                                           "Port":  443
                                                       }
                                                   ],
@@ -89,7 +89,7 @@
                        "DownstreamScheme":  "https",
                        "DownstreamHostAndPorts":  [
                                                       {
-                                                          "Host":  "sales.welco.internal",
+                                                          "Host":  "welco-sales.runasp.net",
                                                           "Port":  443
                                                       }
                                                   ],
