@@ -53,6 +53,7 @@ namespace Welco.Shared.Persistance
         public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
         public DbSet<Notification> Notifications => Set<Notification>();
         public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+        public DbSet<SupportContact> SupportContacts => Set<SupportContact>();
 
         public WelcoDbContext(DbContextOptions<WelcoDbContext> options, ICurrentUserService? currentUserService = null)
             : base(options)

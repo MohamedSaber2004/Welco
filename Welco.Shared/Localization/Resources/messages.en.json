@@ -1,4 +1,4 @@
-﻿{
+{
   "ActionResults": {
     "Ok": "Operation completed successfully.",
     "Created": "Resource created successfully.",
@@ -430,5 +430,13 @@
     "ActionRequired": "Action is required.",
     "PageNumberPositive": "Page number must be positive.",
     "PageSizeRange": "Page size must be between 1 and 100."
+  },
+  "SupportContact": {
+    "Fetched": "Support contact information fetched successfully.",
+    "Updated": "Support contact information updated successfully.",
+    "EmailRequired": "Support email is required.",
+    "EmailInvalid": "Support email is invalid.",
+    "PhoneRequired": "Phone number is required.",
+    "WhatsAppRequired": "WhatsApp number is required."
   }
 }

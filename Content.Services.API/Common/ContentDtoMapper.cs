@@ -6,6 +6,7 @@ using HelpCategoryEntity = Welco.Shared.Domain.Models.HelpCategory;
 using HelpArticleEntity = Welco.Shared.Domain.Models.HelpArticle;
 using FAQEntity = Welco.Shared.Domain.Models.FAQItem;
 using SupportTicketEntity = Welco.Shared.Domain.Models.SupportTicket;
+using SupportContactEntity = Welco.Shared.Domain.Models.SupportContact;
 
 namespace Content.Services.API.Common
 {
@@ -71,6 +72,16 @@ namespace Content.Services.API.Common
             Reply = t.Reply,
             CreatedAt = t.CreatedAt,
             RepliedAt = t.RepliedAt
+        };
+
+        public static Expression<Func<SupportContactEntity, SupportContactDto>> SupportContactProjection => c => new SupportContactDto
+        {
+            Id = c.Id,
+            SupportEmail = c.SupportEmail,
+            PhoneNumber = c.PhoneNumber,
+            WhatsAppNumber = c.WhatsAppNumber,
+            WorkingHours = c.WorkingHours,
+            UpdatedAt = c.UpdatedAt ?? c.CreatedAt
         };
     }
 }

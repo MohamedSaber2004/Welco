@@ -1,4 +1,4 @@
-﻿namespace Welco.Shared.Localization
+namespace Welco.Shared.Localization
 {
     public static class LocalizationKeys
     {
@@ -491,6 +491,16 @@
             public const string ActionRequired = "AuditLog.ActionRequired";
             public const string PageNumberPositive = "AuditLog.PageNumberPositive";
             public const string PageSizeRange = "AuditLog.PageSizeRange";
+        }
+
+        public static class SupportContact
+        {
+            public const string Fetched = "SupportContact.Fetched";
+            public const string Updated = "SupportContact.Updated";
+            public const string EmailRequired = "SupportContact.EmailRequired";
+            public const string EmailInvalid = "SupportContact.EmailInvalid";
+            public const string PhoneRequired = "SupportContact.PhoneRequired";
+            public const string WhatsAppRequired = "SupportContact.WhatsAppRequired";
         }
     }
 }

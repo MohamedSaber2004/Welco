@@ -967,6 +967,37 @@ GETs **public**; writes require `Admin` or `WelcoStaff`.
 }
 ```
 
+### 12.3 Support Contact Channels (`/api/v1/support/contact`)
+
+Manage public-facing support email, telephone (Call Us), and WhatsApp contact channels.
+
+| Endpoint | Auth | Request Body | Response `data` |
+|---|---|---|---|
+| `GET /api/v1/support/contact` | Public (AllowAnonymous) | — | `SupportContactDto` |
+| `PUT /api/v1/support/contact` | Admin | `UpdateSupportContactCommand` | `SupportContactDto` |
+
+**Update body:**
+```json
+{
+  "supportEmail": "support@welco.health",
+  "phoneNumber": "+971 50 000 0000",
+  "whatsAppNumber": "+971500000000",
+  "workingHours": "Mon - Fri: 8:00 AM - 6:00 PM (GST)"
+}
+```
+
+**`SupportContactDto`:**
+```json
+{
+  "id": "11112222-3333-4444-5555-666677778888",
+  "supportEmail": "support@welco.health",
+  "phoneNumber": "+971 50 000 0000",
+  "whatsAppNumber": "+971500000000",
+  "workingHours": "Mon - Fri: 8:00 AM - 6:00 PM (GST)",
+  "updatedAt": "2026-09-04T21:16:16"
+}
+```
+
 ---
 
 ## 13. Frontend Integration Notes (gotchas)

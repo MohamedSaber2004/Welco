@@ -71,4 +71,11 @@ namespace Welco.Shared.Domain.Models
         public DateTime? RepliedAt { get; set; }
         public Guid? RepliedBy { get; set; }
     }
+    public class SupportContact : BaseEntity<Guid>
+    {
+        public string SupportEmail { get; set; } = "support@welco.health";
+        public string PhoneNumber { get; set; } = "+971500000000";
+        public string WhatsAppNumber { get; set; } = "+971500000000";
+        public string? WorkingHours { get; set; } = "Mon - Fri: 8:00 AM - 6:00 PM (GST)";
+    }
 }

@@ -107,4 +107,17 @@ namespace Welco.Shared.Persistance.Configurations
             b.Property(x => x.CreatedBy).IsRequired();
         }
     }
+    public class SupportContactConfiguration : IEntityTypeConfiguration<SupportContact>
+    {
+        public void Configure(EntityTypeBuilder<SupportContact> b)
+        {
+            b.ToTable("SupportContacts");
+            b.HasKey(x => x.Id);
+            b.Property(x => x.SupportEmail).IsRequired().HasMaxLength(256);
+            b.Property(x => x.PhoneNumber).IsRequired().HasMaxLength(50);
+            b.Property(x => x.WhatsAppNumber).IsRequired().HasMaxLength(50);
+            b.Property(x => x.WorkingHours).HasMaxLength(200);
+            b.Property(x => x.CreatedBy).IsRequired();
+        }
+    }
 }

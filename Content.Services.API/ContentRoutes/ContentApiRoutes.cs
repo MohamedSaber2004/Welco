@@ -63,6 +63,13 @@ namespace Content.Services.API.ContentRoutes
             public const string Reply = "{id}/reply";
             public const string Close = "{id}/close";
         }
+        public const string SupportContactBase = Root + "/" + Version + "/support/contact";
+        public static class SupportContact
+        {
+            public const string Base = SupportContactBase;
+            public const string Get = "";
+            public const string Update = "";
+        }
         public const string TradeShowsBase = Root + "/" + Version + "/trade-shows";
     }
 }
