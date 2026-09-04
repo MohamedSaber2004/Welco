@@ -17,7 +17,7 @@ namespace Commerce.Services.API.Features.Orders.Queries.TrackOrder
         public async Task<Result<OrderDto>> Handle(TrackOrderQuery request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(request.OrderNumber))
-                return Result<OrderDto>.Failure("Order number is required");
+                return Result<OrderDto>.Failure(LocalizationKeys.Order.OrderNumberRequired);
 
             var repo = _uow.GetRepository<OrderEntity, Guid>();
             var trimmed = request.OrderNumber.Trim().ToLower();

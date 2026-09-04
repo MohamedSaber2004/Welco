@@ -68,9 +68,14 @@
     "RoleAssigned": "تم تعيين الدور بنجاح.",
     "RoleNotFound": "الدور غير موجود.",
     "OtpEmailSubject": "رمز التحقق الخاص بك",
-    "OtpEmailBody": "رمز التحقق هو: {otp}",
+    "OtpEmailBody": "رمز التحقق هو: {0}",
     "UserTypeRequired": "نوع المستخدم مطلوب.",
-    "LanguageRequired": "اللغة مطلوبة."
+    "LanguageRequired": "اللغة مطلوبة.",
+    "PhoneTooLong": "رقم الهاتف طويل جداً.",
+    "PhoneInvalidFormat": "يجب أن يكون رقم الهاتف 6-20 رقماً، وقد يبدأ بـ +.",
+    "PhoneCodeMismatch": "يجب أن يبدأ رقم الهاتف برمز الدولة {0} ({1}).",
+    "SalesVolumeRequired": "حجم المبيعات مطلوب.",
+    "WebsiteInvalid": "يجب أن يكون الموقع الإلكتروني رابطاً صالحاً."
   },
   "UserManagement": {
     "UserCreated": "تم إنشاء المستخدم بنجاح.",
@@ -216,7 +221,9 @@
     "StockNotNegative": "لا يمكن أن يكون المخزون سالباً.",
     "CategoryRequired": "التصنيف مطلوب.",
     "CategoryNotFound": "التصنيف غير موجود.",
-    "ProductIdRequired": "معرّف المنتج مطلوب."
+    "ProductIdRequired": "معرّف المنتج مطلوب.",
+    "AddedToWishlist": "تمت الإضافة إلى المفضلة.",
+    "RemovedFromWishlist": "تمت الإزالة من المفضلة."
   },
   "Company": {
     "Created": "تم إنشاء الشركة بنجاح.",
@@ -231,6 +238,14 @@
     "TierLevelInvalid": "مستوى السعرات غير صالح.",
     "CompanyIdRequired": "معرّف الشركة مطلوب."
   },
+  "CompanyAddress": {
+    "AddressIdRequired": "معرّف عنوان الشركة مطلوب.",
+    "CompanyIdRequired": "معرّف الشركة مطلوب.",
+    "CountryIdRequired": "معرّف الدولة مطلوب.",
+    "CityIdRequired": "معرّف المدينة مطلوب.",
+    "ZoneIdRequired": "معرّف المنطقة مطلوب.",
+    "StreetRequired": "الشارع مطلوب."
+  },
   "DistributorApplication": {
     "Created": "تم تقديم طلب التوزيع بنجاح.",
     "Updated": "تم تحديث طلب التوزيع بنجاح.",
@@ -243,7 +258,13 @@
     "ApplicationIdRequired": "معرّف طلب التوزيع مطلوب.",
     "PendingApproval": "طلب التوزيع قيد الانتظار.",
     "NotApplied": "لم تقم بتقديم طلب توزيع.",
-    "CompanyNotApproved": "شركتك غير معتمدة بعد."
+    "CompanyNotApproved": "شركتك غير معتمدة بعد.",
+    "ApprovedAlreadyExists": "يوجد طلب توزيع معتمد بالفعل لهذا البريد الإلكتروني.",
+    "CompanyNameRequired": "اسم الشركة مطلوب.",
+    "ContactPersonRequired": "اسم جهة الاتصال مطلوب.",
+    "EmailRequired": "البريد الإلكتروني مطلوب.",
+    "EmailInvalid": "صيغة البريد الإلكتروني غير صالحة.",
+    "SalesVolumeRequired": "حجم المبيعات مطلوب."
   },
   "Cart": {
     "Created": "تم إنشاء سلة التسعير بنجاح.",
@@ -274,6 +295,7 @@
     "QuantityPositive": "يجب أن تكون الكمية موجبة.",
     "PriceNotNegative": "لا يمكن أن يكون السعر سالباً.",
     "OrderIdRequired": "معرّف الطلب مطلوب.",
+    "OrderNumberRequired": "رقم الطلب مطلوب.",
     "StatusRequired": "الحالة مطلوبة."
   },
   "Document": {
@@ -321,7 +343,8 @@
     "ListFetched": "تم استرجاع الأسئلة الشائعة بنجاح.",
     "NotFound": "السؤال الشائع غير موجود.",
     "QuestionRequired": "السؤال مطلوب.",
-    "AnswerRequired": "الإجابة مطلوبة."
+    "AnswerRequired": "الإجابة مطلوبة.",
+    "FAQIdRequired": "معرّف السؤال الشائع مطلوب."
   },
   "SupportTicket": {
     "Created": "تم إنشاء تذكرة الدعم بنجاح.",
@@ -332,7 +355,8 @@
     "Closed": "تم إغلاق تذكرة الدعم بنجاح.",
     "SubjectRequired": "الموضوع مطلوب.",
     "MessageRequired": "الرسالة مطلوبة.",
-    "ReplyRequired": "الرد مطلوب."
+    "ReplyRequired": "الرد مطلوب.",
+    "TicketIdRequired": "معرّف تذكرة الدعم مطلوب."
   },
   "LandingPage": {
     "Created": "تم إنشاء صفحة الهبوط بنجاح.",
@@ -351,7 +375,9 @@
     "ListFetched": "تم استرجاع طلبات التسعير بنجاح.",
     "NotFound": "طلب التسعير غير موجود.",
     "InvalidStatus": "حالة طلب التسعير غير صالحة.",
-    "ItemsRequired": "يجب أن يحتوي طلب التسعير على عناصر."
+    "ItemsRequired": "يجب أن يحتوي طلب التسعير على عناصر.",
+    "ProductIdRequired": "معرّف المنتج مطلوب.",
+    "QuantityPositive": "يجب أن تكون الكمية أكبر من صفر."
   },
   "Quote": {
     "Created": "تم إنشاء عرض الأسعار بنجاح.",
@@ -371,11 +397,19 @@
   "TradeShow": {
     "Created": "تم إنشاء معرض التجارة بنجاح.",
     "ListFetched": "تم استرجاع معارض التجارة بنجاح.",
-    "Fetched": "تم استرجاع معرض التجارة بنجاح."
+    "Fetched": "تم استرجاع معرض التجارة بنجاح.",
+    "NameRequired": "اسم المعرض مطلوب.",
+    "LocationRequired": "موقع المعرض مطلوب.",
+    "EndDateMustBeAfterStartDate": "يجب أن يكون تاريخ الانتهاء بعد تاريخ البدء أو يساويه."
   },
   "ProductInquiry": {
     "Created": "تم إنشاء استفسار المنتج بنجاح.",
-    "ListFetched": "تم استرجاع استفسارات المنتج بنجاح."
+    "ListFetched": "تم استرجاع استفسارات المنتج بنجاح.",
+    "ProductIdRequired": "معرّف المنتج مطلوب.",
+    "NameRequired": "الاسم مطلوب.",
+    "OrganizationRequired": "المؤسسة مطلوبة.",
+    "MessageRequired": "الرسالة مطلوبة.",
+    "EmailInvalid": "صيغة البريد الإلكتروني غير صالحة."
   },
   "Attachments": {
     "FileEmpty": "الملف فارغ.",

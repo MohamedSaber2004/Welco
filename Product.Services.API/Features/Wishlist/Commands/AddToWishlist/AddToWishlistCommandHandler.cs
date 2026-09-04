@@ -46,7 +46,7 @@ namespace Product.Services.API.Features.Wishlist.Commands.AddToWishlist
             interaction.MarkAsCreated(userId.ToString());
             await wishlistRepo.AddAsync(interaction, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<string>.Created(interaction.Id.ToString(), "Added to favourites");
+            return Result<string>.Created(interaction.Id.ToString(), LocalizationKeys.Product.AddedToWishlist);
         }
     }
 }

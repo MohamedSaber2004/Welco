@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Welco.Shared.Localization;
 
 namespace UserManamgent.Service.API.Features.DistributorApplications.Queries.GetDistributorApplications
 {
@@ -6,8 +7,8 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Queries.Get
     {
         public GetDistributorApplicationsQueryValidator()
         {
-            RuleFor(x => x.PageNumber).GreaterThanOrEqualTo(1);
-            RuleFor(x => x.PageSize).GreaterThanOrEqualTo(1);
+            RuleFor(x => x.PageNumber).GreaterThanOrEqualTo(1).WithMessage(LocalizationKeys.AuditLog.PageNumberPositive);
+            RuleFor(x => x.PageSize).GreaterThanOrEqualTo(1).WithMessage(LocalizationKeys.AuditLog.PageSizeRange);
         }
     }
 }

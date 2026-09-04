@@ -33,9 +33,9 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
                 .IsInEnum().WithMessage(LocalizationKeys.Auth.LanguageRequired);
 
             RuleFor(x => x.PhoneNumber)
-                .MaximumLength(20).WithMessage("Phone number is too long")
+                .MaximumLength(20).WithMessage(LocalizationKeys.Auth.PhoneTooLong)
                 .Matches(@"^\+?[0-9\s\-]{6,20}$").When(x => !string.IsNullOrWhiteSpace(x.PhoneNumber))
-                .WithMessage("Phone number must be 6-20 digits, may start with +");
+                .WithMessage(LocalizationKeys.Auth.PhoneInvalidFormat);
 
             RuleFor(x => x.PhoneCountryId)
                 .Must(id => id == null || id != Guid.Empty).WithMessage(LocalizationKeys.Country.NotFound);
@@ -49,11 +49,11 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
                 .Must(id => id == null || id != Guid.Empty).WithMessage(LocalizationKeys.Country.CountryIdRequired)
                 .When(x => x.UserType == UserType.OrganizationUser);
             RuleFor(x => x.SalesVolumeBand)
-                .NotEmpty().WithMessage("Sales volume is required")
+                .NotEmpty().WithMessage(LocalizationKeys.Auth.SalesVolumeRequired)
                 .When(x => x.UserType == UserType.OrganizationUser);
             RuleFor(x => x.Website)
                 .Must(url => string.IsNullOrWhiteSpace(url) || Uri.TryCreate(url, UriKind.Absolute, out _))
-                .WithMessage("Website must be a valid URL")
+                .WithMessage(LocalizationKeys.Auth.WebsiteInvalid)
                 .When(x => !string.IsNullOrWhiteSpace(x.Website));
 
             RuleFor(x => x).CustomAsync(async (command, context, ct) =>

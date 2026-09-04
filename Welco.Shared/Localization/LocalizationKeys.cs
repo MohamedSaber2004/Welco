@@ -81,6 +81,11 @@
             public const string OtpEmailBody = "Auth.OtpEmailBody";
             public const string UserTypeRequired = "Auth.UserTypeRequired";
             public const string LanguageRequired = "Auth.LanguageRequired";
+            public const string PhoneTooLong = "Auth.PhoneTooLong";
+            public const string PhoneInvalidFormat = "Auth.PhoneInvalidFormat";
+            public const string PhoneCodeMismatch = "Auth.PhoneCodeMismatch";
+            public const string SalesVolumeRequired = "Auth.SalesVolumeRequired";
+            public const string WebsiteInvalid = "Auth.WebsiteInvalid";
         }
 
         public static class UserManagement
@@ -245,6 +250,8 @@
             public const string CategoryRequired = "Product.CategoryRequired";
             public const string CategoryNotFound = "Product.CategoryNotFound";
             public const string ProductIdRequired = "Product.ProductIdRequired";
+            public const string AddedToWishlist = "Product.AddedToWishlist";
+            public const string RemovedFromWishlist = "Product.RemovedFromWishlist";
         }
 
         public static class Company
@@ -262,6 +269,16 @@
             public const string CompanyIdRequired = "Company.CompanyIdRequired";
         }
 
+        public static class CompanyAddress
+        {
+            public const string AddressIdRequired = "CompanyAddress.AddressIdRequired";
+            public const string CompanyIdRequired = "CompanyAddress.CompanyIdRequired";
+            public const string CountryIdRequired = "CompanyAddress.CountryIdRequired";
+            public const string CityIdRequired = "CompanyAddress.CityIdRequired";
+            public const string ZoneIdRequired = "CompanyAddress.ZoneIdRequired";
+            public const string StreetRequired = "CompanyAddress.StreetRequired";
+        }
+
         public static class DistributorApplication
         {
             public const string Created = "DistributorApplication.Created";
@@ -276,6 +293,12 @@
             public const string PendingApproval = "DistributorApplication.PendingApproval";
             public const string NotApplied = "DistributorApplication.NotApplied";
             public const string CompanyNotApproved = "DistributorApplication.CompanyNotApproved";
+            public const string ApprovedAlreadyExists = "DistributorApplication.ApprovedAlreadyExists";
+            public const string CompanyNameRequired = "DistributorApplication.CompanyNameRequired";
+            public const string ContactPersonRequired = "DistributorApplication.ContactPersonRequired";
+            public const string EmailRequired = "DistributorApplication.EmailRequired";
+            public const string EmailInvalid = "DistributorApplication.EmailInvalid";
+            public const string SalesVolumeRequired = "DistributorApplication.SalesVolumeRequired";
         }
 
         public static class Cart
@@ -310,6 +333,7 @@
             public const string QuantityPositive = "Order.QuantityPositive";
             public const string PriceNotNegative = "Order.PriceNotNegative";
             public const string OrderIdRequired = "Order.OrderIdRequired";
+            public const string OrderNumberRequired = "Order.OrderNumberRequired";
             public const string StatusRequired = "Order.StatusRequired";
         }
 
@@ -366,6 +390,7 @@
             public const string NotFound = "FAQ.NotFound";
             public const string QuestionRequired = "FAQ.QuestionRequired";
             public const string AnswerRequired = "FAQ.AnswerRequired";
+            public const string FAQIdRequired = "FAQ.FAQIdRequired";
         }
 
         public static class SupportTicket
@@ -379,6 +404,7 @@
             public const string SubjectRequired = "SupportTicket.SubjectRequired";
             public const string MessageRequired = "SupportTicket.MessageRequired";
             public const string ReplyRequired = "SupportTicket.ReplyRequired";
+            public const string TicketIdRequired = "SupportTicket.TicketIdRequired";
         }
 
         public static class LandingPage
@@ -402,6 +428,8 @@
             public const string NotFound = "RFQ.NotFound";
             public const string InvalidStatus = "RFQ.InvalidStatus";
             public const string ItemsRequired = "RFQ.ItemsRequired";
+            public const string ProductIdRequired = "RFQ.ProductIdRequired";
+            public const string QuantityPositive = "RFQ.QuantityPositive";
         }
 
         public static class Quote
@@ -427,11 +455,19 @@
             public const string Created = "TradeShow.Created";
             public const string ListFetched = "TradeShow.ListFetched";
             public const string Fetched = "TradeShow.Fetched";
+            public const string NameRequired = "TradeShow.NameRequired";
+            public const string LocationRequired = "TradeShow.LocationRequired";
+            public const string EndDateMustBeAfterStartDate = "TradeShow.EndDateMustBeAfterStartDate";
         }
         public static class ProductInquiry
         {
             public const string Created = "ProductInquiry.Created";
             public const string ListFetched = "ProductInquiry.ListFetched";
+            public const string ProductIdRequired = "ProductInquiry.ProductIdRequired";
+            public const string NameRequired = "ProductInquiry.NameRequired";
+            public const string OrganizationRequired = "ProductInquiry.OrganizationRequired";
+            public const string MessageRequired = "ProductInquiry.MessageRequired";
+            public const string EmailInvalid = "ProductInquiry.EmailInvalid";
         }
         public static class AttachmentMessages
         {

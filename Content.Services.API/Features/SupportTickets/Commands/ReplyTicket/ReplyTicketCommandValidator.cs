@@ -7,7 +7,7 @@ namespace Content.Services.API.Features.SupportTickets.Commands.ReplyTicket
     {
         public ReplyTicketCommandValidator()
         {
-            RuleFor(x => x.Id).NotEmpty();
+            RuleFor(x => x.Id).NotEmpty().WithMessage(LocalizationKeys.SupportTicket.TicketIdRequired);
             RuleFor(x => x.Reply).NotEmpty().WithMessage(LocalizationKeys.SupportTicket.ReplyRequired);
         }
     }

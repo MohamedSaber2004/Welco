@@ -7,7 +7,7 @@ namespace UserManamgent.Service.API.Features.CompanyAddresses.Commands.UpdateCom
     {
         public UpdateCompanyAddressCommandValidator()
         {
-            RuleFor(x => x.Id).NotEmpty();
+            RuleFor(x => x.Id).NotEmpty().WithMessage(LocalizationKeys.CompanyAddress.AddressIdRequired);
             RuleFor(x => x.Street).MaximumLength(250).When(x => x.Street != null);
         }
     }

@@ -70,7 +70,12 @@
     "OtpEmailSubject": "Welco - Your Verification Code",
     "OtpEmailBody": "Your verification code is: {0}",
     "UserTypeRequired": "User type is required.",
-    "LanguageRequired": "Language is required."
+    "LanguageRequired": "Language is required.",
+    "PhoneTooLong": "Phone number is too long.",
+    "PhoneInvalidFormat": "Phone number must be 6-20 digits, may start with +.",
+    "PhoneCodeMismatch": "Phone number must start with country phone code {0} ({1}).",
+    "SalesVolumeRequired": "Sales volume is required.",
+    "WebsiteInvalid": "Website must be a valid URL."
   },
   "UserManagement": {
     "UserCreated": "User created successfully.",
@@ -216,7 +221,9 @@
     "StockNotNegative": "Stock cannot be negative.",
     "CategoryRequired": "Category is required.",
     "CategoryNotFound": "Category not found.",
-    "ProductIdRequired": "Product ID is required."
+    "ProductIdRequired": "Product ID is required.",
+    "AddedToWishlist": "Added to favourites.",
+    "RemovedFromWishlist": "Removed from favourites."
   },
   "Company": {
     "Created": "Company created successfully.",
@@ -231,15 +238,33 @@
     "TierLevelInvalid": "Tier level must be between 1 and 5.",
     "CompanyIdRequired": "Company ID is required."
   },
+  "CompanyAddress": {
+    "AddressIdRequired": "Company address ID is required.",
+    "CompanyIdRequired": "Company ID is required.",
+    "CountryIdRequired": "Country ID is required.",
+    "CityIdRequired": "City ID is required.",
+    "ZoneIdRequired": "Zone ID is required.",
+    "StreetRequired": "Street is required."
+  },
   "DistributorApplication": {
     "Created": "Distributor application submitted successfully.",
+    "Updated": "Distributor application updated successfully.",
     "Approved": "Distributor application approved successfully.",
     "Rejected": "Distributor application rejected successfully.",
     "NotFound": "Distributor application not found.",
     "Fetched": "Distributor application retrieved successfully.",
     "ListFetched": "Distributor applications retrieved successfully.",
     "AlreadyProcessed": "Application has already been processed.",
-    "ApplicationIdRequired": "Application ID is required."
+    "ApplicationIdRequired": "Application ID is required.",
+    "PendingApproval": "Distributor application is pending approval.",
+    "NotApplied": "You have not submitted a distributor application.",
+    "CompanyNotApproved": "Your company is not yet approved.",
+    "ApprovedAlreadyExists": "An approved distributor application already exists for this email.",
+    "CompanyNameRequired": "Company name is required.",
+    "ContactPersonRequired": "Contact person is required.",
+    "EmailRequired": "Email is required.",
+    "EmailInvalid": "Invalid email format.",
+    "SalesVolumeRequired": "Sales volume is required."
   },
   "Cart": {
     "Created": "Cart created successfully.",
@@ -270,6 +295,7 @@
     "QuantityPositive": "Quantity must be greater than zero.",
     "PriceNotNegative": "Price cannot be negative.",
     "OrderIdRequired": "Order ID is required.",
+    "OrderNumberRequired": "Order number is required.",
     "StatusRequired": "Order status is required."
   },
   "Document": {
@@ -283,6 +309,78 @@
     "FileUrlRequired": "Document file URL is required.",
     "FileSizeNotNegative": "File size cannot be negative.",
     "DocumentIdRequired": "Document ID is required."
+  },
+  "HelpCategory": {
+    "Created": "Help category created successfully.",
+    "Updated": "Help category updated successfully.",
+    "Deleted": "Help category deleted successfully.",
+    "Fetched": "Help category retrieved successfully.",
+    "ListFetched": "Help categories retrieved successfully.",
+    "NotFound": "Help category not found.",
+    "NameRequired": "Help category name is required.",
+    "AlreadyExists": "Help category already exists.",
+    "HelpCategoryIdRequired": "Help category ID is required."
+  },
+  "HelpArticle": {
+    "Created": "Help article created successfully.",
+    "Updated": "Help article updated successfully.",
+    "Deleted": "Help article deleted successfully.",
+    "Fetched": "Help article retrieved successfully.",
+    "ListFetched": "Help articles retrieved successfully.",
+    "NotFound": "Help article not found.",
+    "TitleRequired": "Help article title is required.",
+    "BodyRequired": "Help article body is required.",
+    "SlugRequired": "Help article slug is required.",
+    "CategoryRequired": "Help category is required.",
+    "HelpArticleIdRequired": "Help article ID is required.",
+    "SlugAlreadyExists": "Help article slug already exists."
+  },
+  "FAQ": {
+    "Created": "FAQ created successfully.",
+    "Updated": "FAQ updated successfully.",
+    "Deleted": "FAQ deleted successfully.",
+    "Fetched": "FAQ retrieved successfully.",
+    "ListFetched": "FAQs retrieved successfully.",
+    "NotFound": "FAQ not found.",
+    "QuestionRequired": "Question is required.",
+    "AnswerRequired": "Answer is required.",
+    "FAQIdRequired": "FAQ ID is required."
+  },
+  "SupportTicket": {
+    "Created": "Support ticket created successfully.",
+    "Fetched": "Support ticket retrieved successfully.",
+    "ListFetched": "Support tickets retrieved successfully.",
+    "NotFound": "Support ticket not found.",
+    "Updated": "Support ticket updated successfully.",
+    "Closed": "Support ticket closed successfully.",
+    "SubjectRequired": "Subject is required.",
+    "MessageRequired": "Message is required.",
+    "ReplyRequired": "Reply is required.",
+    "TicketIdRequired": "Support ticket ID is required."
+  },
+  "Content": {
+    "Created": "Content created successfully.",
+    "ListFetched": "Content retrieved successfully.",
+    "Fetched": "Content retrieved successfully.",
+    "Deleted": "Content deleted successfully.",
+    "NotFound": "Content not found."
+  },
+  "TradeShow": {
+    "Created": "Trade show created successfully.",
+    "ListFetched": "Trade shows retrieved successfully.",
+    "Fetched": "Trade show retrieved successfully.",
+    "NameRequired": "Trade show name is required.",
+    "LocationRequired": "Trade show location is required.",
+    "EndDateMustBeAfterStartDate": "End date must be on or after start date."
+  },
+  "ProductInquiry": {
+    "Created": "Product inquiry created successfully.",
+    "ListFetched": "Product inquiries retrieved successfully.",
+    "ProductIdRequired": "Product ID is required.",
+    "NameRequired": "Name is required.",
+    "OrganizationRequired": "Organization is required.",
+    "MessageRequired": "Message is required.",
+    "EmailInvalid": "Invalid email format."
   },
   "LandingPage": {
     "Created": "Landing page created successfully.",
@@ -301,7 +399,9 @@
     "ListFetched": "RFQs retrieved successfully.",
     "NotFound": "RFQ not found.",
     "InvalidStatus": "Invalid RFQ status.",
-    "ItemsRequired": "RFQ items are required."
+    "ItemsRequired": "RFQ items are required.",
+    "ProductIdRequired": "Product ID is required.",
+    "QuantityPositive": "Quantity must be greater than zero."
   },
   "Quote": {
     "Created": "Quote created successfully.",

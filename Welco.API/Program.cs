@@ -180,9 +180,12 @@ namespace Welco.API
                 options.OnRejected = async (context, token) =>
                 {
                     var localizer = context.HttpContext.RequestServices.GetService<ILocalizationProvider>();
-                    var message = localizer?.GetLocalizedString(LocalizationKeys.Auth.TooManyAttempts);
-
-                    context.HttpContext.Response.ContentType = "application/json";
+                    var lang = context.HttpContext.Request.Headers["Accept-Language"].FirstOrDefault()
+                        ?? context.HttpContext.Request.Headers["Language"].FirstOrDefault()
+                        ?? context.HttpContext.Request.Headers["X-Language"].FirstOrDefault()
+                        ?? "en";
+                    lang = lang.Split(',')[0].Trim().Split(';')[0].Split('-')[0].Trim().ToLowerInvariant().StartsWith("ar") ? "ar" : "en";
+                    var message = localizer?.GetLocalizedString(LocalizationKeys.Auth.TooManyAttempts, lang);
                     await context.HttpContext.Response.WriteAsJsonAsync(new
                     {
                         isSuccess = false,

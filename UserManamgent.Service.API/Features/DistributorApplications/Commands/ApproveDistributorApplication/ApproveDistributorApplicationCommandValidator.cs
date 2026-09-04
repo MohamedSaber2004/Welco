@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Welco.Shared.Localization;
 
 namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.ApproveDistributorApplication
 {
@@ -6,7 +7,7 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
     {
         public ApproveDistributorApplicationCommandValidator()
         {
-            RuleFor(x => x.Id).NotEmpty();
+            RuleFor(x => x.Id).NotEmpty().WithMessage(LocalizationKeys.DistributorApplication.ApplicationIdRequired);
         }
     }
 }

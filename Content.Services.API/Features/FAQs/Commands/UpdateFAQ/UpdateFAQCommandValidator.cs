@@ -7,7 +7,7 @@ namespace Content.Services.API.Features.FAQs.Commands.UpdateFAQ
     {
         public UpdateFAQCommandValidator()
         {
-            RuleFor(x => x.Id).NotEmpty();
+            RuleFor(x => x.Id).NotEmpty().WithMessage(LocalizationKeys.FAQ.FAQIdRequired);
             RuleFor(x => x.Question).NotEmpty().WithMessage(LocalizationKeys.FAQ.QuestionRequired).MaximumLength(500);
             RuleFor(x => x.Answer).NotEmpty().WithMessage(LocalizationKeys.FAQ.AnswerRequired);
         }

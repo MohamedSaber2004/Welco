@@ -32,7 +32,7 @@ namespace Product.Services.API.Features.Wishlist.Commands.RemoveFromWishlist
             interaction.MarkAsDeleted(userId.ToString());
             repo.Update(interaction);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            return Result<string>.Success(request.ProductId.ToString(), "Removed from favourites");
+            return Result<string>.Success(request.ProductId.ToString(), LocalizationKeys.Product.RemovedFromWishlist);
         }
     }
 }

@@ -56,8 +56,8 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
                         if (!normalized.StartsWith(codeNorm, StringComparison.Ordinal))
                         {
                             return Result<string>.BadRequest(
-                                $"Phone number must start with country phone code {code} ({phoneCountry.NameEn})",
-                                new List<string> { $"Phone number must start with {code}" });
+                                LocalizationKeys.Auth.PhoneCodeMismatch,
+                                new List<string> { code, phoneCountry.NameEn });
                         }
                     }
                 }
@@ -94,7 +94,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
                     d => !d.IsDeleted && d.ContactEmail.ToLower() == request.Email.Trim().ToLower() && d.Status == DistributorApplicationStatus.Approved,
                     cancellationToken);
                 if (hasApproved)
-                    return Result<string>.BadRequest("An approved distributor application already exists for this email", new List<string> { "An approved distributor application already exists for this email" });
+                    return Result<string>.BadRequest(LocalizationKeys.DistributorApplication.ApprovedAlreadyExists, new List<string> { LocalizationKeys.DistributorApplication.ApprovedAlreadyExists });
 
                 var hasPending = await distRepo.ExistsAsync(
                     d => !d.IsDeleted && d.ContactEmail.ToLower() == request.Email.Trim().ToLower() && d.Status == DistributorApplicationStatus.Pending,
