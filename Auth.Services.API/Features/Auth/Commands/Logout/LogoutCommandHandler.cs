@@ -35,9 +35,11 @@ namespace Auth.Services.API.Features.Auth.Commands.Logout
                 }
             }
 
-            // 2. If authenticated user identity is present, revoke active tokens for that user
+            // 2. Only when explicitly requested, revoke active tokens for that user
+            // (all devices). Default logout revokes just the presented token so
+            // other devices stay signed in.
             var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!string.IsNullOrWhiteSpace(userIdClaim) && Guid.TryParse(userIdClaim, out var userId))
+            if (request.RevokeAllSessions && !string.IsNullOrWhiteSpace(userIdClaim) && Guid.TryParse(userIdClaim, out var userId))
             {
                 var activeTokens = await refreshRepo.GetAllListAsync(r => r.UserId == userId && !r.IsRevoked, cancellationToken);
                 if (activeTokens.Any())
