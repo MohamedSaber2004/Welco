@@ -401,7 +401,8 @@
     "InvalidStatus": "Invalid RFQ status.",
     "ItemsRequired": "RFQ items are required.",
     "ProductIdRequired": "Product ID is required.",
-    "QuantityPositive": "Quantity must be greater than zero."
+    "QuantityPositive": "Quantity must be greater than zero.",
+    "PriceNotNegative": "Unit price cannot be negative."
   },
   "Quote": {
     "Created": "Quote created successfully.",

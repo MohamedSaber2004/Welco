@@ -22,13 +22,13 @@ namespace Sales.Services.API.Features.RFQs.Commands.CreateRFQ
             rfq.MarkAsCreated(curId);
             foreach (var it in r.Items)
             {
-                var item = new RFQItemEntity { Id = Guid.NewGuid(), RFQId = rfq.Id, ProductId = it.ProductId, Quantity = it.Quantity, Notes = it.Notes };
+                var item = new RFQItemEntity { Id = Guid.NewGuid(), RFQId = rfq.Id, ProductId = it.ProductId, Quantity = it.Quantity, UnitPrice = it.UnitPrice < 0 ? 0 : it.UnitPrice, Notes = it.Notes };
                 item.MarkAsCreated(curId);
                 rfq.Items.Add(item);
             }
             var repo = _uow.GetRepository<RFQEntity, Guid>();
             await repo.AddAsync(rfq, ct); await _uow.SaveChangesAsync(ct);
-            return Result<RFQDto>.Created(new RFQDto { Id = rfq.Id, RFQNumber = rfq.RFQNumber, CompanyId = rfq.CompanyId, Status = rfq.Status.ToString(), CreatedAt = rfq.CreatedAt, Items = rfq.Items.Select(i => new RFQItemDto { Id = i.Id, RFQId = i.RFQId, ProductId = i.ProductId, Quantity = i.Quantity, Notes = i.Notes }).ToList() }, LocalizationKeys.RFQ.Created);
+            return Result<RFQDto>.Created(new RFQDto { Id = rfq.Id, RFQNumber = rfq.RFQNumber, CompanyId = rfq.CompanyId, Status = rfq.Status.ToString(), CreatedAt = rfq.CreatedAt, Items = rfq.Items.Select(i => new RFQItemDto { Id = i.Id, RFQId = i.RFQId, ProductId = i.ProductId, Quantity = i.Quantity, UnitPrice = i.UnitPrice, Notes = i.Notes }).ToList() }, LocalizationKeys.RFQ.Created);
         }
     }
 }

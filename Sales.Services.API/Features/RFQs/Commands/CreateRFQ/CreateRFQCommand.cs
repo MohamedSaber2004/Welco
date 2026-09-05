@@ -8,5 +8,5 @@ namespace Sales.Services.API.Features.RFQs.Commands.CreateRFQ
         public Guid CompanyId { get; set; }
         public List<CreateRFQItemDto> Items { get; set; } = new();
     }
-    public class CreateRFQItemDto { public Guid ProductId { get; set; } public int Quantity { get; set; } public string? Notes { get; set; } }
+    public class CreateRFQItemDto { public Guid ProductId { get; set; } public int Quantity { get; set; } public decimal UnitPrice { get; set; } public string? Notes { get; set; } }
 }

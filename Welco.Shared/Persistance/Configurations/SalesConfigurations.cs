@@ -22,6 +22,7 @@ namespace Welco.Shared.Persistance.Configurations
             b.ToTable("RFQItems"); b.HasKey(x => x.Id);
             b.HasOne(x => x.RFQ).WithMany(x => x.Items).HasForeignKey(x => x.RFQId).OnDelete(DeleteBehavior.Cascade);
             b.HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId).OnDelete(DeleteBehavior.Restrict);
+            b.Property(x => x.UnitPrice).HasPrecision(18,2);
             b.Property(x => x.Notes).HasMaxLength(500);
             b.Property(x => x.CreatedBy).IsRequired();
         }

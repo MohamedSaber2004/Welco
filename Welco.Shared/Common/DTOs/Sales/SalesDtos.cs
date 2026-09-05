@@ -10,7 +10,7 @@ namespace Welco.Shared.Common.DTOs.Sales
         public List<RFQItemDto> Items { get; set; } = new();
         public DateTime CreatedAt { get; set; }
     }
-    public class RFQItemDto { public Guid Id { get; set; } public Guid RFQId { get; set; } public Guid ProductId { get; set; } public int Quantity { get; set; } public string? Notes { get; set; } }
+    public class RFQItemDto { public Guid Id { get; set; } public Guid RFQId { get; set; } public Guid ProductId { get; set; } public int Quantity { get; set; } public decimal UnitPrice { get; set; } public string? Notes { get; set; } }
     public class QuoteDto
     {
         public Guid Id { get; set; }

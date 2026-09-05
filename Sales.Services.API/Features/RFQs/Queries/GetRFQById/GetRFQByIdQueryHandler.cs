@@ -16,7 +16,7 @@ namespace Sales.Services.API.Features.RFQs.Queries.GetRFQById
             var repo = _uow.GetRepository<RFQEntity, Guid>();
             var rfq = await repo.GetAll(x => !x.IsDeleted && x.Id == r.Id).Include(x => x.Items).FirstOrDefaultAsync(ct);
             if (rfq == null) return Result<RFQDto>.NotFound(LocalizationKeys.RFQ.NotFound);
-            return Result<RFQDto>.Success(new RFQDto { Id = rfq.Id, RFQNumber = rfq.RFQNumber, CompanyId = rfq.CompanyId, Status = rfq.Status.ToString(), AssignedSalesRepId = rfq.AssignedSalesRepId, Items = rfq.Items.Where(i => !i.IsDeleted).Select(i => new RFQItemDto { Id = i.Id, RFQId = i.RFQId, ProductId = i.ProductId, Quantity = i.Quantity, Notes = i.Notes }).ToList(), CreatedAt = rfq.CreatedAt }, LocalizationKeys.RFQ.Fetched);
+            return Result<RFQDto>.Success(new RFQDto { Id = rfq.Id, RFQNumber = rfq.RFQNumber, CompanyId = rfq.CompanyId, Status = rfq.Status.ToString(), AssignedSalesRepId = rfq.AssignedSalesRepId, Items = rfq.Items.Where(i => !i.IsDeleted).Select(i => new RFQItemDto { Id = i.Id, RFQId = i.RFQId, ProductId = i.ProductId, Quantity = i.Quantity, UnitPrice = i.UnitPrice, Notes = i.Notes }).ToList(), CreatedAt = rfq.CreatedAt }, LocalizationKeys.RFQ.Fetched);
         }
     }
 }

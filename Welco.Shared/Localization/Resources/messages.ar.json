@@ -377,7 +377,8 @@
     "InvalidStatus": "حالة طلب التسعير غير صالحة.",
     "ItemsRequired": "يجب أن يحتوي طلب التسعير على عناصر.",
     "ProductIdRequired": "معرّف المنتج مطلوب.",
-    "QuantityPositive": "يجب أن تكون الكمية أكبر من صفر."
+    "QuantityPositive": "يجب أن تكون الكمية أكبر من صفر.",
+    "PriceNotNegative": "لا يمكن أن يكون سعر الوحدة سالباً."
   },
   "Quote": {
     "Created": "تم إنشاء عرض الأسعار بنجاح.",

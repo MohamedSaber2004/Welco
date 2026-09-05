@@ -16,7 +16,7 @@ namespace Sales.Services.API.Features.RFQs.Queries.GetRFQs
         {
             var repo = _uow.GetRepository<RFQEntity, Guid>();
             var q = repo.GetAll(x => !x.IsDeleted).AsNoTracking();
-            return await q.OrderByDescending(x => x.CreatedAt).ToPaginatedListAsync(x => new RFQDto { Id = x.Id, RFQNumber = x.RFQNumber, CompanyId = x.CompanyId, Status = x.Status.ToString(), AssignedSalesRepId = x.AssignedSalesRepId, CreatedAt = x.CreatedAt }, r.PageNumber, r.PageSize, LocalizationKeys.RFQ.ListFetched, ct);
+            return await q.OrderByDescending(x => x.CreatedAt).ToPaginatedListAsync(x => new RFQDto { Id = x.Id, RFQNumber = x.RFQNumber, CompanyId = x.CompanyId, Status = x.Status.ToString(), AssignedSalesRepId = x.AssignedSalesRepId, CreatedAt = x.CreatedAt, Items = x.Items.Where(i => !i.IsDeleted).Select(i => new RFQItemDto { Id = i.Id, RFQId = i.RFQId, ProductId = i.ProductId, Quantity = i.Quantity, UnitPrice = i.UnitPrice, Notes = i.Notes }).ToList() }, r.PageNumber, r.PageSize, LocalizationKeys.RFQ.ListFetched, ct);
         }
     }
 }

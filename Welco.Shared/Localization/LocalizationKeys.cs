@@ -430,6 +430,7 @@ namespace Welco.Shared.Localization
             public const string ItemsRequired = "RFQ.ItemsRequired";
             public const string ProductIdRequired = "RFQ.ProductIdRequired";
             public const string QuantityPositive = "RFQ.QuantityPositive";
+            public const string PriceNotNegative = "RFQ.PriceNotNegative";
         }
 
         public static class Quote
