@@ -33,14 +33,29 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
                 return Result<DistributorApplicationDto>.NotFound(LocalizationKeys.DistributorApplication.NotFound);
             }
 
-            if (app.Status == DistributorApplicationStatus.Approved)
-            {
-                return Result<DistributorApplicationDto>.BadRequest(LocalizationKeys.DistributorApplication.AlreadyProcessed);
-            }
-
             var currentUserId = _currentUserService.UserId != Guid.Empty
                 ? _currentUserService.UserId.ToString()
                 : "System";
+
+            // Heal path: applications approved before the applicant-link fix left
+            // User.CompanyId null. Re-running approve attaches the applicant to
+            // the approved company instead of failing with AlreadyProcessed.
+            if (app.Status == DistributorApplicationStatus.Approved)
+            {
+                var healCompanyRepo = _unitOfWork.GetRepository<Company, Guid>();
+                var approvedCompany = await healCompanyRepo.GetAll(c => c.Name.ToLower() == app.CompanyName.ToLower() && !c.IsDeleted)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (approvedCompany != null
+                    && approvedCompany.Status == CompanyStatus.Approved
+                    && await TryLinkApplicantAsync(app, approvedCompany.Id, currentUserId, cancellationToken))
+                {
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+                    return Result<DistributorApplicationDto>.Success(ToDto(app), LocalizationKeys.DistributorApplication.Approved);
+                }
+
+                return Result<DistributorApplicationDto>.BadRequest(LocalizationKeys.DistributorApplication.AlreadyProcessed);
+            }
 
             app.Status = DistributorApplicationStatus.Approved;
             app.MarkAsUpdated(currentUserId);
@@ -78,20 +93,49 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
             }
 
             // Link applicant user if available
-            if (!string.IsNullOrWhiteSpace(app.CreatedBy) && Guid.TryParse(app.CreatedBy, out var userId) && userId != Guid.Empty)
-            {
-                var userRepo = _unitOfWork.GetRepository<ApplicationUser, Guid>();
-                var applicantUser = await userRepo.GetByIdAsync(userId, cancellationToken);
-                if (applicantUser != null && !applicantUser.IsDeleted)
-                {
-                    applicantUser.CompanyId = companyId;
-                    applicantUser.MarkAsUpdated(currentUserId);
-                }
-            }
+            await TryLinkApplicantAsync(app, companyId, currentUserId, cancellationToken);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var dto = new DistributorApplicationDto
+            return Result<DistributorApplicationDto>.Success(ToDto(app), LocalizationKeys.DistributorApplication.Approved);
+        }
+
+        /// <summary>
+        /// Attaches the applicant user to the approved company. Registration-created
+        /// applications store the applicant email in CreatedBy, while staff-created
+        /// ones store the staff user id — both shapes are resolved here.
+        /// Returns true when a missing link was applied.
+        /// </summary>
+        private async Task<bool> TryLinkApplicantAsync(DistributorApplication app, Guid companyId, string currentUserId, CancellationToken cancellationToken)
+        {
+            var userRepo = _unitOfWork.GetRepository<ApplicationUser, Guid>();
+            ApplicationUser? applicant = null;
+
+            if (!string.IsNullOrWhiteSpace(app.CreatedBy)
+                && Guid.TryParse(app.CreatedBy, out var createdById)
+                && createdById != Guid.Empty)
+            {
+                applicant = await userRepo.GetByIdAsync(createdById, cancellationToken);
+            }
+
+            if ((applicant == null || applicant.IsDeleted) && !string.IsNullOrWhiteSpace(app.ContactEmail))
+            {
+                var email = app.ContactEmail.Trim().ToLower();
+                applicant = await userRepo.GetAll(u => !u.IsDeleted && (u.Email ?? "").ToLower() == email)
+                    .FirstOrDefaultAsync(cancellationToken);
+            }
+
+            if (applicant == null || applicant.IsDeleted || applicant.CompanyId == companyId)
+                return false;
+
+            applicant.CompanyId = companyId;
+            applicant.MarkAsUpdated(currentUserId);
+            return true;
+        }
+
+        private static DistributorApplicationDto ToDto(DistributorApplication app)
+        {
+            return new DistributorApplicationDto
             {
                 Id = app.Id,
                 CompanyName = app.CompanyName,
@@ -105,8 +149,6 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
                 CreatedAt = app.CreatedAt,
                 UpdatedAt = app.UpdatedAt
             };
-
-            return Result<DistributorApplicationDto>.Success(dto, LocalizationKeys.DistributorApplication.Approved);
         }
     }
 }
