@@ -222,6 +222,7 @@
     "CategoryRequired": "التصنيف مطلوب.",
     "CategoryNotFound": "التصنيف غير موجود.",
     "ProductIdRequired": "معرّف المنتج مطلوب.",
+    "VideoUrlRequired": "رابط الفيديو مطلوب.",
     "AddedToWishlist": "تمت الإضافة إلى المفضلة.",
     "RemovedFromWishlist": "تمت الإزالة من المفضلة."
   },

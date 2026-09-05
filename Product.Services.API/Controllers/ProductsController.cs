@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Product.Services.API.Features.Products.Commands.CreateProduct;
 using Product.Services.API.Features.Products.Commands.DeleteProduct;
 using Product.Services.API.Features.Products.Commands.UpdateProduct;
+using Product.Services.API.Features.Products.Commands.UpdateProductVideos;
 using Product.Services.API.Features.Products.Queries.GetProductById;
 using Product.Services.API.Features.Products.Queries.GetProducts;
 using Product.Services.API.Features.Products.Queries.GetProductVideos;
@@ -84,6 +85,26 @@ namespace Product.Services.API.Controllers
         public async Task<IActionResult> GetVideos([FromRoute] Guid id, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetProductVideosQuery { ProductId = id }, cancellationToken);
+            return ToActionResult(result);
+        }
+
+        /// <summary>
+        /// Replace Product Videos (bulk sync from catalog dashboard)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="command"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route(ProductApiRoutes.Products.UpdateVideos)]
+        [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateVideos([FromRoute] Guid id, [FromBody] UpdateProductVideosCommand command, CancellationToken cancellationToken)
+        {
+            command.ProductId = id;
+            var result = await _mediator.Send(command, cancellationToken);
             return ToActionResult(result);
         }
 

@@ -250,6 +250,7 @@ namespace Welco.Shared.Localization
             public const string CategoryRequired = "Product.CategoryRequired";
             public const string CategoryNotFound = "Product.CategoryNotFound";
             public const string ProductIdRequired = "Product.ProductIdRequired";
+            public const string VideoUrlRequired = "Product.VideoUrlRequired";
             public const string AddedToWishlist = "Product.AddedToWishlist";
             public const string RemovedFromWishlist = "Product.RemovedFromWishlist";
         }

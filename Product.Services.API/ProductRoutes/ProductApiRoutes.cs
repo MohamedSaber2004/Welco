@@ -30,6 +30,7 @@ namespace Product.Services.API.ProductRoutes
             public const string Update = "{id}";
             public const string Delete = "{id}";
             public const string GetVideos = "{id}/videos";
+            public const string UpdateVideos = "{id}/videos";
         }
 
         public static class Currencies

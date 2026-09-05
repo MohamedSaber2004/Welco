@@ -222,6 +222,7 @@
     "CategoryRequired": "Category is required.",
     "CategoryNotFound": "Category not found.",
     "ProductIdRequired": "Product ID is required.",
+    "VideoUrlRequired": "Video URL is required.",
     "AddedToWishlist": "Added to favourites.",
     "RemovedFromWishlist": "Removed from favourites."
   },
