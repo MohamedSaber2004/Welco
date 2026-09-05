@@ -43,6 +43,14 @@ namespace Commerce.Services.API.Features.Orders.Commands.CreateOrder
                 var exists = await currencyRepo.ExistsAsync(c => !c.IsDeleted && c.Id == request.CurrencyId.Value, cancellationToken);
                 if (!exists) return Result<OrderDto>.BadRequest(LocalizationKeys.Currency.NotFound);
             }
+            else if (!string.IsNullOrWhiteSpace(request.CurrencyCode))
+            {
+                var currencyRepo = _uow.GetRepository<CurrencyEntity, Guid>();
+                var code = request.CurrencyCode.Trim().ToUpperInvariant();
+                var currency = await currencyRepo.GetAll(c => !c.IsDeleted && c.Code.ToUpper() == code).FirstOrDefaultAsync(cancellationToken);
+                if (currency == null) return Result<OrderDto>.BadRequest(LocalizationKeys.Currency.NotFound);
+                request.CurrencyId = currency.Id;
+            }
 
             var productRepo = _uow.GetRepository<ProductEntity, Guid>();
             foreach (var it in request.Items)

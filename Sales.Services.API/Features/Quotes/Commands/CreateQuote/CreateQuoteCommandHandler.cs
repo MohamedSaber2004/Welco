@@ -5,6 +5,7 @@ using Welco.Shared.Localization;
 using Welco.Shared.Results;
 using QuoteEntity = Welco.Shared.Domain.Models.Quote;
 using QuoteItemEntity = Welco.Shared.Domain.Models.QuoteItem;
+using RFQEntity = Welco.Shared.Domain.Models.RFQ;
 namespace Sales.Services.API.Features.Quotes.Commands.CreateQuote
 {
     public class CreateQuoteCommandHandler : IRequestHandler<CreateQuoteCommand, Result<string>>
@@ -18,7 +19,19 @@ namespace Sales.Services.API.Features.Quotes.Commands.CreateQuote
             quote.MarkAsCreated(curId);
             foreach (var it in r.Items) { var qi = new QuoteItemEntity { Id = Guid.NewGuid(), QuoteId = quote.Id, ProductId = it.ProductId, Quantity = it.Quantity, UnitPrice = it.UnitPrice }; qi.MarkAsCreated(curId); quote.Items.Add(qi); }
             var repo = _uow.GetRepository<QuoteEntity, Guid>();
-            await repo.AddAsync(quote, ct); await _uow.SaveChangesAsync(ct);
+            await repo.AddAsync(quote, ct);
+            // Advance the parent RFQ so it no longer sits in Pending once priced.
+            if (r.RFQId.HasValue)
+            {
+                var rfqRepo = _uow.GetRepository<RFQEntity, Guid>();
+                var rfq = await rfqRepo.GetByIdAsync(r.RFQId.Value, ct);
+                if (rfq != null && !rfq.IsDeleted && rfq.Status == Welco.Shared.Domain.Models.RFQStatus.Pending)
+                {
+                    rfq.Status = Welco.Shared.Domain.Models.RFQStatus.Quoted;
+                    rfq.MarkAsUpdated(curId);
+                }
+            }
+            await _uow.SaveChangesAsync(ct);
             return Result<string>.Created(quote.Id.ToString(), LocalizationKeys.Quote.Created);
         }
     }
