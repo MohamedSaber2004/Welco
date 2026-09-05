@@ -29,6 +29,8 @@ namespace Product.Services.API
                 ContentRootPath = AppContext.BaseDirectory
             });
 
+
+
             var env = builder.Environment;
 
             builder.Configuration.Sources.Clear();
