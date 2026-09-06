@@ -6,6 +6,7 @@ using Product.Services.API.Features.Currencies.Commands.CreateCurrency;
 using Product.Services.API.Features.Currencies.Commands.DeleteCurrency;
 using Product.Services.API.Features.Currencies.Commands.UpdateCurrency;
 using Product.Services.API.Features.Currencies.Queries.GetCurrencies;
+using Product.Services.API.Features.Currencies.Queries.GetCurrencyByCode;
 using Product.Services.API.Features.Currencies.Queries.GetCurrencyById;
 using Product.Services.API.ProductRoutes;
 using Welco.Shared.Common.Attributes;
@@ -52,6 +53,17 @@ namespace Product.Services.API.Controllers
         public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetCurrencyByIdQuery { Id = id }, cancellationToken);
+            return ToActionResult(result);
+        }
+
+        [HttpGet]
+        [Route(ProductApiRoutes.Currencies.GetByCode)]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByCode([FromRoute] string code, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetCurrencyByCodeQuery { Code = code }, cancellationToken);
             return ToActionResult(result);
         }
 

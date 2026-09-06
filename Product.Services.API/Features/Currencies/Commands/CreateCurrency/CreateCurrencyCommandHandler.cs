@@ -62,6 +62,8 @@ namespace Product.Services.API.Features.Currencies.Commands.CreateCurrency
                 NameAr = currency.NameAr,
                 Code = currency.Code,
                 Symbol = currency.Symbol,
+                SymbolNative = currency.SymbolNative,
+                DecimalDigits = currency.DecimalDigits,
                 IsActive = currency.IsActive,
                 CreatedAt = currency.CreatedAt,
                 UpdatedAt = currency.UpdatedAt

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -10,6 +11,7 @@ using Welco.Shared.Common.Repositories.Implementation.Base;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Common.Services;
 using Welco.Shared.Domain.Models;
+using Welco.Shared.Infrastructure.ExchangeRate;
 using Welco.Shared.Persistance;
 
 namespace Welco.Shared
@@ -31,6 +33,7 @@ namespace Welco.Shared
             {
                 services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
                 services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
+                services.Configure<ExchangeRateSettings>(configuration.GetSection(ExchangeRateSettings.SectionName));
             }
             else
             {
@@ -45,10 +48,16 @@ namespace Welco.Shared
                     {
                         config.GetSection(EmailSettings.SectionName).Bind(options);
                     });
+                services.AddOptions<ExchangeRateSettings>()
+                    .Configure<IConfiguration>((options, config) =>
+                    {
+                        config.GetSection(ExchangeRateSettings.SectionName).Bind(options);
+                    });
             }
 
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<EmailSettings>>().Value);
+            services.AddSingleton(sp => sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value);
 
             services.AddDbContext<WelcoDbContext>((serviceProvider, options) =>
             {
@@ -69,6 +78,34 @@ namespace Welco.Shared
                     });
                 }
             });
+
+            services.AddMemoryCache();
+            services.AddScoped<IExchangeRateService, ExchangeRateService>();
+
+            // Primary provider per prompt: Fawazahmed CDN (no ApiKey, no Authorization) https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json
+            services.AddHttpClient<IExchangeRateProvider, FrankfurterExchangeRateProvider>((sp, client) =>
+            {
+                var opts = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
+                var baseUrl = string.IsNullOrWhiteSpace(opts.BaseUrl) ? "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies" : opts.BaseUrl.TrimEnd('/');
+                client.BaseAddress = new Uri(baseUrl + "/");
+                client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds > 0 ? opts.TimeoutSeconds : 10);
+                client.DefaultRequestHeaders.Clear();
+            });
+
+            // Alternative provider registration (keyed by provider name, switch via factory if needed)
+            services.AddHttpClient<ExchangeRateApiProvider>((sp, client) =>
+            {
+                var opts = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
+                var baseUrl = string.IsNullOrWhiteSpace(opts.BaseUrl) ? "https://v6.exchangerate-api.com" : opts.BaseUrl.TrimEnd('/');
+                // ExchangeRate-API expects https://v6.exchangerate-api.com/v6/{key}/
+                if (!string.IsNullOrWhiteSpace(opts.ApiKey) && !baseUrl.Contains("/v6/"))
+                    client.BaseAddress = new Uri($"https://v6.exchangerate-api.com/v6/{opts.ApiKey}/");
+                else
+                    client.BaseAddress = new Uri(baseUrl + "/");
+                client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds > 0 ? opts.TimeoutSeconds : 10);
+            });
+
+            services.AddHostedService<ExchangeRateSyncBackgroundService>();
 
             services.AddScoped<IWelcoDbContext>(provider => provider.GetRequiredService<WelcoDbContext>());
 

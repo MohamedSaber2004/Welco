@@ -1,6 +1,7 @@
 using System.Reflection;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using Welco.Shared;
 using Welco.Shared.Common.Behaviors;
@@ -9,6 +10,8 @@ using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Middlewares;
 using Welco.Shared.Localization;
 using Welco.Shared.OpenApi;
+using Welco.Shared.Persistance;
+using Welco.Shared.Persistance.Seeding;
 
 namespace Product.Services.API
 {
@@ -108,6 +111,25 @@ namespace Product.Services.API
                        .WithTheme(ScalarTheme.Moon);
             });
             app.MapControllers();
+
+            // Auto-migrate and seed currencies (ISO 4217) - non-destructive
+            if (!app.Environment.IsEnvironment("Test"))
+            {
+                try
+                {
+                    using var scope = app.Services.CreateScope();
+                    var db = scope.ServiceProvider.GetRequiredService<WelcoDbContext>();
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                    // Ensure DB is migrated (adds ExchangeRates, SyncLogs, Currency enhancements)
+                    await db.Database.MigrateAsync();
+                    await CurrencySeeder.SeedAsync(db, logger);
+                }
+                catch (Exception ex)
+                {
+                    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "Currency seeding / migration failed");
+                }
+            }
 
             await app.RunAsync();
         }

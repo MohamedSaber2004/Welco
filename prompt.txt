@@ -1,1 +1,1 @@
-sk-JbT0yuzyXE0MIhK7Xus3TG2Rtnsl8WzVNfE3WqhtdyfceY8Y
+GET https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json use that instead

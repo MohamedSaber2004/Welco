@@ -8,21 +8,27 @@ namespace Welco.Shared.Domain.Models
         public string NameAr { get; set; } = null!;
         public string Code { get; set; } = null!;
         public string Symbol { get; set; } = null!;
+        public string SymbolNative { get; set; } = null!;
+        public int DecimalDigits { get; set; } = 2;
 
         public static Currency Create(
             string nameEn,
             string nameAr,
             string code,
             string symbol,
-            string createdBy)
+            string createdBy,
+            string? symbolNative = null,
+            int decimalDigits = 2)
         {
             var currency = new Currency
             {
                 Id = Guid.NewGuid(),
-                NameEn = nameEn,
-                NameAr = nameAr,
-                Code = code,
-                Symbol = symbol
+                NameEn = nameEn.Trim(),
+                NameAr = nameAr.Trim(),
+                Code = code.Trim().ToUpperInvariant(),
+                Symbol = symbol.Trim(),
+                SymbolNative = (symbolNative ?? symbol).Trim(),
+                DecimalDigits = decimalDigits
             };
             currency.MarkAsCreated(createdBy);
             return currency;
@@ -33,12 +39,16 @@ namespace Welco.Shared.Domain.Models
             string nameAr,
             string code,
             string symbol,
-            string updatedBy)
+            string updatedBy,
+            string? symbolNative = null,
+            int? decimalDigits = null)
         {
             NameEn = nameEn.Trim();
             NameAr = nameAr.Trim();
-            Code = code.Trim();
+            Code = code.Trim().ToUpperInvariant();
             Symbol = symbol.Trim();
+            if (symbolNative != null) SymbolNative = symbolNative.Trim();
+            if (decimalDigits.HasValue) DecimalDigits = decimalDigits.Value;
             MarkAsUpdated(updatedBy);
         }
     }

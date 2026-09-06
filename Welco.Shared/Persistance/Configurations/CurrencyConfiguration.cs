@@ -31,6 +31,13 @@ namespace Welco.Shared.Persistance.Configurations
                 .IsRequired()
                 .HasMaxLength(10);
 
+            builder.Property(x => x.SymbolNative)
+                .IsRequired()
+                .HasMaxLength(10);
+
+            builder.Property(x => x.DecimalDigits)
+                .IsRequired();
+
             builder.Property(x => x.CreatedBy)
                 .IsRequired();
         }

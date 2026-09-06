@@ -38,9 +38,23 @@ namespace Product.Services.API.ProductRoutes
             public const string Base = CurrenciesBase;
             public const string GetAll = "";
             public const string GetById = "{id}";
+            public const string GetByCode = "code/{code}";
             public const string Create = "";
             public const string Update = "{id}";
             public const string Delete = "{id}";
+        }
+
+        public static class ExchangeRates
+        {
+            public const string Base = Root + "/" + Version + "/exchange-rates";
+            public const string Latest = "latest";
+            public const string LatestByBase = "latest/{baseCurrency}";
+            public const string History = "history/{baseCurrency}/{date}";
+            public const string Pair = "{from}/{to}";
+            public const string Convert = "convert";
+            public const string Sync = "sync";
+            public const string SyncHistory = "sync/history/{date}";
+            public const string SyncLogs = "sync/logs";
         }
 
         public static class Wishlist

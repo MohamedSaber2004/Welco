@@ -491,6 +491,33 @@
         }
       }
     },
+    "/api/v1/orders/track/{orderNumber}": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "parameters": [
+          {
+            "name": "orderNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/orders/{id}/status": {
       "put": {
         "tags": [
@@ -619,6 +646,12 @@
               "string"
             ],
             "format": "uuid"
+          },
+          "currencyCode": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "quoteId": {
             "type": [

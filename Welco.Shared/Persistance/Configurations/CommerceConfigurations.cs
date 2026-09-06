@@ -42,6 +42,11 @@ namespace Welco.Shared.Persistance.Configurations
             b.HasOne(x => x.Company).WithMany().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.SetNull);
             b.HasOne(x => x.Currency).WithMany().HasForeignKey(x => x.CurrencyId).OnDelete(DeleteBehavior.SetNull);
             b.Property(x => x.TotalAmount).HasPrecision(18,2);
+            b.Property(x => x.SnapshotBaseCurrency).HasMaxLength(10);
+            b.Property(x => x.SnapshotCurrencyCode).HasMaxLength(10);
+            b.Property(x => x.SnapshotRate).HasPrecision(28, 12);
+            b.Property(x => x.SnapshotRateDate).HasConversion(v => v.HasValue ? v.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null, v => v.HasValue ? DateOnly.FromDateTime(v.Value) : null);
+            b.Property(x => x.SnapshotSource).HasMaxLength(100);
             b.Property(x => x.CreatedBy).IsRequired();
         }
     }

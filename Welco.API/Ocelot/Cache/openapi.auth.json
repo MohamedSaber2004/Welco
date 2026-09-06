@@ -810,6 +810,9 @@
               "null",
               "string"
             ]
+          },
+          "revokeAllSessions": {
+            "type": "boolean"
           }
         }
       },
@@ -880,11 +883,55 @@
               "string"
             ]
           },
+          "phoneCountryId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "phoneCountryCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "userType": {
             "$ref": "#/components/schemas/UserType"
           },
           "language": {
             "$ref": "#/components/schemas/AppLanguage"
+          },
+          "companyName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "distributorCountryId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "salesVolumeBand": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "categoryInterest": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "website": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -946,6 +993,12 @@
             "type": [
               "null",
               "string"
+            ]
+          },
+          "isDefault": {
+            "type": [
+              "null",
+              "boolean"
             ]
           }
         }

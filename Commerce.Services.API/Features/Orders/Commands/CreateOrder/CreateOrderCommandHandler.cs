@@ -2,7 +2,10 @@ using Commerce.Services.API.Common;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Commerce;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Welco.Shared.Common.Interfaces;
+using Welco.Shared.Common.Options;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
@@ -18,11 +21,17 @@ namespace Commerce.Services.API.Features.Orders.Commands.CreateOrder
     {
         private readonly IUnitOfWork _uow;
         private readonly ICurrentUserService _currentUser;
+        private readonly IExchangeRateService _exchangeRateService;
+        private readonly ExchangeRateSettings _fxSettings;
+        private readonly ILogger<CreateOrderCommandHandler> _logger;
 
-        public CreateOrderCommandHandler(IUnitOfWork uow, ICurrentUserService currentUser)
+        public CreateOrderCommandHandler(IUnitOfWork uow, ICurrentUserService currentUser, IExchangeRateService exchangeRateService, IOptions<ExchangeRateSettings> fxOptions, ILogger<CreateOrderCommandHandler> logger)
         {
             _uow = uow;
             _currentUser = currentUser;
+            _exchangeRateService = exchangeRateService;
+            _fxSettings = fxOptions.Value;
+            _logger = logger;
         }
 
         public async Task<Result<OrderDto>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -61,6 +70,43 @@ namespace Commerce.Services.API.Features.Orders.Commands.CreateOrder
 
             var currentUserId = _currentUser.UserId != Guid.Empty ? _currentUser.UserId.ToString() : "System";
 
+            // Snapshot exchange rate for historical financial consistency (do not recalculate old orders with today's rate)
+            string? snapshotBase = null;
+            string? snapshotCode = null;
+            decimal? snapshotRate = null;
+            DateOnly? snapshotDate = null;
+            string? snapshotSource = null;
+            if (request.CurrencyId.HasValue)
+            {
+                try
+                {
+                    var currencyRepo = _uow.GetRepository<CurrencyEntity, Guid>();
+                    var cur = await currencyRepo.GetByIdAsync(request.CurrencyId.Value, cancellationToken);
+                    if (cur != null)
+                    {
+                        snapshotCode = cur.Code;
+                        snapshotBase = string.IsNullOrWhiteSpace(_fxSettings.BaseCurrency) ? "USD" : _fxSettings.BaseCurrency.Trim().ToUpperInvariant();
+                        if (snapshotCode != snapshotBase)
+                        {
+                            var conv = await _exchangeRateService.ConvertWithDetailsAsync(1m, snapshotBase, snapshotCode, cancellationToken);
+                            snapshotRate = conv.Rate;
+                            snapshotDate = conv.RateDate;
+                            snapshotSource = conv.Source;
+                        }
+                        else
+                        {
+                            snapshotRate = 1m;
+                            snapshotDate = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+                            snapshotSource = "identity";
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to snapshot exchange rate for order currency {CurrencyId}", request.CurrencyId);
+                }
+            }
+
             var order = new OrderEntity
             {
                 Id = Guid.NewGuid(),
@@ -70,7 +116,12 @@ namespace Commerce.Services.API.Features.Orders.Commands.CreateOrder
                 CompanyId = request.CompanyId,
                 CurrencyId = request.CurrencyId,
                 QuoteId = request.QuoteId,
-                TotalAmount = request.Items.Sum(i => i.Quantity * i.UnitPrice)
+                TotalAmount = request.Items.Sum(i => i.Quantity * i.UnitPrice),
+                SnapshotBaseCurrency = snapshotBase,
+                SnapshotCurrencyCode = snapshotCode,
+                SnapshotRate = snapshotRate,
+                SnapshotRateDate = snapshotDate,
+                SnapshotSource = snapshotSource
             };
             order.MarkAsCreated(currentUserId);
 
