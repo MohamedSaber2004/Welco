@@ -6,6 +6,7 @@ namespace Welco.Shared.Common.DTOs.UserManagement
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        public string? Email { get; set; }
         public CompanyType Type { get; set; }
         public Guid CountryId { get; set; }
         public string? CountryNameEn { get; set; }

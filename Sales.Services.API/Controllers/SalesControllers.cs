@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sales.Services.API.Features.Quotes.Commands.ApproveQuote;
@@ -12,6 +13,9 @@ using Sales.Services.API.Features.RFQs.Queries.GetRFQById;
 using Sales.Services.API.Features.RFQs.Queries.GetRFQs;
 using Sales.Services.API.SalesRoutes;
 using Sales.Services.API.Features.ProductInquiries.Commands.CreateProductInquiry;
+using Sales.Services.API.Features.ProductInquiries.Commands.DeleteProductInquiry;
+using Sales.Services.API.Features.ProductInquiries.Queries.GetProductInquiries;
+using Sales.Services.API.Features.ProductInquiries.Queries.GetProductInquiryById;
 using Welco.Shared.Common.Attributes;
 using Welco.Shared.Controllers;
 using Welco.Shared.Enums;
@@ -43,9 +47,14 @@ namespace Sales.Services.API.Controllers
     public class ProductInquiriesController : AppControllerBase
     {
         public ProductInquiriesController(IMediator mediator) : base(mediator) { }
+        // Guest inquiry (no account needed) — must stay anonymous at controller
+        // level; the gateway exposes POST anonymously, GET/DELETE for staff.
+        [HttpGet][RoleAuthorize(UserType.Admin, UserType.WelcoStaff)] public async Task<IActionResult> GetAll([FromQuery] GetProductInquiriesQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
+        [HttpGet][Route(SalesApiRoutes.ProductInquiries.GetById)][RoleAuthorize(UserType.Admin, UserType.WelcoStaff)] public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetProductInquiryByIdQuery { Id = id }, ct));
         [HttpPost]
-        [RoleAuthorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateProductInquiryCommand c, CancellationToken ct) => ToActionResult(await _mediator.Send(c, ct));
+        [HttpDelete][Route(SalesApiRoutes.ProductInquiries.Delete)][RoleAuthorize(UserType.Admin)] public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new DeleteProductInquiryCommand { Id = id }, ct));
     }
 }
 

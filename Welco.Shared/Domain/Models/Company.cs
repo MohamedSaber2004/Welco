@@ -6,6 +6,7 @@ namespace Welco.Shared.Domain.Models
     public class Company : BaseEntity<Guid>
     {
         public string Name { get; set; } = null!;
+        public string? Email { get; set; }
         public CompanyType Type { get; set; }
         public Guid CountryId { get; set; }
         public virtual Country? Country { get; set; }
@@ -23,12 +24,14 @@ namespace Welco.Shared.Domain.Models
             int tierLevel,
             CompanyStatus status,
             Guid? accountManagerId,
-            string createdBy)
+            string createdBy,
+            string? email = null)
         {
             var company = new Company
             {
                 Id = Guid.NewGuid(),
                 Name = name,
+                Email = NormalizeEmail(email),
                 Type = type,
                 CountryId = countryId,
                 TierLevel = tierLevel,
@@ -46,9 +49,11 @@ namespace Welco.Shared.Domain.Models
             int tierLevel,
             CompanyStatus status,
             Guid? accountManagerId,
-            string updatedBy)
+            string updatedBy,
+            string? email = null)
         {
             Name = name.Trim();
+            Email = NormalizeEmail(email);
             Type = type;
             CountryId = countryId;
             TierLevel = tierLevel;
@@ -56,5 +61,8 @@ namespace Welco.Shared.Domain.Models
             AccountManagerId = accountManagerId;
             MarkAsUpdated(updatedBy);
         }
+
+        private static string? NormalizeEmail(string? email) =>
+            string.IsNullOrWhiteSpace(email) ? null : email.Trim();
     }
 }

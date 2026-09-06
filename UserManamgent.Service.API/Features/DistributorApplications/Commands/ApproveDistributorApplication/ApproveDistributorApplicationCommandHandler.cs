@@ -75,7 +75,8 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
                     request.TierLevel > 0 ? request.TierLevel : 1,
                     CompanyStatus.Approved,
                     request.AccountManagerId,
-                    currentUserId);
+                    currentUserId,
+                    string.IsNullOrWhiteSpace(existingCompany.Email) ? app.ContactEmail : existingCompany.Email);
                 companyId = existingCompany.Id;
             }
             else
@@ -87,7 +88,8 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
                     request.TierLevel > 0 ? request.TierLevel : 1,
                     CompanyStatus.Approved,
                     request.AccountManagerId,
-                    currentUserId);
+                    currentUserId,
+                    app.ContactEmail);
                 await companyRepo.AddAsync(newCompany, cancellationToken);
                 companyId = newCompany.Id;
             }

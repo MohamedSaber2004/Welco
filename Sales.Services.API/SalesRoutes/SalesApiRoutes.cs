@@ -27,7 +27,10 @@ namespace Sales.Services.API.SalesRoutes
         public static class ProductInquiries
         {
             public const string Base = ProductInquiriesBase;
+            public const string GetAll = "";
+            public const string GetById = "{id}";
             public const string Create = "";
+            public const string Delete = "{id}";
         }
     }
 }

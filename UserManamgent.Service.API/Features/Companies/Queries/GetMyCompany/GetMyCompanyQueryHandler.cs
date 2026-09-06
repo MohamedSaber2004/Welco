@@ -43,6 +43,7 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetMyCompany
             {
                 Id = company.Id,
                 Name = company.Name,
+                Email = company.Email,
                 Type = company.Type,
                 CountryId = company.CountryId,
                 TierLevel = company.TierLevel,

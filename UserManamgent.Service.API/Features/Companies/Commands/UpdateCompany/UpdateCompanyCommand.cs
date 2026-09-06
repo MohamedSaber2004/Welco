@@ -8,6 +8,7 @@ namespace UserManamgent.Service.API.Features.Companies.Commands.UpdateCompany
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        public string? Email { get; set; }
         public CompanyType Type { get; set; }
         public Guid CountryId { get; set; }
         public int TierLevel { get; set; }

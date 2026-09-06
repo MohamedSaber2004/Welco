@@ -7,6 +7,7 @@ namespace UserManamgent.Service.API.Features.Companies.Commands.CreateCompany
     public class CreateCompanyCommand : IRequest<Result<CompanyDto>>
     {
         public string Name { get; set; } = string.Empty;
+        public string? Email { get; set; }
         public CompanyType Type { get; set; }
         public Guid CountryId { get; set; }
         public int TierLevel { get; set; } = 1;

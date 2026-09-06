@@ -15,7 +15,7 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetCompanyById
             var repo = _unitOfWork.GetRepository<CompanyEntity, Guid>();
             var c = await repo.GetByIdAsync(request.Id, ct);
             if (c == null || c.IsDeleted) return Result<CompanyDto>.NotFound(LocalizationKeys.Company.NotFound);
-            return Result<CompanyDto>.Success(new CompanyDto { Id = c.Id, Name = c.Name, Type = c.Type, CountryId = c.CountryId, TierLevel = c.TierLevel, Status = c.Status, AccountManagerId = c.AccountManagerId, IsActive = c.IsActive, CreatedAt = c.CreatedAt, UpdatedAt = c.UpdatedAt }, LocalizationKeys.Company.Fetched);
+            return Result<CompanyDto>.Success(new CompanyDto { Id = c.Id, Name = c.Name, Email = c.Email, Type = c.Type, CountryId = c.CountryId, TierLevel = c.TierLevel, Status = c.Status, AccountManagerId = c.AccountManagerId, IsActive = c.IsActive, CreatedAt = c.CreatedAt, UpdatedAt = c.UpdatedAt }, LocalizationKeys.Company.Fetched);
         }
     }
 }

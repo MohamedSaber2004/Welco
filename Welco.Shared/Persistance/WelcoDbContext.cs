@@ -56,7 +56,7 @@ namespace Welco.Shared.Persistance
         public DbSet<Notification> Notifications => Set<Notification>();
         public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
         public DbSet<SupportContact> SupportContacts => Set<SupportContact>();
-
+        public DbSet<OemInquiry> OemInquiries => Set<OemInquiry>();
         public WelcoDbContext(DbContextOptions<WelcoDbContext> options, ICurrentUserService? currentUserService = null)
             : base(options)
         {

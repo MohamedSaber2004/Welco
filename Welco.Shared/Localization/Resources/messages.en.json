@@ -237,7 +237,8 @@
     "TypeRequired": "Company type is required.",
     "CountryRequired": "Country is required.",
     "TierLevelInvalid": "Tier level must be between 1 and 5.",
-    "CompanyIdRequired": "Company ID is required."
+    "CompanyIdRequired": "Company ID is required.",
+    "EmailInvalid": "Company email is invalid."
   },
   "CompanyAddress": {
     "AddressIdRequired": "Company address ID is required.",
@@ -377,11 +378,27 @@
   "ProductInquiry": {
     "Created": "Product inquiry created successfully.",
     "ListFetched": "Product inquiries retrieved successfully.",
+    "Fetched": "Product inquiry retrieved successfully.",
+    "Deleted": "Product inquiry deleted successfully.",
+    "NotFound": "Product inquiry not found.",
     "ProductIdRequired": "Product ID is required.",
     "NameRequired": "Name is required.",
     "OrganizationRequired": "Organization is required.",
     "MessageRequired": "Message is required.",
     "EmailInvalid": "Invalid email format."
+  },
+  "OemInquiry": {
+    "Created": "OEM inquiry submitted successfully.",
+    "ListFetched": "OEM inquiries retrieved successfully.",
+    "Fetched": "OEM inquiry retrieved successfully.",
+    "Deleted": "OEM inquiry deleted successfully.",
+    "NotFound": "OEM inquiry not found.",
+    "FullNameRequired": "Full name is required.",
+    "EmailRequired": "Email is required.",
+    "EmailInvalid": "Invalid email format.",
+    "CompanyNameRequired": "Company name is required.",
+    "ServiceTypeRequired": "Service type is required.",
+    "MessageRequired": "Message is required."
   },
   "LandingPage": {
     "Created": "Landing page created successfully.",

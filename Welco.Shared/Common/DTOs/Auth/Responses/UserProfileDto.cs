@@ -12,6 +12,7 @@ namespace Welco.Shared.Common.DTOs.Auth.Responses
         public string? ProfilePictureName { get; set; }
         public UserType UserType { get; set; }
         public Guid? CompanyId { get; set; }
+        public CompanyDto? Company { get; set; }
         public AppLanguage Language { get; set; }
         public bool IsEmailConfirmed { get; set; }
         public DateTime CreatedAt { get; set; }

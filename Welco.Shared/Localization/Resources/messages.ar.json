@@ -237,7 +237,8 @@
     "TypeRequired": "نوع الشركة مطلوب.",
     "CountryRequired": "الدولة مطلوبة.",
     "TierLevelInvalid": "مستوى السعرات غير صالح.",
-    "CompanyIdRequired": "معرّف الشركة مطلوب."
+    "CompanyIdRequired": "معرّف الشركة مطلوب.",
+    "EmailInvalid": "البريد الإلكتروني للشركة غير صالح."
   },
   "CompanyAddress": {
     "AddressIdRequired": "معرّف عنوان الشركة مطلوب.",
@@ -407,11 +408,27 @@
   "ProductInquiry": {
     "Created": "تم إنشاء استفسار المنتج بنجاح.",
     "ListFetched": "تم استرجاع استفسارات المنتج بنجاح.",
+    "Fetched": "تم استرجاع استفسار المنتج بنجاح.",
+    "Deleted": "تم حذف استفسار المنتج بنجاح.",
+    "NotFound": "استفسار المنتج غير موجود.",
     "ProductIdRequired": "معرّف المنتج مطلوب.",
     "NameRequired": "الاسم مطلوب.",
     "OrganizationRequired": "المؤسسة مطلوبة.",
     "MessageRequired": "الرسالة مطلوبة.",
     "EmailInvalid": "صيغة البريد الإلكتروني غير صالحة."
+  },
+  "OemInquiry": {
+    "Created": "تم إرسال استفسار التصنيع بنجاح.",
+    "ListFetched": "تم استرجاع استفسارات التصنيع بنجاح.",
+    "Fetched": "تم استرجاع استفسار التصنيع بنجاح.",
+    "Deleted": "تم حذف استفسار التصنيع بنجاح.",
+    "NotFound": "استفسار التصنيع غير موجود.",
+    "FullNameRequired": "الاسم الكامل مطلوب.",
+    "EmailRequired": "البريد الإلكتروني مطلوب.",
+    "EmailInvalid": "صيغة البريد الإلكتروني غير صالحة.",
+    "CompanyNameRequired": "اسم الشركة مطلوب.",
+    "ServiceTypeRequired": "نوع الخدمة مطلوب.",
+    "MessageRequired": "الرسالة مطلوبة."
   },
   "Attachments": {
     "FileEmpty": "الملف فارغ.",

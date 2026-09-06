@@ -17,9 +17,9 @@ namespace UserManamgent.Service.API.Features.Companies.Commands.CreateCompany
             var countryRepo = _uow.GetRepository<Welco.Shared.Domain.Models.Country, Guid>();
             if (!await countryRepo.ExistsAsync(c => !c.IsDeleted && c.Id == r.CountryId, ct)) return Result<CompanyDto>.BadRequest(LocalizationKeys.Company.CountryRequired);
             var curId = _cur.UserId != Guid.Empty ? _cur.UserId.ToString() : "System";
-            var c = CompanyEntity.Create(r.Name.Trim(), r.Type, r.CountryId, r.TierLevel, r.Status, r.AccountManagerId, curId);
+            var c = CompanyEntity.Create(r.Name.Trim(), r.Type, r.CountryId, r.TierLevel, r.Status, r.AccountManagerId, curId, r.Email);
             await repo.AddAsync(c, ct); await _uow.SaveChangesAsync(ct);
-            return Result<CompanyDto>.Created(new CompanyDto { Id = c.Id, Name = c.Name, Type = c.Type, CountryId = c.CountryId, TierLevel = c.TierLevel, Status = c.Status, AccountManagerId = c.AccountManagerId, IsActive = c.IsActive, CreatedAt = c.CreatedAt }, LocalizationKeys.Company.Created);
+            return Result<CompanyDto>.Created(new CompanyDto { Id = c.Id, Name = c.Name, Email = c.Email, Type = c.Type, CountryId = c.CountryId, TierLevel = c.TierLevel, Status = c.Status, AccountManagerId = c.AccountManagerId, IsActive = c.IsActive, CreatedAt = c.CreatedAt }, LocalizationKeys.Company.Created);
         }
     }
 }

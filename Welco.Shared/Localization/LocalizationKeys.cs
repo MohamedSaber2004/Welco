@@ -268,6 +268,7 @@ namespace Welco.Shared.Localization
             public const string CountryRequired = "Company.CountryRequired";
             public const string TierLevelInvalid = "Company.TierLevelInvalid";
             public const string CompanyIdRequired = "Company.CompanyIdRequired";
+            public const string EmailInvalid = "Company.EmailInvalid";
         }
 
         public static class CompanyAddress
@@ -465,11 +466,28 @@ namespace Welco.Shared.Localization
         {
             public const string Created = "ProductInquiry.Created";
             public const string ListFetched = "ProductInquiry.ListFetched";
+            public const string Fetched = "ProductInquiry.Fetched";
+            public const string Deleted = "ProductInquiry.Deleted";
+            public const string NotFound = "ProductInquiry.NotFound";
             public const string ProductIdRequired = "ProductInquiry.ProductIdRequired";
             public const string NameRequired = "ProductInquiry.NameRequired";
             public const string OrganizationRequired = "ProductInquiry.OrganizationRequired";
             public const string MessageRequired = "ProductInquiry.MessageRequired";
             public const string EmailInvalid = "ProductInquiry.EmailInvalid";
+        }
+        public static class OemInquiry
+        {
+            public const string Created = "OemInquiry.Created";
+            public const string ListFetched = "OemInquiry.ListFetched";
+            public const string Fetched = "OemInquiry.Fetched";
+            public const string Deleted = "OemInquiry.Deleted";
+            public const string NotFound = "OemInquiry.NotFound";
+            public const string FullNameRequired = "OemInquiry.FullNameRequired";
+            public const string EmailRequired = "OemInquiry.EmailRequired";
+            public const string EmailInvalid = "OemInquiry.EmailInvalid";
+            public const string CompanyNameRequired = "OemInquiry.CompanyNameRequired";
+            public const string ServiceTypeRequired = "OemInquiry.ServiceTypeRequired";
+            public const string MessageRequired = "OemInquiry.MessageRequired";
         }
         public static class AttachmentMessages
         {

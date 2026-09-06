@@ -277,6 +277,7 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                 ProfilePictureName = user.ProfilePictureName,
                 UserType = user.UserType,
                 CompanyId = user.CompanyId,
+                Company = await LoadCompanyAsync(user.CompanyId, cancellationToken),
                 Language = user.Language,
                 IsEmailConfirmed = user.EmailConfirmed,
                 CreatedAt = user.CreatedAt,
@@ -285,6 +286,44 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
             };
 
             return Result<UserProfileDto>.Success(profile, LocalizationKeys.Auth.ProfileUpdated);
+        }
+
+        private async Task<CompanyDto?> LoadCompanyAsync(Guid? companyId, CancellationToken cancellationToken)
+        {
+            if (!companyId.HasValue || companyId.Value == Guid.Empty) return null;
+            try
+            {
+                var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
+                var company = await companyRepo.GetByIdAsync(companyId.Value, cancellationToken);
+                if (company == null || company.IsDeleted) return null;
+                string? countryNameEn = null;
+                try
+                {
+                    var countryRepo = _unitOfWork.GetRepository<Country, Guid>();
+                    var country = await countryRepo.GetByIdAsync(company.CountryId, cancellationToken);
+                    countryNameEn = country?.NameEn;
+                }
+                catch { /* optional */ }
+                return new CompanyDto
+                {
+                    Id = company.Id,
+                    Name = company.Name,
+                    Email = company.Email,
+                    Type = company.Type,
+                    CountryId = company.CountryId,
+                    CountryNameEn = countryNameEn,
+                    TierLevel = company.TierLevel,
+                    Status = company.Status,
+                    AccountManagerId = company.AccountManagerId,
+                    IsActive = company.IsActive,
+                    CreatedAt = company.CreatedAt,
+                    UpdatedAt = company.UpdatedAt
+                };
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

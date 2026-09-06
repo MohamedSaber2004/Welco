@@ -19,10 +19,11 @@ namespace UserManamgent.Service.API.Features.Companies.Commands.UpdateCompany
             var countryRepo = _uow.GetRepository<Welco.Shared.Domain.Models.Country, Guid>();
             if (!await countryRepo.ExistsAsync(x => !x.IsDeleted && x.Id == r.CountryId, ct)) return Result<CompanyDto>.BadRequest(LocalizationKeys.Company.CountryRequired);
             var curId = _cur.UserId != Guid.Empty ? _cur.UserId.ToString() : "System";
-            c.Update(r.Name.Trim(), r.Type, r.CountryId, r.TierLevel, r.Status, r.AccountManagerId, curId);
+            // Null Email means "not provided" (old clients) — keep the stored value.
+            c.Update(r.Name.Trim(), r.Type, r.CountryId, r.TierLevel, r.Status, r.AccountManagerId, curId, r.Email ?? c.Email);
             if (r.IsActive.HasValue) c.SetActiveState(r.IsActive.Value, curId);
             repo.Update(c); await _uow.SaveChangesAsync(ct);
-            return Result<CompanyDto>.Success(new CompanyDto { Id = c.Id, Name = c.Name, Type = c.Type, CountryId = c.CountryId, TierLevel = c.TierLevel, Status = c.Status, AccountManagerId = c.AccountManagerId, IsActive = c.IsActive, CreatedAt = c.CreatedAt, UpdatedAt = c.UpdatedAt }, LocalizationKeys.Company.Updated);
+            return Result<CompanyDto>.Success(new CompanyDto { Id = c.Id, Name = c.Name, Email = c.Email, Type = c.Type, CountryId = c.CountryId, TierLevel = c.TierLevel, Status = c.Status, AccountManagerId = c.AccountManagerId, IsActive = c.IsActive, CreatedAt = c.CreatedAt, UpdatedAt = c.UpdatedAt }, LocalizationKeys.Company.Updated);
         }
     }
 }

@@ -61,6 +61,22 @@
                        "UpstreamHttpMethod":  [
                                                   "POST"
                                               ],
+                       "DangerousAcceptAnyServerCertificateValidator":  false
+                   },
+                   {
+                       "DownstreamPathTemplate":  "/api/v1/product-inquiries/{everything}",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "welco-sales.runasp.net",
+                                                          "Port":  443
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/product-inquiries/{everything}",
+                       "UpstreamHttpMethod":  [
+                                                  "GET",
+                                                  "DELETE"
+                                              ],
                        "DangerousAcceptAnyServerCertificateValidator":  false,
                        "AuthenticationOptions":  {
                                                      "AuthenticationProviderKey":  "Bearer",

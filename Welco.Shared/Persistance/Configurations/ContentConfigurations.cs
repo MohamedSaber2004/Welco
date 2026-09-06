@@ -120,4 +120,18 @@ namespace Welco.Shared.Persistance.Configurations
             b.Property(x => x.CreatedBy).IsRequired();
         }
     }
+    public class OemInquiryConfiguration : IEntityTypeConfiguration<OemInquiry>
+    {
+        public void Configure(EntityTypeBuilder<OemInquiry> b)
+        {
+            b.ToTable("OemInquiries"); b.HasKey(x => x.Id);
+            b.Property(x => x.FullName).IsRequired().HasMaxLength(200);
+            b.Property(x => x.Email).IsRequired().HasMaxLength(256);
+            b.Property(x => x.CompanyName).IsRequired().HasMaxLength(200);
+            b.Property(x => x.ServiceType).IsRequired().HasMaxLength(200);
+            b.Property(x => x.Message).IsRequired().HasMaxLength(2000);
+            b.HasIndex(x => x.Email);
+            b.Property(x => x.CreatedBy).IsRequired();
+        }
+    }
 }
