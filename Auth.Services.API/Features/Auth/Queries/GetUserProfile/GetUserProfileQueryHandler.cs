@@ -6,6 +6,7 @@ using Welco.Shared.Common.DTOs.UserManagement;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Domain.Models;
+using Welco.Shared.Enums;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
 
@@ -97,7 +98,7 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                 ProfilePictureName = user.ProfilePictureName,
                 UserType = user.UserType,
                 CompanyId = user.CompanyId,
-                Company = await LoadCompanyAsync(user.CompanyId, cancellationToken),
+                Company = await LoadCompanyAsync(user, cancellationToken),
                 Language = user.Language,
                 IsEmailConfirmed = user.EmailConfirmed,
                 CreatedAt = user.CreatedAt,
@@ -108,43 +109,99 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
             return Result<UserProfileDto>.Success(profile, LocalizationKeys.Auth.ProfileFetched);
         }
 
-        private async Task<CompanyDto?> LoadCompanyAsync(Guid? companyId, CancellationToken cancellationToken)
+        private async Task<CompanyDto?> LoadCompanyAsync(ApplicationUser user, CancellationToken cancellationToken)
         {
-            if (!companyId.HasValue || companyId.Value == Guid.Empty) return null;
-            try
+            if (user.CompanyId.HasValue && user.CompanyId.Value != Guid.Empty)
             {
-                var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
-                var company = await companyRepo.GetByIdAsync(companyId.Value, cancellationToken);
-                if (company == null || company.IsDeleted) return null;
-                string? countryNameEn = null;
                 try
                 {
-                    var countryRepo = _unitOfWork.GetRepository<Country, Guid>();
-                    var country = await countryRepo.GetByIdAsync(company.CountryId, cancellationToken);
-                    countryNameEn = country?.NameEn;
+                    var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
+                    var company = await companyRepo.GetByIdAsync(user.CompanyId.Value, cancellationToken);
+                    if (company != null && !company.IsDeleted)
+                    {
+                        string? countryNameEn = null;
+                        string? countryNameAr = null;
+                        try
+                        {
+                            var countryRepo = _unitOfWork.GetRepository<Country, Guid>();
+                            var country = await countryRepo.GetByIdAsync(company.CountryId, cancellationToken);
+                            countryNameEn = country?.NameEn;
+                            countryNameAr = country?.NameAr;
+                        }
+                        catch { /* optional */ }
+
+                        return new CompanyDto
+                        {
+                            Id = company.Id,
+                            Name = company.Name,
+                            Email = company.Email,
+                            Type = company.Type,
+                            CountryId = company.CountryId,
+                            CountryNameEn = countryNameEn,
+                            CountryNameAr = countryNameAr,
+                            TierLevel = company.TierLevel,
+                            Status = company.Status,
+                            AccountManagerId = company.AccountManagerId,
+                            IsActive = company.IsActive,
+                            CreatedAt = company.CreatedAt,
+                            UpdatedAt = company.UpdatedAt
+                        };
+                    }
                 }
-                catch { /* optional */ }
-                return new CompanyDto
+                catch (Exception ex)
                 {
-                    Id = company.Id,
-                    Name = company.Name,
-                    Email = company.Email,
-                    Type = company.Type,
-                    CountryId = company.CountryId,
-                    CountryNameEn = countryNameEn,
-                    TierLevel = company.TierLevel,
-                    Status = company.Status,
-                    AccountManagerId = company.AccountManagerId,
-                    IsActive = company.IsActive,
-                    CreatedAt = company.CreatedAt,
-                    UpdatedAt = company.UpdatedAt
-                };
+                    _logger.LogWarning(ex, "Failed to load company {CompanyId} for profile", user.CompanyId);
+                }
             }
-            catch (Exception ex)
+
+            // Fallback: If user is an OrganizationUser without companyId yet, look up their DistributorApplication
+            if (user.UserType == UserType.OrganizationUser)
             {
-                _logger.LogWarning(ex, "Failed to load company {CompanyId} for profile", companyId);
-                return null;
+                try
+                {
+                    var distRepo = _unitOfWork.GetRepository<DistributorApplication, Guid>();
+                    var email = (user.Email ?? "").Trim().ToLower();
+                    var app = await distRepo.GetAll(d => !d.IsDeleted && (d.ContactEmail.ToLower() == email || d.CreatedBy.ToLower() == email))
+                        .OrderByDescending(d => d.CreatedAt)
+                        .FirstOrDefaultAsync(cancellationToken);
+                    if (app != null)
+                    {
+                        string? countryNameEn = null;
+                        string? countryNameAr = null;
+                        try
+                        {
+                            var countryRepo = _unitOfWork.GetRepository<Country, Guid>();
+                            var country = await countryRepo.GetByIdAsync(app.CountryId, cancellationToken);
+                            countryNameEn = country?.NameEn;
+                            countryNameAr = country?.NameAr;
+                        }
+                        catch { /* optional */ }
+
+                        return new CompanyDto
+                        {
+                            Id = app.Id,
+                            Name = app.CompanyName,
+                            Email = app.ContactEmail,
+                            Type = CompanyType.Distributor,
+                            CountryId = app.CountryId,
+                            CountryNameEn = countryNameEn,
+                            CountryNameAr = countryNameAr,
+                            TierLevel = 1,
+                            Status = app.Status == DistributorApplicationStatus.Approved ? CompanyStatus.Approved :
+                                     app.Status == DistributorApplicationStatus.Rejected ? CompanyStatus.Rejected :
+                                     CompanyStatus.Pending,
+                            CreatedAt = app.CreatedAt,
+                            UpdatedAt = app.UpdatedAt
+                        };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to load distributor application for user {UserId}", user.Id);
+                }
             }
+
+            return null;
         }
     }
 }

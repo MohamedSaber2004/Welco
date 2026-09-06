@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Identity;
 using Welco.Shared.Common.DTOs.UserManagement;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Domain.Models;
+using Welco.Shared.Enums;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
 using Welco.Shared.Common.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace UserManamgent.Service.API.Features.Companies.Queries.GetMyCompany
 {
@@ -32,7 +34,53 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetMyCompany
                 return Result<CompanyDto>.NotFound(LocalizationKeys.UserManagement.UserNotFound);
 
             if (!user.CompanyId.HasValue)
+            {
+                if (user.UserType == UserType.OrganizationUser)
+                {
+                    try
+                    {
+                        var distRepo = _unitOfWork.GetRepository<DistributorApplication, Guid>();
+                        var userEmail = (user.Email ?? "").Trim().ToLower();
+                        var app = await distRepo.GetAll(d => !d.IsDeleted && (d.ContactEmail.ToLower() == userEmail || d.CreatedBy.ToLower() == userEmail))
+                            .OrderByDescending(d => d.CreatedAt)
+                            .FirstOrDefaultAsync(cancellationToken);
+                        if (app != null)
+                        {
+                            string? countryNameEn = null;
+                            string? countryNameAr = null;
+                            try
+                            {
+                                var countryRepo = _unitOfWork.GetRepository<Country, Guid>();
+                                var country = await countryRepo.GetByIdAsync(app.CountryId, cancellationToken);
+                                countryNameEn = country?.NameEn;
+                                countryNameAr = country?.NameAr;
+                            }
+                            catch { }
+
+                            var appDto = new CompanyDto
+                            {
+                                Id = app.Id,
+                                Name = app.CompanyName,
+                                Email = app.ContactEmail,
+                                Type = CompanyType.Distributor,
+                                CountryId = app.CountryId,
+                                CountryNameEn = countryNameEn,
+                                CountryNameAr = countryNameAr,
+                                TierLevel = 1,
+                                Status = app.Status == DistributorApplicationStatus.Approved ? CompanyStatus.Approved :
+                                         app.Status == DistributorApplicationStatus.Rejected ? CompanyStatus.Rejected :
+                                         CompanyStatus.Pending,
+                                CreatedAt = app.CreatedAt,
+                                UpdatedAt = app.UpdatedAt
+                            };
+                            return Result<CompanyDto>.Success(appDto, LocalizationKeys.Company.Fetched);
+                        }
+                    }
+                    catch { }
+                }
+
                 return Result<CompanyDto>.NotFound(LocalizationKeys.Company.NotFound);
+            }
 
             var repo = _unitOfWork.GetRepository<Company, Guid>();
             var company = await repo.GetByIdAsync(user.CompanyId.Value, cancellationToken);
@@ -54,12 +102,16 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetMyCompany
                 UpdatedAt = company.UpdatedAt
             };
 
-            // Try to populate CountryNameEn for convenience (optional)
+            // Try to populate CountryNameEn and CountryNameAr
             try
             {
                 var countryRepo = _unitOfWork.GetRepository<Country, Guid>();
                 var country = await countryRepo.GetByIdAsync(company.CountryId, cancellationToken);
-                if (country != null) dto.CountryNameEn = country.NameEn;
+                if (country != null)
+                {
+                    dto.CountryNameEn = country.NameEn;
+                    dto.CountryNameAr = country.NameAr;
+                }
             }
             catch { /* ignore */ }
 
