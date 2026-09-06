@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Domain.Models;
@@ -25,12 +26,18 @@ namespace Product.Services.API.Features.Wishlist.Commands.RemoveFromWishlist
 
             var userId = _currentUserService.UserId;
             var repo = _unitOfWork.GetRepository<UserProductInteraction, Guid>();
-            var interaction = await repo.GetFirstAsync(w => !w.IsDeleted && w.UserId == userId && w.ProductId == request.ProductId && w.Type == "Wishlist", cancellationToken);
-            if (interaction == null)
-                return Result<string>.NotFound(LocalizationKeys.Product.NotFound);
+            var interactions = await repo.GetAll(w => !w.IsDeleted && w.UserId == userId && w.ProductId == request.ProductId && w.Type == "Wishlist")
+                .ToListAsync(cancellationToken);
 
-            interaction.MarkAsDeleted(userId.ToString());
-            repo.Update(interaction);
+            if (!interactions.Any())
+                return Result<string>.Success(request.ProductId.ToString(), LocalizationKeys.Product.RemovedFromWishlist); // Idempotent remove
+
+            foreach (var interaction in interactions)
+            {
+                interaction.MarkAsDeleted(userId.ToString());
+                repo.Update(interaction);
+            }
+
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return Result<string>.Success(request.ProductId.ToString(), LocalizationKeys.Product.RemovedFromWishlist);
         }
