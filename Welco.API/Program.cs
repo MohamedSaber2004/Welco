@@ -304,6 +304,7 @@ namespace Welco.API
                 }
             }
 
+
 #pragma warning disable ASP0014
             app.UseEndpoints(endpoints =>
             {
