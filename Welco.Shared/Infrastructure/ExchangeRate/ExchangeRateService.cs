@@ -250,59 +250,68 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 var currencies = await _db.Currencies.Where(c => !c.IsDeleted).ToDictionaryAsync(c => c.Code, c => c, StringComparer.OrdinalIgnoreCase, cancellationToken);
 
                 var count = 0;
-                using var tx = await _db.Database.BeginTransactionAsync(cancellationToken);
-                try
+                // NOTE: DbContext is configured with EnableRetryOnFailure, whose
+                // SqlServerRetryingExecutionStrategy forbids user-initiated
+                // transactions. All transactional work must run inside
+                // CreateExecutionStrategy().ExecuteAsync so retries wrap the
+                // whole transaction as a retriable unit.
+                var strategy = _db.Database.CreateExecutionStrategy();
+                await strategy.ExecuteAsync(async () =>
                 {
-                    foreach (var kv in validRates)
+                    using var tx = await _db.Database.BeginTransactionAsync(cancellationToken);
+                    try
                     {
-                        if (!currencies.TryGetValue(kv.Key, out var targetCurr))
+                        foreach (var kv in validRates)
                         {
-                            _logger.LogWarning("Skipping unknown currency {Code} not in DB", kv.Key);
-                            continue;
-                        }
-
-                        var existing = await _db.ExchangeRates.FirstOrDefaultAsync(r =>
-                            r.BaseCurrencyId == baseCurr.Id &&
-                            r.TargetCurrencyId == targetCurr.Id &&
-                            r.RateDate == targetDate, cancellationToken);
-
-                        if (existing != null)
-                        {
-                            // Update today's rate if changed (idempotent)
-                            if (existing.Rate != kv.Value || existing.Source != response.Source)
+                            if (!currencies.TryGetValue(kv.Key, out var targetCurr))
                             {
-                                existing.Rate = kv.Value;
-                                existing.Source = response.Source;
-                                existing.FetchedAt = response.FetchedAt;
-                                existing.MarkAsUpdated("System");
+                                _logger.LogWarning("Skipping unknown currency {Code} not in DB", kv.Key);
+                                continue;
                             }
-                        }
-                        else
-                        {
-                            var er = new ExchangeRateEntity
-                            {
-                                Id = Guid.NewGuid(),
-                                BaseCurrencyId = baseCurr.Id,
-                                TargetCurrencyId = targetCurr.Id,
-                                Rate = kv.Value,
-                                RateDate = targetDate,
-                                Source = response.Source,
-                                FetchedAt = response.FetchedAt
-                            };
-                            er.MarkAsCreated("System");
-                            _db.ExchangeRates.Add(er);
-                        }
-                        count++;
-                    }
 
-                    await _db.SaveChangesAsync(cancellationToken);
-                    await tx.CommitAsync(cancellationToken);
-                }
-                catch
-                {
-                    await tx.RollbackAsync(cancellationToken);
-                    throw;
-                }
+                            var existing = await _db.ExchangeRates.FirstOrDefaultAsync(r =>
+                                r.BaseCurrencyId == baseCurr.Id &&
+                                r.TargetCurrencyId == targetCurr.Id &&
+                                r.RateDate == targetDate, cancellationToken);
+
+                            if (existing != null)
+                            {
+                                // Update today's rate if changed (idempotent)
+                                if (existing.Rate != kv.Value || existing.Source != response.Source)
+                                {
+                                    existing.Rate = kv.Value;
+                                    existing.Source = response.Source;
+                                    existing.FetchedAt = response.FetchedAt;
+                                    existing.MarkAsUpdated("System");
+                                }
+                            }
+                            else
+                            {
+                                var er = new ExchangeRateEntity
+                                {
+                                    Id = Guid.NewGuid(),
+                                    BaseCurrencyId = baseCurr.Id,
+                                    TargetCurrencyId = targetCurr.Id,
+                                    Rate = kv.Value,
+                                    RateDate = targetDate,
+                                    Source = response.Source,
+                                    FetchedAt = response.FetchedAt
+                                };
+                                er.MarkAsCreated("System");
+                                _db.ExchangeRates.Add(er);
+                            }
+                            count++;
+                        }
+
+                        await _db.SaveChangesAsync(cancellationToken);
+                        await tx.CommitAsync(cancellationToken);
+                    }
+                    catch
+                    {
+                        await tx.RollbackAsync(cancellationToken);
+                        throw;
+                    }
+                });
 
                 // Invalidate cache
                 var cacheKey = CacheKey(baseCurrency, targetDate);

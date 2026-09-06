@@ -112,7 +112,7 @@ namespace Product.Services.API
             });
             app.MapControllers();
 
-            // Auto-migrate and seed currencies (ISO 4217) - non-destructive
+            // Auto-migrate and seed currencies + world locations - non-destructive
             if (!app.Environment.IsEnvironment("Test"))
             {
                 try
@@ -120,14 +120,14 @@ namespace Product.Services.API
                     using var scope = app.Services.CreateScope();
                     var db = scope.ServiceProvider.GetRequiredService<WelcoDbContext>();
                     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-                    // Ensure DB is migrated (adds ExchangeRates, SyncLogs, Currency enhancements)
                     await db.Database.MigrateAsync();
                     await CurrencySeeder.SeedAsync(db, logger);
+                    await WorldLocationSeeder.SeedAsync(db, logger);
                 }
                 catch (Exception ex)
                 {
                     var logger = app.Services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "Currency seeding / migration failed");
+                    logger.LogError(ex, "Seeding / migration failed");
                 }
             }
 

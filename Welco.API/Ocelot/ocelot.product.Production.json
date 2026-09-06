@@ -39,7 +39,32 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [{ "Host": "welco-product.runasp.net", "Port": 443 }],
       "UpstreamPathTemplate": "/api/v1/currencies/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": false
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/currencies/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-product.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/currencies/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer", "AllowedScopes": [] },
+      "DangerousAcceptAnyServerCertificateValidator": false
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/exchange-rates/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-product.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/exchange-rates/{everything}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": false
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/exchange-rates/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-product.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/exchange-rates/{everything}",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer", "AllowedScopes": [] },
       "DangerousAcceptAnyServerCertificateValidator": false
     },

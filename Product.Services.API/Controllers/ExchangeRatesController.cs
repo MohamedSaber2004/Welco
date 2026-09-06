@@ -24,8 +24,15 @@ namespace Product.Services.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetLatest(CancellationToken ct)
         {
-            var rates = await _service.GetLatestRatesAsync("USD", ct);
-            return ToActionResult(Result<IReadOnlyCollection<ExchangeRateDto>>.Success(rates.ToList()));
+            try
+            {
+                var rates = await _service.GetLatestRatesAsync("USD", ct);
+                return ToActionResult(Result<IReadOnlyCollection<ExchangeRateDto>>.Success(rates.ToList()));
+            }
+            catch (Exception ex)
+            {
+                return ToActionResult(Result<IReadOnlyCollection<ExchangeRateDto>>.Failure(ex.Message));
+            }
         }
 
         /// <summary>Latest rates for baseCurrency</summary>
@@ -34,8 +41,15 @@ namespace Product.Services.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetLatestByBase([FromRoute] string baseCurrency, CancellationToken ct)
         {
-            var rates = await _service.GetLatestRatesAsync(baseCurrency, ct);
-            return ToActionResult(Result<IReadOnlyCollection<ExchangeRateDto>>.Success(rates.ToList()));
+            try
+            {
+                var rates = await _service.GetLatestRatesAsync(baseCurrency, ct);
+                return ToActionResult(Result<IReadOnlyCollection<ExchangeRateDto>>.Success(rates.ToList()));
+            }
+            catch (Exception ex)
+            {
+                return ToActionResult(Result<IReadOnlyCollection<ExchangeRateDto>>.Failure(ex.Message));
+            }
         }
 
         /// <summary>Single pair rate</summary>
@@ -85,8 +99,15 @@ namespace Product.Services.API.Controllers
         {
             if (!DateOnly.TryParse(date, out var d))
                 return ToActionResult(Result<IReadOnlyCollection<ExchangeRateDto>>.BadRequest("Invalid date format, use yyyy-MM-dd"));
-            var rates = await _service.GetHistoricalRatesAsync(baseCurrency, d, ct);
-            return ToActionResult(Result<IReadOnlyCollection<ExchangeRateDto>>.Success(rates.ToList()));
+            try
+            {
+                var rates = await _service.GetHistoricalRatesAsync(baseCurrency, d, ct);
+                return ToActionResult(Result<IReadOnlyCollection<ExchangeRateDto>>.Success(rates.ToList()));
+            }
+            catch (Exception ex)
+            {
+                return ToActionResult(Result<IReadOnlyCollection<ExchangeRateDto>>.Failure(ex.Message));
+            }
         }
 
         /// <summary>Manual sync - Admin only</summary>
