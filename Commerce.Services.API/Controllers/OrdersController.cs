@@ -1,4 +1,4 @@
-﻿using Commerce.Services.API.CommerceRoutes;
+using Commerce.Services.API.CommerceRoutes;
 using Commerce.Services.API.Features.Orders.Commands.CreateOrder;
 using Commerce.Services.API.Features.Orders.Commands.UpdateOrderStatus;
 using Commerce.Services.API.Features.Orders.Queries.GetOrderById;
@@ -24,7 +24,7 @@ namespace Commerce.Services.API.Controllers
         /// </summary>
         [HttpGet]
         [Route(CommerceApiRoutes.Orders.GetAll)]
-        [RoleAuthorize(UserType.Admin)]
+        [RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> GetAll([FromQuery] GetOrdersQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace Commerce.Services.API.Controllers
         /// </summary>
         [HttpGet]
         [Route(CommerceApiRoutes.Orders.GetById)]
-        [RoleAuthorize(UserType.OrganizationUser, UserType.Admin)]
+        [RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetOrderByIdQuery { Id = id }, ct));
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Commerce.Services.API.Controllers
         /// </summary>
         [HttpPost]
         [Route(CommerceApiRoutes.Orders.Create)]
-        [RoleAuthorize(UserType.OrganizationUser, UserType.Admin)]
+        [RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> Create([FromBody] CreateOrderCommand cmd, CancellationToken ct) => ToActionResult(await _mediator.Send(cmd, ct));
 
         /// <summary>

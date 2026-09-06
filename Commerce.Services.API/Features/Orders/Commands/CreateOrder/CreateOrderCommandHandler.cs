@@ -14,6 +14,7 @@ using OrderItemEntity = Welco.Shared.Domain.Models.OrderItem;
 using ProductEntity = Welco.Shared.Domain.Models.Product;
 using CompanyEntity = Welco.Shared.Domain.Models.Company;
 using CurrencyEntity = Welco.Shared.Domain.Models.Currency;
+using ApplicationUser = Welco.Shared.Domain.Models.ApplicationUser;
 
 namespace Commerce.Services.API.Features.Orders.Commands.CreateOrder
 {
@@ -107,13 +108,25 @@ namespace Commerce.Services.API.Features.Orders.Commands.CreateOrder
                 }
             }
 
+            var effectiveUserId = request.UserId ?? (_currentUser.UserId != Guid.Empty ? _currentUser.UserId : (Guid?)null);
+            var effectiveCompanyId = request.CompanyId;
+            if (!effectiveCompanyId.HasValue && effectiveUserId.HasValue)
+            {
+                var userRepo = _uow.GetRepository<ApplicationUser, Guid>();
+                var u = await userRepo.GetByIdAsync(effectiveUserId.Value, cancellationToken);
+                if (u?.CompanyId.HasValue == true)
+                {
+                    effectiveCompanyId = u.CompanyId.Value;
+                }
+            }
+
             var order = new OrderEntity
             {
                 Id = Guid.NewGuid(),
                 OrderNumber = $"ORD-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6].ToUpper()}",
                 Status = Welco.Shared.Domain.Models.OrderStatus.Pending,
-                UserId = request.UserId,
-                CompanyId = request.CompanyId,
+                UserId = effectiveUserId,
+                CompanyId = effectiveCompanyId,
                 CurrencyId = request.CurrencyId,
                 QuoteId = request.QuoteId,
                 TotalAmount = request.Items.Sum(i => i.Quantity * i.UnitPrice),

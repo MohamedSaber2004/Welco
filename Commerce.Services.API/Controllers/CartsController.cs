@@ -29,7 +29,7 @@ namespace Commerce.Services.API.Controllers
         /// </summary>
         [HttpGet]
         [Route(CommerceApiRoutes.Carts.Create)]
-        [RoleAuthorize(UserType.Admin)]
+        [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> GetAll([FromQuery] GetCartsQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
 
         /// <summary>

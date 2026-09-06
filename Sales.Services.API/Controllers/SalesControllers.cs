@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +29,7 @@ namespace Sales.Services.API.Controllers
         public RFQsController(IMediator mediator) : base(mediator) { }
         [HttpGet] public async Task<IActionResult> GetAll([FromQuery] GetRFQsQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
         [HttpGet][Route(SalesApiRoutes.RFQs.GetById)] public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetRFQByIdQuery { Id = id }, ct));
-        [HttpPost][RoleAuthorize(UserType.OrganizationUser, UserType.Admin)] public async Task<IActionResult> Create([FromBody] CreateRFQCommand c, CancellationToken ct) => ToActionResult(await _mediator.Send(c, ct));
+        [HttpPost][RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)] public async Task<IActionResult> Create([FromBody] CreateRFQCommand c, CancellationToken ct) => ToActionResult(await _mediator.Send(c, ct));
         [HttpPut][Route(SalesApiRoutes.RFQs.UpdateStatus)][RoleAuthorize(UserType.WelcoStaff, UserType.Admin)] public async Task<IActionResult> UpdateStatus([FromRoute] Guid id, [FromBody] UpdateRFQStatusCommand c, CancellationToken ct) { c.Id = id; return ToActionResult(await _mediator.Send(c, ct)); }
     }
     [RoleAuthorize]
@@ -40,8 +40,8 @@ namespace Sales.Services.API.Controllers
         [HttpGet] public async Task<IActionResult> GetAll([FromQuery] GetQuotesQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
         [HttpGet][Route(SalesApiRoutes.Quotes.GetById)] public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetQuoteByIdQuery { Id = id }, ct));
         [HttpPost][RoleAuthorize(UserType.WelcoStaff, UserType.Admin)] public async Task<IActionResult> Create([FromBody] CreateQuoteCommand c, CancellationToken ct) => ToActionResult(await _mediator.Send(c, ct));
-        [HttpPost][Route(SalesApiRoutes.Quotes.Approve)][RoleAuthorize(UserType.OrganizationUser, UserType.Admin)] public async Task<IActionResult> Approve([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new ApproveQuoteCommand { Id = id }, ct));
-        [HttpPost][Route(SalesApiRoutes.Quotes.Decline)][RoleAuthorize(UserType.OrganizationUser, UserType.Admin)] public async Task<IActionResult> Decline([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new DeclineQuoteCommand { Id = id }, ct));
+        [HttpPost][Route(SalesApiRoutes.Quotes.Approve)][RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)] public async Task<IActionResult> Approve([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new ApproveQuoteCommand { Id = id }, ct));
+        [HttpPost][Route(SalesApiRoutes.Quotes.Decline)][RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)] public async Task<IActionResult> Decline([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new DeclineQuoteCommand { Id = id }, ct));
     }
     [Route(SalesApiRoutes.ProductInquiries.Base)]
     public class ProductInquiriesController : AppControllerBase
