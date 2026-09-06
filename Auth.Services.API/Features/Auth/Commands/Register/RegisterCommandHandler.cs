@@ -90,14 +90,16 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
                     return Result<string>.NotFound(LocalizationKeys.Country.NotFound, new List<string> { LocalizationKeys.Country.NotFound });
 
                 var distRepo = _unitOfWork.GetRepository<DistributorApplication, Guid>();
+                var checkEmail = !string.IsNullOrWhiteSpace(request.CompanyEmail) ? request.CompanyEmail.Trim().ToLower() : request.Email.Trim().ToLower();
+                var userEmail = request.Email.Trim().ToLower();
                 var hasApproved = await distRepo.ExistsAsync(
-                    d => !d.IsDeleted && d.ContactEmail.ToLower() == request.Email.Trim().ToLower() && d.Status == DistributorApplicationStatus.Approved,
+                    d => !d.IsDeleted && (d.ContactEmail.ToLower() == userEmail || d.ContactEmail.ToLower() == checkEmail || d.CreatedBy.ToLower() == userEmail) && d.Status == DistributorApplicationStatus.Approved,
                     cancellationToken);
                 if (hasApproved)
                     return Result<string>.BadRequest(LocalizationKeys.DistributorApplication.ApprovedAlreadyExists, new List<string> { LocalizationKeys.DistributorApplication.ApprovedAlreadyExists });
 
                 var hasPending = await distRepo.ExistsAsync(
-                    d => !d.IsDeleted && d.ContactEmail.ToLower() == request.Email.Trim().ToLower() && d.Status == DistributorApplicationStatus.Pending,
+                    d => !d.IsDeleted && (d.ContactEmail.ToLower() == userEmail || d.ContactEmail.ToLower() == checkEmail || d.CreatedBy.ToLower() == userEmail) && d.Status == DistributorApplicationStatus.Pending,
                     cancellationToken);
                 if (hasPending)
                     return Result<string>.BadRequest(LocalizationKeys.DistributorApplication.PendingApproval, new List<string> { LocalizationKeys.DistributorApplication.PendingApproval });
@@ -111,7 +113,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
                     CategoryInterest = string.IsNullOrWhiteSpace(request.CategoryInterest) ? null : request.CategoryInterest.Trim(),
                     Website = string.IsNullOrWhiteSpace(request.Website) ? null : request.Website.Trim(),
                     ContactPerson = request.FullName.Trim(),
-                    ContactEmail = request.Email.Trim(),
+                    ContactEmail = !string.IsNullOrWhiteSpace(request.CompanyEmail) ? request.CompanyEmail.Trim() : request.Email.Trim(),
                     Phone = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim(),
                     Status = DistributorApplicationStatus.Pending,
                 };

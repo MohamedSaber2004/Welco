@@ -4,6 +4,7 @@ using Welco.Shared.Common.DTOs.Auth.Responses;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Domain.Models;
+using Welco.Shared.Enums;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
 
@@ -48,6 +49,47 @@ namespace Auth.Services.API.Features.Auth.Commands.VerifyEmailOtp
             await _userManager.UpdateAsync(user);
 
             var roles = await _userManager.GetRolesAsync(user);
+
+            // Distributor gate: OrganizationUser must have approved Company/DistributorApplication.
+            // If still pending, keep them logged out: do NOT issue tokens. They can try to log in anytime later once approved.
+            if (user.UserType == UserType.OrganizationUser)
+            {
+                bool isApproved = false;
+                if (user.CompanyId.HasValue)
+                {
+                    var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
+                    var company = await companyRepo.GetByIdAsync(user.CompanyId.Value, cancellationToken);
+                    isApproved = company != null && !company.IsDeleted && company.Status == CompanyStatus.Approved;
+                }
+                else
+                {
+                    var distRepo = _unitOfWork.GetRepository<DistributorApplication, Guid>();
+                    var userEmail = (user.Email ?? "").Trim().ToLower();
+                    isApproved = await distRepo.ExistsAsync(
+                        d => !d.IsDeleted && (d.ContactEmail.ToLower() == userEmail || d.CreatedBy.ToLower() == userEmail) && d.Status == DistributorApplicationStatus.Approved,
+                        cancellationToken);
+                }
+
+                if (!isApproved)
+                {
+                    var pendingResponse = new AuthResponseDto
+                    {
+                        UserId = user.Id,
+                        FullName = user.FullName,
+                        Email = user.Email ?? string.Empty,
+                        UserName = user.UserName,
+                        UserType = user.UserType,
+                        CompanyId = user.CompanyId,
+                        Language = user.Language,
+                        Roles = roles,
+                        AccessToken = string.Empty,
+                        RefreshToken = string.Empty,
+                        RefreshTokenExpiryTime = DateTime.MinValue
+                    };
+                    return Result<AuthResponseDto>.Success(pendingResponse, LocalizationKeys.DistributorApplication.PendingApproval);
+                }
+            }
+
             var accessToken = _jwtTokenService.GenerateAccessToken(user, roles);
             var refreshTokenString = _jwtTokenService.GenerateRefreshToken(user);
             var refreshTokenExpiry = DateTime.UtcNow.AddDays(30);

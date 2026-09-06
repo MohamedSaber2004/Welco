@@ -51,6 +51,10 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
             RuleFor(x => x.SalesVolumeBand)
                 .NotEmpty().WithMessage(LocalizationKeys.Auth.SalesVolumeRequired)
                 .When(x => x.UserType == UserType.OrganizationUser);
+            RuleFor(x => x.CompanyEmail)
+                .EmailAddress().WithMessage(LocalizationKeys.Company.EmailInvalid)
+                .MaximumLength(256)
+                .When(x => !string.IsNullOrWhiteSpace(x.CompanyEmail));
             RuleFor(x => x.Website)
                 .Must(url => string.IsNullOrWhiteSpace(url) || Uri.TryCreate(url, UriKind.Absolute, out _))
                 .WithMessage(LocalizationKeys.Auth.WebsiteInvalid)

@@ -23,6 +23,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
 
         // Distributor application — unified registration (OrganizationUser)
         public string? CompanyName { get; set; }
+        public string? CompanyEmail { get; set; }
         public Guid? DistributorCountryId { get; set; }
         public string? SalesVolumeBand { get; set; }
         public string? CategoryInterest { get; set; }

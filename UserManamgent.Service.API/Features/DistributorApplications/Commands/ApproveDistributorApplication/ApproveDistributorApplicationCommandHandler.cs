@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.UserManagement;
 using Welco.Shared.Common.Interfaces;
@@ -113,11 +113,18 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
             var userRepo = _unitOfWork.GetRepository<ApplicationUser, Guid>();
             ApplicationUser? applicant = null;
 
-            if (!string.IsNullOrWhiteSpace(app.CreatedBy)
-                && Guid.TryParse(app.CreatedBy, out var createdById)
-                && createdById != Guid.Empty)
+            if (!string.IsNullOrWhiteSpace(app.CreatedBy))
             {
-                applicant = await userRepo.GetByIdAsync(createdById, cancellationToken);
+                if (Guid.TryParse(app.CreatedBy, out var createdById) && createdById != Guid.Empty)
+                {
+                    applicant = await userRepo.GetByIdAsync(createdById, cancellationToken);
+                }
+                else
+                {
+                    var createdByEmail = app.CreatedBy.Trim().ToLower();
+                    applicant = await userRepo.GetAll(u => !u.IsDeleted && (u.Email ?? "").ToLower() == createdByEmail)
+                        .FirstOrDefaultAsync(cancellationToken);
+                }
             }
 
             if ((applicant == null || applicant.IsDeleted) && !string.IsNullOrWhiteSpace(app.ContactEmail))
