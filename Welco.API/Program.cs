@@ -32,7 +32,6 @@ namespace Welco.API
                 builder.WebHost.UseUrls($"http://*:{port}");
             }
 
-
             builder.Configuration.Sources.Clear();
             builder.Configuration
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
