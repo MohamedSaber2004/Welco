@@ -1,1 +1,4 @@
-GET https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json use that instead
+Access to fetch at 'https://welco-gateway.runasp.net/api/v1/auth/login' from origin 'https://welco-frontend.vercel.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+welco-gateway.runasp.net/api/v1/auth/login:1  Failed to load resource: net::ERR_FAILED
+
+https://welco-frontend.vercel.app/ that is the baseurl need to add it
