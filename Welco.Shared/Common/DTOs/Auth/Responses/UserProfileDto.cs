@@ -9,6 +9,7 @@ namespace Welco.Shared.Common.DTOs.Auth.Responses
         public string FullName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }
+        public string? PhoneCode { get; set; }
         public string? ProfilePictureName { get; set; }
         public UserType UserType { get; set; }
         public Guid? CompanyId { get; set; }

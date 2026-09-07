@@ -89,12 +89,68 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                 _logger.LogWarning(ex, "Failed to load addresses for user {UserId}", user.Id);
             }
 
+            string? phoneCode = null;
+            if (!string.IsNullOrWhiteSpace(user.PhoneNumber))
+            {
+                var cleanPhone = user.PhoneNumber.Trim().Replace(" ", "").Replace("-", "");
+                try
+                {
+                    var countryRepo = _unitOfWork.GetRepository<Country, Guid>();
+                    var allCountries = await countryRepo.GetAllListAsync(c => !c.IsDeleted && c.PhoneCode != null, cancellationToken);
+                    var matched = allCountries
+                        .Where(c => !string.IsNullOrWhiteSpace(c.PhoneCode) && cleanPhone.StartsWith(c.PhoneCode!.Trim().Replace(" ", ""), StringComparison.Ordinal))
+                        .OrderByDescending(c => c.PhoneCode!.Length)
+                        .FirstOrDefault();
+
+                    if (matched != null)
+                    {
+                        phoneCode = matched.PhoneCode?.Trim();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to resolve phoneCode by country prefix for user {UserId}", user.Id);
+                }
+
+                if (phoneCode == null && user.CompanyId.HasValue && user.CompanyId.Value != Guid.Empty)
+                {
+                    try
+                    {
+                        var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
+                        var company = await companyRepo.GetByIdAsync(user.CompanyId.Value, cancellationToken);
+                        if (company != null && company.CountryId != Guid.Empty)
+                        {
+                            var countryRepo = _unitOfWork.GetRepository<Country, Guid>();
+                            var companyCountry = await countryRepo.GetByIdAsync(company.CountryId, cancellationToken);
+                            phoneCode = companyCountry?.PhoneCode?.Trim();
+                        }
+                    }
+                    catch { /* optional */ }
+                }
+
+                if (phoneCode == null && addresses.Count > 0)
+                {
+                    var def = addresses.FirstOrDefault(a => a.IsDefault) ?? addresses[0];
+                    phoneCode = def.CountryPhoneCode;
+                }
+
+                if (phoneCode == null && cleanPhone.StartsWith("+"))
+                {
+                    var match = System.Text.RegularExpressions.Regex.Match(cleanPhone, @"^(\+\d{1,4})");
+                    if (match.Success)
+                    {
+                        phoneCode = match.Value;
+                    }
+                }
+            }
+
             var profile = new UserProfileDto
             {
                 UserId = user.Id,
                 FullName = user.FullName,
                 Email = user.Email ?? string.Empty,
                 PhoneNumber = user.PhoneNumber,
+                PhoneCode = phoneCode,
                 ProfilePictureName = user.ProfilePictureName,
                 UserType = user.UserType,
                 CompanyId = user.CompanyId,
