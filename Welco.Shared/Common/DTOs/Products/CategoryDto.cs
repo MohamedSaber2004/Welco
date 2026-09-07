@@ -8,6 +8,7 @@ namespace Welco.Shared.Common.DTOs.Products
         public string? Description { get; set; }
         public string? ImageName { get; set; }
         public Guid? ParentCategoryId { get; set; }
+        public int ProductCount { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
