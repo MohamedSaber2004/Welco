@@ -11,5 +11,6 @@ namespace UserManamgent.Service.API.Features.Countries.Commands.UpdateCountry
         public string? NameAr { get; set; }
         public string? Code { get; set; }
         public string? PhoneCode { get; set; }
+        public bool? IsActive { get; set; }
     }
 }

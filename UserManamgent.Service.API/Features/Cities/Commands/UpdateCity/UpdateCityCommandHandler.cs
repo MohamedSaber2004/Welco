@@ -60,6 +60,9 @@ namespace UserManamgent.Service.API.Features.Cities.Commands.UpdateCity
                 : "System";
 
             city.Update(request.CountryId, request.NameEn, request.NameAr, currentUserId);
+
+            if (request.IsActive.HasValue)
+                city.SetActiveState(request.IsActive.Value, currentUserId);
             cityRepo.Update(city);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 

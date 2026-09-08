@@ -26,6 +26,9 @@ namespace Content.Services.API.Features.FAQs.Commands.UpdateFAQ
             entity.Answer = request.Answer.Trim();
             entity.SortOrder = request.SortOrder;
             entity.MarkAsUpdated(currentUserId);
+
+            if (request.IsActive.HasValue)
+                entity.SetActiveState(request.IsActive.Value, currentUserId);
             repo.Update(entity);
             await _uow.SaveChangesAsync(cancellationToken);
             var dto = await repo.GetAll(f => !f.IsDeleted && f.Id == entity.Id)

@@ -37,6 +37,9 @@ namespace Content.Services.API.Features.HelpArticles.Commands.UpdateHelpArticle
             entity.Body = request.Body.Trim();
             entity.Slug = slug;
             entity.MarkAsUpdated(currentUserId);
+
+            if (request.IsActive.HasValue)
+                entity.SetActiveState(request.IsActive.Value, currentUserId);
             repo.Update(entity);
             await _uow.SaveChangesAsync(cancellationToken);
 

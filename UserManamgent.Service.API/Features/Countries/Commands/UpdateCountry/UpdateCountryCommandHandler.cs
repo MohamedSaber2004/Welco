@@ -35,6 +35,9 @@ namespace UserManamgent.Service.API.Features.Countries.Commands.UpdateCountry
                 : "System";
 
             country.Update(request.NameEn, request.NameAr, request.Code, request.PhoneCode, currentUserId);
+
+            if (request.IsActive.HasValue)
+                country.SetActiveState(request.IsActive.Value, currentUserId);
             countryRepo.Update(country);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 

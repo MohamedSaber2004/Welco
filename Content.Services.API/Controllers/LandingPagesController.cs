@@ -1,5 +1,6 @@
 using Content.Services.API.ContentRoutes;
 using Content.Services.API.Features.LandingPages.Commands.CreateLandingPage;
+using Content.Services.API.Features.LandingPages.Commands.DeleteLandingPage;
 using Content.Services.API.Features.LandingPages.Commands.UpdateLandingPage;
 using Content.Services.API.Features.LandingPages.Queries.GetLandingPageBySlug;
 using Content.Services.API.Features.LandingPages.Queries.GetLandingPages;
@@ -53,6 +54,17 @@ namespace Content.Services.API.Controllers
         {
             cmd.Id = id;
             return ToActionResult(await _mediator.Send(cmd, ct));
+        }
+
+        /// <summary>
+        /// Delete LandingPage
+        /// </summary>
+        [HttpDelete]
+        [Route(ContentApiRoutes.LandingPages.Delete)]
+        [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
+        public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken ct)
+        {
+            return ToActionResult(await _mediator.Send(new DeleteLandingPageCommand { Id = id }, ct));
         }
     }
 }

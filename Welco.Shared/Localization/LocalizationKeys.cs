@@ -420,6 +420,7 @@ namespace Welco.Shared.Localization
             public const string TypeRequired = "LandingPage.TypeRequired";
             public const string HeroTitleRequired = "LandingPage.HeroTitleRequired";
             public const string Updated = "LandingPage.Updated";
+            public const string Deleted = "LandingPage.Deleted";
             public const string LandingPageIdRequired = "LandingPage.LandingPageIdRequired";
         }
 

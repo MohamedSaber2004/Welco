@@ -10,5 +10,6 @@ namespace UserManamgent.Service.API.Features.Zones.Commands.UpdateZone
         public Guid? CityId { get; set; }
         public string? NameEn { get; set; }
         public string? NameAr { get; set; }
+        public bool? IsActive { get; set; }
     }
 }

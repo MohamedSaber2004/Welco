@@ -36,6 +36,9 @@ namespace Content.Services.API.Features.HelpCategories.Commands.UpdateHelpCatego
             entity.Name = request.Name.Trim();
             entity.Icon = request.Icon?.Trim();
             entity.MarkAsUpdated(currentUserId);
+
+            if (request.IsActive.HasValue)
+                entity.SetActiveState(request.IsActive.Value, currentUserId);
             repo.Update(entity);
             await _uow.SaveChangesAsync(cancellationToken);
 

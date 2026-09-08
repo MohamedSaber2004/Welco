@@ -42,6 +42,7 @@ namespace Content.Services.API.Common
             Name = c.Name,
             Icon = c.Icon,
             ArticleCount = c.Articles.Count(a => !a.IsDeleted),
+            IsActive = c.IsActive,
             CreatedAt = c.CreatedAt
         };
 
@@ -53,6 +54,7 @@ namespace Content.Services.API.Common
             Title = a.Title,
             Body = a.Body,
             Slug = a.Slug,
+            IsActive = a.IsActive,
             CreatedAt = a.CreatedAt
         };
 
@@ -62,6 +64,7 @@ namespace Content.Services.API.Common
             Question = f.Question,
             Answer = f.Answer,
             SortOrder = f.SortOrder,
+            IsActive = f.IsActive,
             CreatedAt = f.CreatedAt
         };
 

@@ -60,6 +60,9 @@ namespace UserManamgent.Service.API.Features.Zones.Commands.UpdateZone
                 : "System";
 
             zone.Update(request.CityId, request.NameEn, request.NameAr, currentUserId);
+
+            if (request.IsActive.HasValue)
+                zone.SetActiveState(request.IsActive.Value, currentUserId);
             zoneRepo.Update(zone);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
