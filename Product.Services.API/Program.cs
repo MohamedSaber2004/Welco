@@ -123,6 +123,13 @@ namespace Product.Services.API
                     await db.Database.MigrateAsync();
                     await CurrencySeeder.SeedAsync(db, logger);
                     await WorldLocationSeeder.SeedAsync(db, logger);
+                    // Bogus demo data: Development only + explicit opt-in flag.
+                    // Never runs in Production (re-checked inside the seeder).
+                    if (app.Environment.IsDevelopment() &&
+                        string.Equals(Environment.GetEnvironmentVariable("SEED_DEMO_DATA"), "true", StringComparison.OrdinalIgnoreCase))
+                    {
+                        await BogusDemoSeeder.SeedDemoAsync(scope.ServiceProvider, logger);
+                    }
                 }
                 catch (Exception ex)
                 {

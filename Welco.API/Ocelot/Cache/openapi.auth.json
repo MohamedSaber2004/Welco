@@ -908,6 +908,12 @@
               "string"
             ]
           },
+          "companyEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "distributorCountryId": {
             "type": [
               "null",

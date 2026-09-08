@@ -2728,6 +2728,12 @@
           "name": {
             "type": "string"
           },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "type": {
             "$ref": "#/components/schemas/CompanyType"
           },
@@ -3015,6 +3021,12 @@
               "null",
               "string"
             ]
+          },
+          "isActive": {
+            "type": [
+              "null",
+              "boolean"
+            ]
           }
         }
       },
@@ -3088,6 +3100,12 @@
           "name": {
             "type": "string"
           },
+          "email": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "type": {
             "$ref": "#/components/schemas/CompanyType"
           },
@@ -3150,6 +3168,12 @@
             "type": [
               "null",
               "string"
+            ]
+          },
+          "isActive": {
+            "type": [
+              "null",
+              "boolean"
             ]
           }
         }
@@ -3228,6 +3252,12 @@
             "type": [
               "null",
               "string"
+            ]
+          },
+          "isActive": {
+            "type": [
+              "null",
+              "boolean"
             ]
           }
         }
