@@ -1,6 +1,8 @@
 using System.Reflection;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Scalar.AspNetCore;
 using Welco.Shared;
 using Welco.Shared.Common.Behaviors;
@@ -9,6 +11,7 @@ using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Middlewares;
 using Welco.Shared.Localization;
 using Welco.Shared.OpenApi;
+using Welco.Shared.Persistance.Seeding;
 
 namespace UserManamgent.Service.API
 {
@@ -78,6 +81,22 @@ namespace UserManamgent.Service.API
             });
 
             var app = builder.Build();
+
+            // Ensure Identity roles exist (seeded from the UserType enum, incl.
+            // Customer) so admin-created users can be assigned any role even if
+            // the Auth service hasn't started yet. Idempotent.
+            using (var scope = app.Services.CreateScope())
+            {
+                try
+                {
+                    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+                    await RoleSeeder.SeedRolesAsync(roleManager, logger);
+                }
+                catch (Exception)
+                {
+                }
+            }
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {

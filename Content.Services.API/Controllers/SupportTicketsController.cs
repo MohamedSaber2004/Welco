@@ -28,7 +28,7 @@ namespace Content.Services.API.Controllers
 
         [HttpGet]
         [Route(ContentApiRoutes.SupportTickets.GetMy)]
-        [RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)]
+        [RoleAuthorize(UserType.OrganizationUser, UserType.Customer, UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> GetMy(CancellationToken ct) => ToActionResult(await _mediator.Send(new GetMyTicketsQuery(), ct));
 
         [HttpGet]
@@ -38,7 +38,7 @@ namespace Content.Services.API.Controllers
 
         [HttpPost]
         [Route(ContentApiRoutes.SupportTickets.Create)]
-        [RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)]
+        [RoleAuthorize(UserType.OrganizationUser, UserType.Customer, UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> Create([FromBody] CreateTicketCommand cmd, CancellationToken ct) => ToActionResult(await _mediator.Send(cmd, ct));
 
         [HttpPost]

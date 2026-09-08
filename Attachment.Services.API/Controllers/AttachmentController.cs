@@ -30,7 +30,7 @@ namespace Attachment.Services.API.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route(AttachmentApiRoutes.Attachments.Upload)]
-        [RoleAuthorize(UserType.OrganizationUser, UserType.WelcoStaff, UserType.Admin)]
+        [RoleAuthorize(UserType.OrganizationUser, UserType.Customer, UserType.WelcoStaff, UserType.Admin)]
         [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -48,7 +48,7 @@ namespace Attachment.Services.API.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route(AttachmentApiRoutes.Attachments.UploadMultiple)]
-        [RoleAuthorize(UserType.OrganizationUser, UserType.WelcoStaff, UserType.Admin)]
+        [RoleAuthorize(UserType.OrganizationUser, UserType.Customer, UserType.WelcoStaff, UserType.Admin)]
         [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -67,7 +67,7 @@ namespace Attachment.Services.API.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route(AttachmentApiRoutes.Attachments.Update)]
-        [RoleAuthorize(UserType.OrganizationUser, UserType.WelcoStaff, UserType.Admin)]
+        [RoleAuthorize(UserType.OrganizationUser, UserType.Customer, UserType.WelcoStaff, UserType.Admin)]
         [Consumes("multipart/form-data")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

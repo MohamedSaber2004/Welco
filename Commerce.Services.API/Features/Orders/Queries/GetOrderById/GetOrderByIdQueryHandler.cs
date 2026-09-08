@@ -39,7 +39,7 @@ namespace Commerce.Services.API.Features.Orders.Queries.GetOrderById
             {
                 var userRepo = _uow.GetRepository<ApplicationUser, Guid>();
                 var user = await userRepo.GetByIdAsync(_currentUser.UserId, cancellationToken);
-                if (user != null && !user.IsDeleted && user.UserType == UserType.OrganizationUser)
+                if (user != null && !user.IsDeleted && (user.UserType == UserType.OrganizationUser || user.UserType == UserType.Customer))
                 {
                     var isOwner = order.UserId == user.Id || (user.CompanyId.HasValue && order.CompanyId == user.CompanyId.Value);
                     if (!isOwner) return Result<OrderDto>.NotFound(LocalizationKeys.Order.NotFound);
