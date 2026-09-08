@@ -408,7 +408,9 @@
     "SlugAlreadyExists": "Landing page slug already exists.",
     "SlugRequired": "Landing page slug is required.",
     "TypeRequired": "Landing page type is required.",
-    "HeroTitleRequired": "Hero title is required."
+    "HeroTitleRequired": "Hero title is required.",
+      "Updated": "Landing page updated successfully.",
+      "LandingPageIdRequired": "Landing page ID is required."
   },
   "RFQ": {
     "Created": "RFQ created successfully.",

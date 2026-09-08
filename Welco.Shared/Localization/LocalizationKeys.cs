@@ -419,6 +419,8 @@ namespace Welco.Shared.Localization
             public const string SlugRequired = "LandingPage.SlugRequired";
             public const string TypeRequired = "LandingPage.TypeRequired";
             public const string HeroTitleRequired = "LandingPage.HeroTitleRequired";
+            public const string Updated = "LandingPage.Updated";
+            public const string LandingPageIdRequired = "LandingPage.LandingPageIdRequired";
         }
 
         public static class RFQ

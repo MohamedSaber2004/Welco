@@ -18,7 +18,7 @@ namespace Content.Services.API.Features.LandingPages.Queries.GetLandingPageBySlu
         {
             var repo = _uow.GetRepository<LandingPageEntity, Guid>();
             var slug = request.Slug.Trim().ToLowerInvariant();
-            var dto = await repo.GetAll(x => !x.IsDeleted && x.Slug.ToLower() == slug)
+            var dto = await repo.GetAll(x => !x.IsDeleted && x.IsActive && x.Slug.ToLower() == slug)
                 .Select(ContentDtoMapper.LandingPageProjection)
                 .FirstOrDefaultAsync(cancellationToken);
 

@@ -368,7 +368,9 @@
     "SlugAlreadyExists": "الاسم الرابط موجود بالفعل.",
     "SlugRequired": "الاسم الرابط مطلوب.",
     "TypeRequired": "نوع صفحة الهبوط مطلوب.",
-    "HeroTitleRequired": "العنوان الرئيسي مطلوب."
+    "HeroTitleRequired": "العنوان الرئيسي مطلوب.",
+      "Updated": "تم تحديث صفحة الهبوط بنجاح.",
+      "LandingPageIdRequired": "معرف صفحة الهبوط مطلوب."
   },
   "RFQ": {
     "Created": "تم إنشاء طلب التسعير بنجاح.",

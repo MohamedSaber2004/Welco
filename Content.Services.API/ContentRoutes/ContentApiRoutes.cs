@@ -24,6 +24,7 @@ namespace Content.Services.API.ContentRoutes
             public const string GetAll = "";
             public const string GetBySlug = "slug/{slug}";
             public const string Create = "";
+            public const string Update = "{id}";
         }
         public static class HelpCategories
         {

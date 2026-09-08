@@ -30,6 +30,9 @@ namespace Content.Services.API.Common
             Type = l.Type,
             Slug = l.Slug,
             HeroTitle = l.HeroTitle,
+            HeroBody = l.HeroBody,
+            ContentBlock = l.ContentBlock,
+            IsActive = l.IsActive,
             CreatedAt = l.CreatedAt
         };
 

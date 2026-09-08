@@ -1,5 +1,6 @@
 using Content.Services.API.ContentRoutes;
 using Content.Services.API.Features.LandingPages.Commands.CreateLandingPage;
+using Content.Services.API.Features.LandingPages.Commands.UpdateLandingPage;
 using Content.Services.API.Features.LandingPages.Queries.GetLandingPageBySlug;
 using Content.Services.API.Features.LandingPages.Queries.GetLandingPages;
 using MediatR;
@@ -41,5 +42,17 @@ namespace Content.Services.API.Controllers
         [Route(ContentApiRoutes.LandingPages.Create)]
         [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> Create([FromBody] CreateLandingPageCommand cmd, CancellationToken ct) => ToActionResult(await _mediator.Send(cmd, ct));
+
+        /// <summary>
+        /// Update LandingPage
+        /// </summary>
+        [HttpPut]
+        [Route(ContentApiRoutes.LandingPages.Update)]
+        [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
+        public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateLandingPageCommand cmd, CancellationToken ct)
+        {
+            cmd.Id = id;
+            return ToActionResult(await _mediator.Send(cmd, ct));
+        }
     }
 }

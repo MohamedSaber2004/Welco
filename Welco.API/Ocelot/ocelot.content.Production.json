@@ -1,5 +1,22 @@
-﻿{
+{
   "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/v1/landing-pages",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-content.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/landing-pages",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": false
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/landing-pages",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-content.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/landing-pages",
+      "UpstreamHttpMethod": [ "POST", "PUT" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer", "AllowedScopes": [] },
+      "DangerousAcceptAnyServerCertificateValidator": false
+    },
     {
       "DownstreamPathTemplate": "/api/v1/documents/{everything}",
       "DownstreamScheme": "https",
