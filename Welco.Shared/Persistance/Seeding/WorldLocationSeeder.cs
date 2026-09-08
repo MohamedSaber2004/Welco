@@ -139,7 +139,7 @@ namespace Welco.Shared.Persistance.Seeding
                 var key = $"{c.Code}|{c.NameEn}";
                 if (existSet.Contains(key)) continue;
                 // also skip if a country with same code and similar name already exists? we allow duplicates for previously wrong CA etc, but check by code+name
-                var existsSameCodeName = existing.Any(e => e.Code.Equals(c.Code, StringComparison.OrdinalIgnoreCase) && e.NameEn.Equals(c.NameEn, StringComparison.OrdinalIgnoreCase));
+                var existsSameCodeName = existing.Any(e => string.Equals(e.Code, c.Code, StringComparison.OrdinalIgnoreCase) && string.Equals(e.NameEn, c.NameEn, StringComparison.OrdinalIgnoreCase));
                 if (existsSameCodeName) continue;
                 var ent = Country.Create(c.NameEn, c.NameAr, c.Code, c.PhoneCode, "Seeder");
                 toAddCountries.Add(ent);

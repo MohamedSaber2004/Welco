@@ -225,4 +225,31 @@ public class ExchangeRateServiceTests : IDisposable
         var after = await _db.ExchangeRates.CountAsync();
         Assert.Equal(before, after);
     }
+
+    [Fact]
+    public async Task SyncLatestRates_SetsLogSuccessAndRatesCount()
+    {
+        var res = await _svc.SyncLatestRatesAsync(CancellationToken.None);
+        Assert.True(res.Success);
+        Assert.True(res.RatesCount > 0);
+
+        var log = await _db.ExchangeRateSyncLogs.OrderByDescending(l => l.StartedAt).FirstOrDefaultAsync();
+        Assert.NotNull(log);
+        Assert.Equal(ExchangeRateSyncStatus.Success, log.Status);
+        Assert.Equal(res.RatesCount, log.RatesCount);
+        Assert.Equal("USD", log.BaseCurrency);
+    }
+
+    [Fact]
+    public async Task SyncLatestRates_WhenProviderFails_SetsLogFailed()
+    {
+        _provider.ShouldFail = true;
+        var res = await _svc.SyncLatestRatesAsync(CancellationToken.None);
+        Assert.False(res.Success);
+
+        var log = await _db.ExchangeRateSyncLogs.OrderByDescending(l => l.StartedAt).FirstOrDefaultAsync();
+        Assert.NotNull(log);
+        Assert.Equal(ExchangeRateSyncStatus.Failed, log.Status);
+        Assert.False(string.IsNullOrWhiteSpace(log.ErrorMessage));
+    }
 }

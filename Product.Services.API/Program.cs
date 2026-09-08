@@ -1,13 +1,18 @@
 using System.Reflection;
 using FluentValidation;
+using Hangfire;
+using Hangfire.SqlServer;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Product.Services.API.Filters;
+using Product.Services.API.Jobs;
 using Scalar.AspNetCore;
 using Welco.Shared;
 using Welco.Shared.Common.Behaviors;
 using Welco.Shared.Common.Extensions;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Middlewares;
+using Welco.Shared.Common.Options;
 using Welco.Shared.Localization;
 using Welco.Shared.OpenApi;
 using Welco.Shared.Persistance;
@@ -82,6 +87,35 @@ namespace Product.Services.API
                 });
             });
 
+            // Hangfire background jobs (exclusively hosted in Product.Services.API)
+            var connectionString = builder.Configuration.GetConnectionString("DatabaseConnection")
+                ?? builder.Configuration["DatabaseConnection"];
+
+            if (!string.IsNullOrWhiteSpace(connectionString))
+            {
+                builder.Services.AddHangfire(configuration => configuration
+                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseRecommendedSerializerSettings()
+                    .UseSqlServerStorage(connectionString, new SqlServerStorageOptions
+                    {
+                        CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                        SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                        QueuePollInterval = TimeSpan.Zero,
+                        UseRecommendedIsolationLevel = true,
+                        DisableGlobalLocks = true,
+                        PrepareSchemaIfNecessary = true
+                    }));
+
+                builder.Services.AddHangfireServer(options =>
+                {
+                    options.WorkerCount = Math.Max(Environment.ProcessorCount, 2);
+                    options.ServerName = "ProductService-ExchangeRateServer";
+                });
+
+                builder.Services.AddScoped<ExchangeRateSyncJob>();
+            }
+
             var app = builder.Build();
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -112,6 +146,15 @@ namespace Product.Services.API
             });
             app.MapControllers();
 
+            if (!string.IsNullOrWhiteSpace(connectionString))
+            {
+                app.UseHangfireDashboard("/hangfire", new DashboardOptions
+                {
+                    Authorization = new[] { new HangfireAuthorizationFilter() },
+                    DashboardTitle = "Welco - Background Jobs"
+                });
+            }
+
             // Auto-migrate and seed currencies + world locations - non-destructive
             if (!app.Environment.IsEnvironment("Test"))
             {
@@ -123,18 +166,57 @@ namespace Product.Services.API
                     await db.Database.MigrateAsync();
                     await CurrencySeeder.SeedAsync(db, logger);
                     await WorldLocationSeeder.SeedAsync(db, logger);
-                    // Bogus demo data: Development only + explicit opt-in flag.
+                    // Bogus demo data: Development only + explicit opt-in flag
+                    // (Seeding:SeedDemoData=true in config OR SEED_DEMO_DATA=true env var).
                     // Never runs in Production (re-checked inside the seeder).
-                    if (app.Environment.IsDevelopment() &&
-                        string.Equals(Environment.GetEnvironmentVariable("SEED_DEMO_DATA"), "true", StringComparison.OrdinalIgnoreCase))
+                    if (BogusDemoSeeder.ShouldSeedDemoData(app.Environment, app.Configuration, out var demoReason))
                     {
+                        logger.LogInformation("Bogus demo seeding {Reason}", demoReason);
                         await BogusDemoSeeder.SeedDemoAsync(scope.ServiceProvider, logger);
+                    }
+                    else
+                    {
+                        logger.LogInformation("Bogus demo seeding {Reason}", demoReason);
                     }
                 }
                 catch (Exception ex)
                 {
                     var logger = app.Services.GetRequiredService<ILogger<Program>>();
                     logger.LogError(ex, "Seeding / migration failed");
+                }
+
+                // Register Recurring Hangfire Job for Exchange Rate Sync
+                if (!string.IsNullOrWhiteSpace(connectionString))
+                {
+                    try
+                    {
+                        var recurringJobManager = app.Services.GetService<IRecurringJobManager>();
+                        if (recurringJobManager != null)
+                        {
+                            var exchangeRateSettings = app.Configuration.GetSection(ExchangeRateSettings.SectionName).Get<ExchangeRateSettings>() ?? new ExchangeRateSettings();
+                            var intervalHours = exchangeRateSettings.SyncIntervalHours > 0 ? exchangeRateSettings.SyncIntervalHours : 24;
+
+                            var cronExpression = intervalHours switch
+                            {
+                                1 => Cron.Hourly(),
+                                > 1 and < 24 => Cron.HourInterval(intervalHours),
+                                _ => Cron.Daily()
+                            };
+
+                            recurringJobManager.AddOrUpdate<ExchangeRateSyncJob>(
+                                "sync-latest-exchange-rates",
+                                job => job.ExecuteAsync(),
+                                cronExpression);
+
+                            var logger = app.Services.GetRequiredService<ILogger<Program>>();
+                            logger.LogInformation("Hangfire recurring job 'sync-latest-exchange-rates' registered (interval: {Hours}h)", intervalHours);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+                        logger.LogError(ex, "Failed to register recurring Hangfire jobs");
+                    }
                 }
             }
 

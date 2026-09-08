@@ -105,8 +105,6 @@ namespace Welco.Shared
                 client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds > 0 ? opts.TimeoutSeconds : 10);
             });
 
-            services.AddHostedService<ExchangeRateSyncBackgroundService>();
-
             services.AddScoped<IWelcoDbContext>(provider => provider.GetRequiredService<WelcoDbContext>());
 
             return services;

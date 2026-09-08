@@ -1,12 +1,17 @@
+using Hangfire;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Product.Services.API.Jobs;
 using Product.Services.API.ProductRoutes;
 using Welco.Shared.Common.Attributes;
 using Welco.Shared.Common.DTOs.Products;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Controllers;
+using Welco.Shared.Domain.Models;
 using Welco.Shared.Enums;
+using Welco.Shared.Persistance;
 using Welco.Shared.Results;
 
 namespace Product.Services.API.Controllers
@@ -131,6 +136,30 @@ namespace Product.Services.API.Controllers
             var result = await _service.SyncHistoricalRatesAsync(d, ct);
             if (!result.Success) return ToActionResult(Result<ExchangeRateSyncResult>.Failure(result.ErrorMessage ?? "Sync failed", 502));
             return ToActionResult(Result<ExchangeRateSyncResult>.Success(result));
+        }
+
+        /// <summary>Enqueue background sync via Hangfire - Admin only</summary>
+        [HttpPost]
+        [Route("sync/enqueue")]
+        [RoleAuthorize(UserType.Admin)]
+        public IActionResult EnqueueSync([FromServices] IBackgroundJobClient backgroundJobs)
+        {
+            var jobId = backgroundJobs.Enqueue<ExchangeRateSyncJob>(job => job.ExecuteAsync());
+            return ToActionResult(Result<string>.Success(jobId, "Exchange rate sync job enqueued in Hangfire"));
+        }
+
+        /// <summary>Recent sync logs</summary>
+        [HttpGet]
+        [Route(ProductApiRoutes.ExchangeRates.SyncLogs)]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetSyncLogs([FromServices] WelcoDbContext db, [FromQuery] int take = 10, CancellationToken ct = default)
+        {
+            var logs = await db.ExchangeRateSyncLogs
+                .AsNoTracking()
+                .OrderByDescending(l => l.StartedAt)
+                .Take(Math.Clamp(take, 1, 100))
+                .ToListAsync(ct);
+            return ToActionResult(Result<List<ExchangeRateSyncLog>>.Success(logs));
         }
     }
 }

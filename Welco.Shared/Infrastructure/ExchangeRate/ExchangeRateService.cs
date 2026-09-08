@@ -200,7 +200,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 StartedAt = started,
                 BaseCurrency = baseCurrency,
                 Source = _provider.ProviderName,
-                Status = ExchangeRateSyncStatus.Success
+                Status = ExchangeRateSyncStatus.Pending
             };
             log.MarkAsCreated("System");
             _db.ExchangeRateSyncLogs.Add(log);
@@ -245,9 +245,12 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
 
                 // Bulk upsert for today's RateDate (do not overwrite history)
                 var targetDate = response.Date;
-                // Ensure we use rateDate param for consistency? Provider's date is authoritative (e.g., Frankfurter date)
-                // Use provider date for storage
                 var currencies = await _db.Currencies.Where(c => !c.IsDeleted).ToDictionaryAsync(c => c.Code, c => c, StringComparer.OrdinalIgnoreCase, cancellationToken);
+
+                // Fetch all existing rates for base currency & targetDate in a single batch query
+                var existingRates = await _db.ExchangeRates
+                    .Where(r => r.BaseCurrencyId == baseCurr.Id && r.RateDate == targetDate && !r.IsDeleted)
+                    .ToDictionaryAsync(r => r.TargetCurrencyId, cancellationToken);
 
                 var count = 0;
                 // NOTE: DbContext is configured with EnableRetryOnFailure, whose
@@ -269,12 +272,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                                 continue;
                             }
 
-                            var existing = await _db.ExchangeRates.FirstOrDefaultAsync(r =>
-                                r.BaseCurrencyId == baseCurr.Id &&
-                                r.TargetCurrencyId == targetCurr.Id &&
-                                r.RateDate == targetDate, cancellationToken);
-
-                            if (existing != null)
+                            if (existingRates.TryGetValue(targetCurr.Id, out var existing))
                             {
                                 // Update today's rate if changed (idempotent)
                                 if (existing.Rate != kv.Value || existing.Source != response.Source)
@@ -299,6 +297,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                                 };
                                 er.MarkAsCreated("System");
                                 _db.ExchangeRates.Add(er);
+                                existingRates[targetCurr.Id] = er;
                             }
                             count++;
                         }
@@ -341,12 +340,25 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             catch (Exception ex)
             {
                 _logger.LogError(ex, "ExchangeRate sync failed {Base} {Provider}", baseCurrency, _provider.ProviderName);
-                log.CompletedAt = DateTime.UtcNow;
-                log.Status = ExchangeRateSyncStatus.Failed;
-                log.ErrorMessage = ex.Message.Length > 2000 ? ex.Message[..2000] : ex.Message;
-                log.Source = _provider.ProviderName;
-                log.MarkAsUpdated("System");
-                await _db.SaveChangesAsync(cancellationToken);
+                try
+                {
+                    _db.ChangeTracker.Clear();
+                    var errorLog = await _db.ExchangeRateSyncLogs.FirstOrDefaultAsync(l => l.Id == log.Id, CancellationToken.None) ?? log;
+                    errorLog.CompletedAt = DateTime.UtcNow;
+                    errorLog.Status = ExchangeRateSyncStatus.Failed;
+                    errorLog.ErrorMessage = ex.Message.Length > 2000 ? ex.Message[..2000] : ex.Message;
+                    errorLog.Source = _provider.ProviderName;
+                    errorLog.MarkAsUpdated("System");
+                    if (_db.Entry(errorLog).State == EntityState.Detached)
+                    {
+                        _db.ExchangeRateSyncLogs.Update(errorLog);
+                    }
+                    await _db.SaveChangesAsync(CancellationToken.None);
+                }
+                catch (Exception logEx)
+                {
+                    _logger.LogError(logEx, "Failed to persist error state into ExchangeRateSyncLog {Id}", log.Id);
+                }
 
                 return new ExchangeRateSyncResult
                 {

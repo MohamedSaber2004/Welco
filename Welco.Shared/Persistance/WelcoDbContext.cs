@@ -149,7 +149,11 @@ namespace Welco.Shared.Persistance
                     switch (entry.State)
                     {
                         case EntityState.Added:
-                            baseEntity.MarkAsCreated(currentUserId);
+                            // Preserve an explicitly assigned creator (e.g. seeders
+                            // stamping CreatedBy = "BogusSeeder"/"Seeder"); only
+                            // default to the ambient user when nothing was set.
+                            if (string.IsNullOrWhiteSpace(baseEntity.CreatedBy))
+                                baseEntity.MarkAsCreated(currentUserId);
                             break;
 
                         case EntityState.Modified:
@@ -167,7 +171,8 @@ namespace Welco.Shared.Persistance
                     switch (entry.State)
                     {
                         case EntityState.Added:
-                            userEntity.MarkAsCreated(currentUserId);
+                            if (string.IsNullOrWhiteSpace(userEntity.CreatedBy))
+                                userEntity.MarkAsCreated(currentUserId);
                             break;
 
                         case EntityState.Modified:

@@ -4,6 +4,7 @@ namespace Welco.Shared.Domain.Models
 {
     public enum ExchangeRateSyncStatus
     {
+        Pending = 0,
         Success = 1,
         Failed = 2,
         Partial = 3
