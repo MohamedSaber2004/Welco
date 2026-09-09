@@ -10,5 +10,7 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetCompanies
         public int PageSize { get; set; } = 10;
         public string? SearchTerm { get; set; }
         public bool? IsActive { get; set; }
+        public bool? IsProvider { get; set; }
+        public Welco.Shared.Enums.CompanyType? Type { get; set; }
     }
 }

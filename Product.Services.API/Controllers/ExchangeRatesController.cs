@@ -1,9 +1,7 @@
-using Hangfire;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Product.Services.API.Jobs;
 using Product.Services.API.ProductRoutes;
 using Welco.Shared.Common.Attributes;
 using Welco.Shared.Common.DTOs.Products;
@@ -136,16 +134,6 @@ namespace Product.Services.API.Controllers
             var result = await _service.SyncHistoricalRatesAsync(d, ct);
             if (!result.Success) return ToActionResult(Result<ExchangeRateSyncResult>.Failure(result.ErrorMessage ?? "Sync failed", 502));
             return ToActionResult(Result<ExchangeRateSyncResult>.Success(result));
-        }
-
-        /// <summary>Enqueue background sync via Hangfire - Admin only</summary>
-        [HttpPost]
-        [Route("sync/enqueue")]
-        [RoleAuthorize(UserType.Admin)]
-        public IActionResult EnqueueSync([FromServices] IBackgroundJobClient backgroundJobs)
-        {
-            var jobId = backgroundJobs.Enqueue<ExchangeRateSyncJob>(job => job.ExecuteAsync());
-            return ToActionResult(Result<string>.Success(jobId, "Exchange rate sync job enqueued in Hangfire"));
         }
 
         /// <summary>Recent sync logs</summary>

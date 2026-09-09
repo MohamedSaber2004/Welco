@@ -7,6 +7,7 @@ namespace Welco.Shared.Domain.Models
     {
         public string Name { get; set; } = null!;
         public string? Email { get; set; }
+        public string? ImageName { get; set; }
         public CompanyType Type { get; set; }
         public Guid CountryId { get; set; }
         public virtual Country? Country { get; set; }
@@ -26,13 +27,15 @@ namespace Welco.Shared.Domain.Models
             CompanyStatus status,
             Guid? accountManagerId,
             string createdBy,
-            string? email = null)
+            string? email = null,
+            string? imageName = null)
         {
             var company = new Company
             {
                 Id = Guid.NewGuid(),
                 Name = name,
                 Email = NormalizeEmail(email),
+                ImageName = string.IsNullOrWhiteSpace(imageName) ? null : imageName.Trim(),
                 Type = type,
                 CountryId = countryId,
                 TierLevel = tierLevel,
@@ -51,10 +54,13 @@ namespace Welco.Shared.Domain.Models
             CompanyStatus status,
             Guid? accountManagerId,
             string updatedBy,
-            string? email = null)
+            string? email = null,
+            string? imageName = null)
         {
             Name = name.Trim();
             Email = NormalizeEmail(email);
+            if (imageName != null)
+                ImageName = string.IsNullOrWhiteSpace(imageName) ? null : imageName.Trim();
             Type = type;
             CountryId = countryId;
             TierLevel = tierLevel;

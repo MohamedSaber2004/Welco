@@ -28,12 +28,12 @@ namespace Commerce.Services.API.Features.Orders.Queries.GetOrders
             var repo = _uow.GetRepository<OrderEntity, Guid>();
             var query = repo.GetAll(o => !o.IsDeleted).AsNoTracking();
 
-            // Organization users and Customers only see orders for their own company or user account.
+            // Organization users only see orders for their own company or user account.
             if (_currentUser.UserId != Guid.Empty)
             {
                 var userRepo = _uow.GetRepository<ApplicationUser, Guid>();
                 var user = await userRepo.GetByIdAsync(_currentUser.UserId, cancellationToken);
-                if (user != null && !user.IsDeleted && (user.UserType == UserType.OrganizationUser || user.UserType == UserType.Customer))
+                if (user != null && !user.IsDeleted && user.UserType == UserType.OrganizationUser)
                 {
                     if (user.CompanyId.HasValue)
                         query = query.Where(o => o.CompanyId == user.CompanyId.Value || o.UserId == user.Id);

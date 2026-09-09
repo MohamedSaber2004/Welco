@@ -82,8 +82,8 @@ namespace UserManamgent.Service.API
 
             var app = builder.Build();
 
-            // Ensure Identity roles exist (seeded from the UserType enum, incl.
-            // Customer) so admin-created users can be assigned any role even if
+            // Ensure Identity roles exist (seeded from the UserType enum)
+            // so admin-created users can be assigned any role even if
             // the Auth service hasn't started yet. Idempotent.
             using (var scope = app.Services.CreateScope())
             {

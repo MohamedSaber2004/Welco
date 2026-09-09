@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using UserManamgent.Service.API.Features.Companies.Commands.CreateCompany;
@@ -20,7 +21,7 @@ namespace UserManamgent.Service.API.Controllers
     {
         public CompaniesController(IMediator mediator) : base(mediator) { }
         [HttpGet][Route(UserManagementApiRoutes.Companies.GetMyCompany)] public async Task<IActionResult> GetMyCompany(CancellationToken ct) => ToActionResult(await _mediator.Send(new GetMyCompanyQuery(), ct));
-        [HttpGet][Route(UserManagementApiRoutes.Companies.GetAll)] public async Task<IActionResult> GetAll([FromQuery] GetCompaniesQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
+        [HttpGet][Route(UserManagementApiRoutes.Companies.GetAll)][AllowAnonymous] public async Task<IActionResult> GetAll([FromQuery] GetCompaniesQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
         [HttpGet][Route(UserManagementApiRoutes.Companies.GetById)] public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetCompanyByIdQuery { Id = id }, ct));
         [HttpPost][Route(UserManagementApiRoutes.Companies.Create)][RoleAuthorize(UserType.Admin)] public async Task<IActionResult> Create([FromBody] CreateCompanyCommand c, CancellationToken ct) => ToActionResult(await _mediator.Send(c, ct));
         [HttpPut][Route(UserManagementApiRoutes.Companies.Update)][RoleAuthorize(UserType.Admin)] public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateCompanyCommand c, CancellationToken ct) { c.Id = id; return ToActionResult(await _mediator.Send(c, ct)); }

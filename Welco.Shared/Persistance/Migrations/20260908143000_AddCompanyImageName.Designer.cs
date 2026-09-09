@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Welco.Shared.Persistance;
 
@@ -11,9 +12,10 @@ using Welco.Shared.Persistance;
 namespace Welco.Shared.Persistance.Migrations
 {
     [DbContext(typeof(WelcoDbContext))]
-    partial class WelcoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260908143000_AddCompanyImageName")]
+    partial class AddCompanyImageName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3469,3 +3471,4 @@ namespace Welco.Shared.Persistance.Migrations
         }
     }
 }
+

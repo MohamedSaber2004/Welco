@@ -46,7 +46,10 @@ namespace Product.Services.API.Features.Products.Queries.GetProducts
                 query = query.Where(p => p.LengthCm.HasValue && p.LengthCm.Value <= request.LengthMax.Value);
 
             if (request.CategoryId.HasValue)
-                query = query.Where(p => p.CategoryId == request.CategoryId.Value);
+            {
+                var targetCatId = request.CategoryId.Value;
+                query = query.Where(p => p.CategoryId == targetCatId || (p.Category != null && p.Category.ParentCategoryId == targetCatId));
+            }
 
             if (request.IsActive.HasValue)
             {

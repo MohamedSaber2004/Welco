@@ -15,5 +15,6 @@ namespace UserManamgent.Service.API.Features.Companies.Commands.UpdateCompany
         public CompanyStatus Status { get; set; }
         public Guid? AccountManagerId { get; set; }
         public bool? IsActive { get; set; }
+        public string? ImageName { get; set; }
     }
 }

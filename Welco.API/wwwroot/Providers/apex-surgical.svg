@@ -1,0 +1,21 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 140" width="400" height="140">
+  <defs>
+    <linearGradient id="apex-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="apex-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#4F46E5"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="140" rx="16" fill="url(#apex-bg)"/>
+  <rect x="1" y="1" width="398" height="138" rx="15" fill="none" stroke="#334155" stroke-width="1.5"/>
+  <g transform="translate(36, 30)">
+    <rect width="80" height="80" rx="14" fill="url(#apex-accent)"/>
+    <path d="M40 18 L58 54 L49 54 L40 34 L31 54 L22 54 Z" fill="#FFFFFF"/>
+    <circle cx="40" cy="62" r="3.5" fill="#A5B4FC"/>
+  </g>
+  <text x="134" y="66" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="22" font-weight="800" fill="#FFFFFF" letter-spacing="-0.02em">APEX SURGICAL</text>
+  <text x="135" y="90" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="600" fill="#94A3B8" letter-spacing="0.08em">PRECISION SUPPLIES · EST. 1998</text>
+</svg>

@@ -30,6 +30,14 @@ namespace Welco.Shared.Persistance.Seeding
                         logger?.LogInformation("Seeded role: {RoleName} with Id: {RoleId}", roleName, identityRole.Id);
                     }
                 }
+
+                // Remove obsolete Customer role if it exists
+                var obsoleteCustomerRole = await roleManager.FindByNameAsync("Customer");
+                if (obsoleteCustomerRole != null)
+                {
+                    await roleManager.DeleteAsync(obsoleteCustomerRole);
+                    logger?.LogInformation("Removed obsolete Customer role from Identity");
+                }
             }
             catch (Exception ex)
             {

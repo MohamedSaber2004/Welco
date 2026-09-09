@@ -72,6 +72,22 @@ namespace Welco.Shared.Persistance.Seeding
             "Arthroscopy", "Spine Fusion", "Rhinoplasty", "Otology",
         };
 
+        private static readonly (string Name, string ImageName, CompanyType Type)[] CompanySeedList =
+        {
+            ("Apex Surgical Supplies", "apex-surgical.svg", CompanyType.Distributor),
+            ("MedCore Distributors", "medcore.svg", CompanyType.Distributor),
+            ("Gulf Medical Trading", "gulf-medical.svg", CompanyType.Distributor),
+            ("CityCare Hospitals Group", "citycare.svg", CompanyType.Hospital),
+            ("Nova Health Clinic", "nova-health.svg", CompanyType.Clinic),
+            ("PrimeCare Medical", "primecare.svg", CompanyType.Clinic),
+            ("Sahara Med Import", "sahara-med.svg", CompanyType.Importer),
+            ("Delta Surgical Co.", "delta-surgical.svg", CompanyType.Distributor),
+            ("LifeLine Hospitals", "lifeline.svg", CompanyType.Hospital),
+            ("OrthoPlus Distributors", "orthoplus.svg", CompanyType.Distributor),
+            ("CarePoint Clinics", "carepoint.svg", CompanyType.Clinic),
+            ("Meridian Med Import", "meridian.svg", CompanyType.Importer),
+        };
+
         private static readonly string[] CompanyNames =
         {
             "Apex Surgical Supplies", "MedCore Distributors", "Gulf Medical Trading",
@@ -297,26 +313,49 @@ namespace Welco.Shared.Persistance.Seeding
                 List<Company> companies;
                 if (await db.Companies.AnyAsync(c => !c.IsDeleted, ct))
                 {
-                    logger.LogInformation("Companies already present, skipping Bogus company seeding.");
+                    logger.LogInformation("Companies already present, updating existing data with actual images and ensuring IsProvider = true.");
                     companies = await db.Companies.Where(c => !c.IsDeleted).Take(20).ToListAsync(ct);
+                    var updatedExisting = false;
+                    for (var idx = 0; idx < companies.Count; idx++)
+                    {
+                        var comp = companies[idx];
+                        if (!comp.IsProvider)
+                        {
+                            comp.IsProvider = true;
+                            updatedExisting = true;
+                        }
+                        if (string.IsNullOrWhiteSpace(comp.ImageName))
+                        {
+                            var seedMatch = CompanySeedList.FirstOrDefault(s => s.Name.Equals(comp.Name, StringComparison.OrdinalIgnoreCase));
+                            comp.ImageName = seedMatch.ImageName ?? CompanySeedList[idx % CompanySeedList.Length].ImageName;
+                            updatedExisting = true;
+                        }
+                    }
+                    if (updatedExisting)
+                    {
+                        await db.SaveChangesAsync(ct);
+                        logger.LogInformation("Successfully updated existing companies with actual images and provider access.");
+                    }
                 }
                 else
                 {
-                    var types = new[] { CompanyType.Distributor, CompanyType.Distributor, CompanyType.Distributor, CompanyType.Distributor, CompanyType.Hospital, CompanyType.Hospital, CompanyType.Hospital, CompanyType.Hospital, CompanyType.Clinic, CompanyType.Clinic, CompanyType.Importer, CompanyType.Importer };
                     companies = new List<Company>();
-                for (var i = 0; i < CompanyNames.Length; i++)
-                {
-                    var country = faker.PickRandom(countries);
-                    var status = i == CompanyNames.Length - 1 ? CompanyStatus.Pending : CompanyStatus.Approved;
-                    var company = Company.Create(
-                        CompanyNames[i], types[i], country.Id,
-                        faker.Random.Int(1, 3), status, null, Marker,
-                        $"info@{Slugify(CompanyNames[i])}.example.com");
-                    company.IsProvider = types[i] == CompanyType.Distributor;
-                    companies.Add(company);
-                }
-                await db.Companies.AddRangeAsync(companies, ct);
-                await db.SaveChangesAsync(ct);
+                    for (var i = 0; i < CompanySeedList.Length; i++)
+                    {
+                        var seed = CompanySeedList[i];
+                        var country = faker.PickRandom(countries);
+                        var status = i == CompanySeedList.Length - 1 ? CompanyStatus.Pending : CompanyStatus.Approved;
+                        var company = Company.Create(
+                            seed.Name, seed.Type, country.Id,
+                            faker.Random.Int(1, 3), status, null, Marker,
+                            $"info@{Slugify(seed.Name)}.example.com",
+                            seed.ImageName);
+                        // All companies are providers and can upload products
+                        company.IsProvider = true;
+                        companies.Add(company);
+                    }
+                    await db.Companies.AddRangeAsync(companies, ct);
+                    await db.SaveChangesAsync(ct);
 
                 var addresses = new List<CompanyAddress>();
                 foreach (var company in companies)
@@ -364,26 +403,34 @@ namespace Welco.Shared.Persistance.Seeding
                         $"demo.org{i + 1:00}@welco.health", faker.Name.FullName(),
                         UserType.OrganizationUser, approved[i].Id, AppLanguage.En, password, ct);
                     if (u != null) orgUsers.Add((u, approved[i]));
+
+                    var u2 = await EnsureUserAsync(userManager, logger, faker,
+                        $"demo.member{i + 1:00}@welco.health", faker.Name.FullName(),
+                        UserType.OrganizationUser, approved[i].Id, i % 2 == 0 ? AppLanguage.Ar : AppLanguage.En, password, ct);
+                    if (u2 != null) orgUsers.Add((u2, approved[i]));
                 }
-                var customers = new List<ApplicationUser>();
-                for (var i = 1; i <= 14; i++)
+
+                // Migrate any legacy users with obsolete UserType (4) to OrganizationUser
+                var legacyCustomers = await db.ApplicationUsers.Where(u => !u.IsDeleted && (int)u.UserType == 4).ToListAsync(ct);
+                if (legacyCustomers.Count > 0 && approved.Count > 0)
                 {
-                    var u = await EnsureUserAsync(userManager, logger, faker,
-                        $"demo.customer{i:00}@welco.health", faker.Name.FullName(),
-                        UserType.Customer, null, i % 3 == 0 ? AppLanguage.Ar : AppLanguage.En,
-                        password, ct);
-                    if (u != null) customers.Add(u);
+                    for (var i = 0; i < legacyCustomers.Count; i++)
+                    {
+                        var lc = legacyCustomers[i];
+                        lc.UserType = UserType.OrganizationUser;
+                        if (!lc.CompanyId.HasValue)
+                            lc.CompanyId = approved[i % approved.Count].Id;
+                    }
+                    await db.SaveChangesAsync(ct);
+                    logger.LogInformation("Migrated {Count} legacy customer users to OrganizationUser.", legacyCustomers.Count);
                 }
-                logger.LogInformation("Bogus seeded {Staff} staff, {Org} org users, {Cust} customers.",
-                    staff.Count, orgUsers.Count, customers.Count);
+
+                logger.LogInformation("Bogus seeded {Staff} staff, {Org} org users.",
+                    staff.Count, orgUsers.Count);
 
                 // Fallbacks in case users were created on a prior run or pre-existing
                 if (staff.Count == 0)
                     staff = await db.ApplicationUsers.Where(u => !u.IsDeleted && u.UserType == UserType.WelcoStaff).Take(5).ToListAsync(ct);
-                if (customers.Count == 0)
-                    customers = await db.ApplicationUsers.Where(u => !u.IsDeleted && u.UserType == UserType.Customer).Take(20).ToListAsync(ct);
-                if (customers.Count == 0)
-                    customers = await db.ApplicationUsers.Where(u => !u.IsDeleted).Take(20).ToListAsync(ct);
                 if (orgUsers.Count == 0 && approved.Count > 0)
                 {
                     var orgDbUsers = await db.ApplicationUsers.Where(u => !u.IsDeleted && u.CompanyId != null).ToListAsync(ct);
@@ -394,29 +441,35 @@ namespace Welco.Shared.Persistance.Seeding
                     }
                 }
 
-                // default address for every customer (checkout needs one) —
-                // skip customers that already have one so re-runs stay no-ops.
-                var customersWithAddress = new HashSet<Guid>(
+                var activeMembers = orgUsers.Select(x => x.User).ToList();
+                if (activeMembers.Count == 0)
+                    activeMembers = await db.ApplicationUsers.Where(u => !u.IsDeleted && u.UserType == UserType.OrganizationUser).Take(20).ToListAsync(ct);
+                if (activeMembers.Count == 0)
+                    activeMembers = await db.ApplicationUsers.Where(u => !u.IsDeleted).Take(20).ToListAsync(ct);
+
+                // default address for active members (checkout needs one) —
+                // skip members that already have one so re-runs stay no-ops.
+                var membersWithAddress = new HashSet<Guid>(
                     await db.UserAddresses.Where(a => !a.IsDeleted).Select(a => a.UserId).ToListAsync(ct));
-                var custAddresses = new List<UserAddress>();
-                foreach (var c in customers)
+                var memberAddresses = new List<UserAddress>();
+                foreach (var c in activeMembers)
                 {
-                    if (!customersWithAddress.Contains(c.Id))
+                    if (!membersWithAddress.Contains(c.Id))
                     {
                         var country = faker.PickRandom(countries);
-                    var city = await db.Cities.FirstOrDefaultAsync(x => !x.IsDeleted && x.CountryId == country.Id, ct)
-                        ?? await db.Cities.FirstOrDefaultAsync(x => !x.IsDeleted, ct);
-                    if (city == null) continue;
-                    var zone = await db.Zones.FirstOrDefaultAsync(z => !z.IsDeleted && z.CityId == city.Id, ct)
-                        ?? await db.Zones.FirstOrDefaultAsync(z => !z.IsDeleted, ct);
-                    if (zone == null) continue;
-                    custAddresses.Add(UserAddress.Create(c.Id, country.Id, city.Id, zone.Id,
-                        $"{faker.Random.Int(1, 200)} {faker.Address.StreetName()}", null, null, null, Marker, isDefault: true));
+                        var city = await db.Cities.FirstOrDefaultAsync(x => !x.IsDeleted && x.CountryId == country.Id, ct)
+                            ?? await db.Cities.FirstOrDefaultAsync(x => !x.IsDeleted, ct);
+                        if (city == null) continue;
+                        var zone = await db.Zones.FirstOrDefaultAsync(z => !z.IsDeleted && z.CityId == city.Id, ct)
+                            ?? await db.Zones.FirstOrDefaultAsync(z => !z.IsDeleted, ct);
+                        if (zone == null) continue;
+                        memberAddresses.Add(UserAddress.Create(c.Id, country.Id, city.Id, zone.Id,
+                            $"{faker.Random.Int(1, 200)} {faker.Address.StreetName()}", null, null, null, Marker, isDefault: true));
                     }
                 }
-                if (custAddresses.Count > 0)
+                if (memberAddresses.Count > 0)
                 {
-                    await db.UserAddresses.AddRangeAsync(custAddresses, ct);
+                    await db.UserAddresses.AddRangeAsync(memberAddresses, ct);
                     await db.SaveChangesAsync(ct);
                 }
 
@@ -640,9 +693,9 @@ namespace Welco.Shared.Persistance.Seeding
                     logger.LogInformation("Bogus seeded {Count} OEM inquiries.", oem.Count);
                 }
 
-                if (!await db.SupportTickets.AnyAsync(t => !t.IsDeleted, ct) && customers.Count > 0)
+                if (!await db.SupportTickets.AnyAsync(t => !t.IsDeleted, ct) && activeMembers.Count > 0)
                 {
-                    var ticketUsers = customers.Take(8).ToList();
+                    var ticketUsers = activeMembers.Take(8).ToList();
                     var statuses = new[] { "Open", "Answered", "Closed" };
                     var tickets = new List<SupportTicket>();
                     foreach (var tu in ticketUsers)
@@ -664,9 +717,9 @@ namespace Welco.Shared.Persistance.Seeding
                     await db.SaveChangesAsync(ct);
                     logger.LogInformation("Bogus seeded {Count} support tickets.", tickets.Count);
                 }
-                if (!await db.Notifications.AnyAsync(n => !n.IsDeleted, ct) && customers.Count > 0)
+                if (!await db.Notifications.AnyAsync(n => !n.IsDeleted, ct) && activeMembers.Count > 0)
                 {
-                    var notes = customers.Take(12).Select(u =>
+                    var notes = activeMembers.Take(12).Select(u =>
                     {
                         var n = new Notification
                         {
@@ -774,7 +827,7 @@ namespace Welco.Shared.Persistance.Seeding
                 // Carts + CartItems (user carts + guest session carts).
                 if (!await db.Carts.AnyAsync(c => !c.IsDeleted && c.CreatedBy == Marker, ct) && products.Count > 0)
                 {
-                    var cartOwners = customers.Take(6).ToList();
+                    var cartOwners = activeMembers.Take(6).ToList();
                     if (cartOwners.Count == 0)
                         cartOwners = await db.ApplicationUsers.Where(u => !u.IsDeleted).Take(6).ToListAsync(ct);
                     var carts = new List<Cart>();
@@ -819,7 +872,7 @@ namespace Welco.Shared.Persistance.Seeding
                 }
 
                 // UserProductInteractions (unique per user/product/type → skip taken).
-                var interactionUsers = customers.Take(10).ToList();
+                var interactionUsers = activeMembers.Take(10).ToList();
                 if (interactionUsers.Count == 0)
                     interactionUsers = await db.ApplicationUsers.Where(u => !u.IsDeleted).Take(10).ToListAsync(ct);
                 if (interactionUsers.Count > 0 && products.Count > 0
@@ -984,8 +1037,8 @@ namespace Welco.Shared.Persistance.Seeding
                     logger.LogInformation("Bogus seeded {Count} landing pages.", pagesToAdd.Count);
                 }
 
-                // UserRefreshTokens (one valid token per demo customer).
-                var tokenUsers = customers.Take(5).ToList();
+                // UserRefreshTokens (one valid token per demo org member).
+                var tokenUsers = activeMembers.Take(5).ToList();
                 if (tokenUsers.Count == 0)
                     tokenUsers = await db.ApplicationUsers.Where(u => !u.IsDeleted).Take(5).ToListAsync(ct);
                 if (tokenUsers.Count > 0 && !await db.UserRefreshTokens.AnyAsync(t => t.CreatedBy == Marker, ct))

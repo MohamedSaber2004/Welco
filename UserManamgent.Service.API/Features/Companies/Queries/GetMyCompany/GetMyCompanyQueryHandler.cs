@@ -92,12 +92,14 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetMyCompany
                 Id = company.Id,
                 Name = company.Name,
                 Email = company.Email,
+                ImageName = company.ImageName,
                 Type = company.Type,
                 CountryId = company.CountryId,
                 TierLevel = company.TierLevel,
                 Status = company.Status,
                 AccountManagerId = company.AccountManagerId,
                 IsActive = company.IsActive,
+                IsProvider = company.IsProvider,
                 CreatedAt = company.CreatedAt,
                 UpdatedAt = company.UpdatedAt
             };

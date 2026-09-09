@@ -13,5 +13,6 @@ namespace UserManamgent.Service.API.Features.Companies.Commands.CreateCompany
         public int TierLevel { get; set; } = 1;
         public CompanyStatus Status { get; set; } = CompanyStatus.Pending;
         public Guid? AccountManagerId { get; set; }
+        public string? ImageName { get; set; }
     }
 }
