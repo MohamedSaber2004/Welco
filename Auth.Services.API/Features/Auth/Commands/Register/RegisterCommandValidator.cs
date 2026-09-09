@@ -51,6 +51,9 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
             RuleFor(x => x.SalesVolumeBand)
                 .NotEmpty().WithMessage(LocalizationKeys.Auth.SalesVolumeRequired)
                 .When(x => x.UserType == UserType.OrganizationUser);
+            RuleFor(x => x.CompanyType)
+                .IsInEnum().WithMessage(LocalizationKeys.Company.TypeRequired)
+                .When(x => x.CompanyType.HasValue);
             RuleFor(x => x.CompanyEmail)
                 .EmailAddress().WithMessage(LocalizationKeys.Company.EmailInvalid)
                 .MaximumLength(256)

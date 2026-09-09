@@ -368,7 +368,6 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                     Type = company.Type,
                     CountryId = company.CountryId,
                     CountryNameEn = countryNameEn,
-                    TierLevel = company.TierLevel,
                     Status = company.Status,
                     AccountManagerId = company.AccountManagerId,
                     IsActive = company.IsActive,

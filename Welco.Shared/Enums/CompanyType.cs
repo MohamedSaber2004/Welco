@@ -4,7 +4,6 @@ namespace Welco.Shared.Enums
     {
         Hospital = 1,
         Distributor = 2,
-        Clinic = 3,
-        Importer = 4
+        Clinic = 3
     }
 }

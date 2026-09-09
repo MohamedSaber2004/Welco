@@ -2,7 +2,6 @@ using System.Security.Cryptography;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Welco.Shared.Common.DTOs.Auth.Responses;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Options;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
@@ -108,6 +107,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
                 {
                     Id = Guid.NewGuid(),
                     CompanyName = request.CompanyName!.Trim(),
+                    Type = request.CompanyType ?? Welco.Shared.Enums.CompanyType.Distributor,
                     CountryId = request.DistributorCountryId.Value,
                     SalesVolumeBand = request.SalesVolumeBand!.Trim(),
                     CategoryInterest = string.IsNullOrWhiteSpace(request.CategoryInterest) ? null : request.CategoryInterest.Trim(),

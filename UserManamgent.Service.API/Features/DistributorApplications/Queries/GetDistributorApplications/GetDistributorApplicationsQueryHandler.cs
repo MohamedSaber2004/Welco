@@ -41,6 +41,7 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Queries.Get
             {
                 Id = a.Id,
                 CompanyName = a.CompanyName,
+                Type = a.Type,
                 CountryId = a.CountryId,
                 CountryNameEn = a.Country != null ? a.Country.NameEn : null,
                 SalesVolumeBand = a.SalesVolumeBand,

@@ -80,12 +80,12 @@ namespace Welco.Shared.Persistance.Seeding
             ("CityCare Hospitals Group", "citycare.svg", CompanyType.Hospital),
             ("Nova Health Clinic", "nova-health.svg", CompanyType.Clinic),
             ("PrimeCare Medical", "primecare.svg", CompanyType.Clinic),
-            ("Sahara Med Import", "sahara-med.svg", CompanyType.Importer),
+            ("Sahara Med Import", "sahara-med.svg", CompanyType.Distributor),
             ("Delta Surgical Co.", "delta-surgical.svg", CompanyType.Distributor),
             ("LifeLine Hospitals", "lifeline.svg", CompanyType.Hospital),
             ("OrthoPlus Distributors", "orthoplus.svg", CompanyType.Distributor),
             ("CarePoint Clinics", "carepoint.svg", CompanyType.Clinic),
-            ("Meridian Med Import", "meridian.svg", CompanyType.Importer),
+            ("Meridian Med Import", "meridian.svg", CompanyType.Distributor),
         };
 
         private static readonly string[] CompanyNames =
@@ -347,7 +347,7 @@ namespace Welco.Shared.Persistance.Seeding
                         var status = i == CompanySeedList.Length - 1 ? CompanyStatus.Pending : CompanyStatus.Approved;
                         var company = Company.Create(
                             seed.Name, seed.Type, country.Id,
-                            faker.Random.Int(1, 3), status, null, Marker,
+                            status, null, Marker,
                             $"info@{Slugify(seed.Name)}.example.com",
                             seed.ImageName);
                         // All companies are providers and can upload products

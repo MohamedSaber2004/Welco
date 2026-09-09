@@ -7,7 +7,6 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
     public class ApproveDistributorApplicationCommand : IRequest<Result<DistributorApplicationDto>>
     {
         public Guid Id { get; set; }
-        public int TierLevel { get; set; } = 1;
         public Guid? AccountManagerId { get; set; }
     }
 }

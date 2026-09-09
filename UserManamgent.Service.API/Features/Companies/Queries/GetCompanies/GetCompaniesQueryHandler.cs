@@ -27,7 +27,7 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetCompanies
             if (request.Type.HasValue) query = query.Where(c => c.Type == request.Type.Value);
             return await query.OrderBy(c => c.Name).ToPaginatedListAsync(c => new CompanyDto
             {
-                Id = c.Id, Name = c.Name, Email = c.Email, ImageName = c.ImageName, Type = c.Type, CountryId = c.CountryId, CountryNameEn = c.Country != null ? c.Country.NameEn : null, CountryNameAr = c.Country != null ? c.Country.NameAr : null, TierLevel = c.TierLevel, Status = c.Status, AccountManagerId = c.AccountManagerId, IsActive = c.IsActive, IsProvider = c.IsProvider, CreatedAt = c.CreatedAt, UpdatedAt = c.UpdatedAt
+                Id = c.Id, Name = c.Name, Email = c.Email, ImageName = c.ImageName, Type = c.Type, CountryId = c.CountryId, CountryNameEn = c.Country != null ? c.Country.NameEn : null, CountryNameAr = c.Country != null ? c.Country.NameAr : null, Status = c.Status, AccountManagerId = c.AccountManagerId, IsActive = c.IsActive, IsProvider = c.IsProvider, CreatedAt = c.CreatedAt, UpdatedAt = c.UpdatedAt
             }, request.PageNumber, request.PageSize, LocalizationKeys.Company.ListFetched, cancellationToken);
         }
     }

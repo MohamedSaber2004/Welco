@@ -15,7 +15,6 @@ namespace Welco.Shared.Persistance.Configurations
             builder.Property(x => x.ImageName).IsRequired(false).HasMaxLength(500);
             builder.Property(x => x.Type).HasConversion<string>().IsRequired();
             builder.Property(x => x.Status).HasConversion<string>().IsRequired();
-            builder.Property(x => x.TierLevel).IsRequired();
             builder.HasIndex(x => x.Name);
             builder.HasOne(x => x.Country).WithMany().HasForeignKey(x => x.CountryId).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(x => x.AccountManager).WithMany().HasForeignKey(x => x.AccountManagerId).OnDelete(DeleteBehavior.Restrict);

@@ -1,4 +1,5 @@
 using Welco.Shared.Common.Classes;
+using Welco.Shared.Enums;
 namespace Welco.Shared.Domain.Models
 {
     public enum RFQStatus { Pending = 1, Quoted = 2, Ordered = 3, Cancelled = 4 }
@@ -55,9 +56,10 @@ namespace Welco.Shared.Domain.Models
     }
     public class DistributorApplication : BaseEntity<Guid>
     {
-        public string CompanyName { get; set; } = null!;
-        public Guid CountryId { get; set; }
-        public virtual Country? Country { get; set; }
+          public string CompanyName { get; set; } = null!;
+          public CompanyType Type { get; set; } = CompanyType.Distributor;
+          public Guid CountryId { get; set; }
+          public virtual Country? Country { get; set; }
         public string SalesVolumeBand { get; set; } = null!;
         public string? CategoryInterest { get; set; }
         public string? Website { get; set; }

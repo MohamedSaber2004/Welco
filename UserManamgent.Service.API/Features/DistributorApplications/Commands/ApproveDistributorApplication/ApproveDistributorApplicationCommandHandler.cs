@@ -70,9 +70,8 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
             {
                 existingCompany.Update(
                     existingCompany.Name,
-                    CompanyType.Distributor,
+                    app.Type,
                     app.CountryId,
-                    request.TierLevel > 0 ? request.TierLevel : 1,
                     CompanyStatus.Approved,
                     request.AccountManagerId,
                     currentUserId,
@@ -83,9 +82,8 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
             {
                 var newCompany = Company.Create(
                     app.CompanyName,
-                    CompanyType.Distributor,
+                    app.Type,
                     app.CountryId,
-                    request.TierLevel > 0 ? request.TierLevel : 1,
                     CompanyStatus.Approved,
                     request.AccountManagerId,
                     currentUserId,
@@ -148,6 +146,7 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
             {
                 Id = app.Id,
                 CompanyName = app.CompanyName,
+                Type = app.Type,
                 CountryId = app.CountryId,
                 CountryNameEn = app.Country != null ? app.Country.NameEn : null,
                 SalesVolumeBand = app.SalesVolumeBand,

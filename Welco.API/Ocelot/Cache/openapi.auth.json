@@ -783,6 +783,9 @@
       "AppLanguage": {
         "type": "integer"
       },
+      "CompanyType": {
+        "type": "integer"
+      },
       "ForgotPasswordCommand": {
         "type": "object",
         "properties": {
@@ -901,6 +904,16 @@
           },
           "language": {
             "$ref": "#/components/schemas/AppLanguage"
+          },
+          "companyType": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CompanyType"
+              }
+            ]
           },
           "companyName": {
             "type": [

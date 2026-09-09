@@ -62,11 +62,10 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetMyCompany
                                 Id = app.Id,
                                 Name = app.CompanyName,
                                 Email = app.ContactEmail,
-                                Type = CompanyType.Distributor,
+                                Type = app.Type,
                                 CountryId = app.CountryId,
                                 CountryNameEn = countryNameEn,
                                 CountryNameAr = countryNameAr,
-                                TierLevel = 1,
                                 Status = app.Status == DistributorApplicationStatus.Approved ? CompanyStatus.Approved :
                                          app.Status == DistributorApplicationStatus.Rejected ? CompanyStatus.Rejected :
                                          CompanyStatus.Pending,
@@ -95,7 +94,6 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetMyCompany
                 ImageName = company.ImageName,
                 Type = company.Type,
                 CountryId = company.CountryId,
-                TierLevel = company.TierLevel,
                 Status = company.Status,
                 AccountManagerId = company.AccountManagerId,
                 IsActive = company.IsActive,

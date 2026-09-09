@@ -195,7 +195,6 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                             CountryId = company.CountryId,
                             CountryNameEn = countryNameEn,
                             CountryNameAr = countryNameAr,
-                            TierLevel = company.TierLevel,
                             Status = company.Status,
                             AccountManagerId = company.AccountManagerId,
                             IsActive = company.IsActive,
@@ -238,11 +237,10 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                             Id = app.Id,
                             Name = app.CompanyName,
                             Email = app.ContactEmail,
-                            Type = CompanyType.Distributor,
+                            Type = app.Type,
                             CountryId = app.CountryId,
                             CountryNameEn = countryNameEn,
                             CountryNameAr = countryNameAr,
-                            TierLevel = 1,
                             Status = app.Status == DistributorApplicationStatus.Approved ? CompanyStatus.Approved :
                                      app.Status == DistributorApplicationStatus.Rejected ? CompanyStatus.Rejected :
                                      CompanyStatus.Pending,

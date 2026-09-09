@@ -6,6 +6,7 @@ namespace Welco.Shared.Common.DTOs.UserManagement
     {
         public Guid Id { get; set; }
         public string CompanyName { get; set; } = string.Empty;
+        public CompanyType Type { get; set; } = CompanyType.Distributor;
         public Guid CountryId { get; set; }
         public string? CountryNameEn { get; set; }
         public string SalesVolumeBand { get; set; } = string.Empty;

@@ -11,7 +11,6 @@ namespace Welco.Shared.Domain.Models
         public CompanyType Type { get; set; }
         public Guid CountryId { get; set; }
         public virtual Country? Country { get; set; }
-        public int TierLevel { get; set; } = 1;
         public CompanyStatus Status { get; set; } = CompanyStatus.Pending;
         public Guid? AccountManagerId { get; set; }
         public bool IsProvider { get; set; }
@@ -23,7 +22,6 @@ namespace Welco.Shared.Domain.Models
             string name,
             CompanyType type,
             Guid countryId,
-            int tierLevel,
             CompanyStatus status,
             Guid? accountManagerId,
             string createdBy,
@@ -38,7 +36,6 @@ namespace Welco.Shared.Domain.Models
                 ImageName = string.IsNullOrWhiteSpace(imageName) ? null : imageName.Trim(),
                 Type = type,
                 CountryId = countryId,
-                TierLevel = tierLevel,
                 Status = status,
                 AccountManagerId = accountManagerId
             };
@@ -50,7 +47,6 @@ namespace Welco.Shared.Domain.Models
             string name,
             CompanyType type,
             Guid countryId,
-            int tierLevel,
             CompanyStatus status,
             Guid? accountManagerId,
             string updatedBy,
@@ -63,7 +59,6 @@ namespace Welco.Shared.Domain.Models
                 ImageName = string.IsNullOrWhiteSpace(imageName) ? null : imageName.Trim();
             Type = type;
             CountryId = countryId;
-            TierLevel = tierLevel;
             Status = status;
             AccountManagerId = accountManagerId;
             MarkAsUpdated(updatedBy);

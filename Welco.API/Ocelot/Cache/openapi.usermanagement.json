@@ -2596,14 +2596,6 @@
             "type": "string",
             "format": "uuid"
           },
-          "tierLevel": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          },
           "accountManagerId": {
             "type": [
               "null",
@@ -2754,14 +2746,6 @@
           "countryId": {
             "type": "string",
             "format": "uuid"
-          },
-          "tierLevel": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
           },
           "status": {
             "$ref": "#/components/schemas/CompanyStatus"
@@ -3132,14 +3116,6 @@
           "countryId": {
             "type": "string",
             "format": "uuid"
-          },
-          "tierLevel": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
           },
           "status": {
             "$ref": "#/components/schemas/CompanyStatus"

@@ -12,7 +12,6 @@ namespace Welco.Shared.Common.DTOs.UserManagement
         public Guid CountryId { get; set; }
         public string? CountryNameEn { get; set; }
         public string? CountryNameAr { get; set; }
-        public int TierLevel { get; set; }
         public CompanyStatus Status { get; set; }
         public Guid? AccountManagerId { get; set; }
         public bool IsActive { get; set; }
