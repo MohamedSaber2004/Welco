@@ -1007,6 +1007,38 @@
         }
       }
     },
+    "/api/v1/exchange-rates/sync/logs": {
+      "get": {
+        "tags": [
+          "ExchangeRates"
+        ],
+        "parameters": [
+          {
+            "name": "take",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 10
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/products": {
       "get": {
         "tags": [
