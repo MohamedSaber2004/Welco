@@ -106,32 +106,47 @@ namespace Welco.Shared.Common.Services
             <head>
                 <meta charset=""utf-8"">
                 <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+                <meta name=""color-scheme"" content=""light dark"">
+                <meta name=""supported-color-schemes"" content=""light dark"">
                 <title>{subject}</title>
+                <style>
+                    @media (prefers-color-scheme: dark) {{
+                        .em-page {{ background-color: #1E1F22 !important; }}
+                        .em-card {{ background-color: #2B2D31 !important; border: 1px solid #3A3D44 !important; }}
+                        .em-title {{ color: #F2F3F5 !important; }}
+                        .em-text {{ color: #B5BAC1 !important; }}
+                        .em-note {{ color: #949BA4 !important; }}
+                        .em-foot {{ background-color: #232428 !important; border-top: 1px solid #3A3D44 !important; }}
+                        .em-foottext {{ color: #949BA4 !important; }}
+                        .em-band--verify {{ background-color: #5865F2 !important; }}
+                        .em-code--verify {{ color: #C7D2FE !important; background-color: #313338 !important; border-color: #5865F2 !important; }}
+                    }}
+                </style>
             </head>
-            <body style=""font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px;"">
-                <table align=""center"" border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);"">
+            <body class=""em-page"" style=""font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px;"">
+                <table class=""em-card"" align=""center"" border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);"">
                     <tr>
-                        <td style=""background-color: #2563eb; padding: 24px; text-align: center;"">
+                        <td class=""em-band--verify"" style=""background-color: #2563eb; padding: 24px; text-align: center;"">
                             <h1 style=""color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;"">Welco</h1>
                         </td>
                     </tr>
                     <tr>
                         <td style=""padding: 32px 24px;"">
-                            <h2 style=""color: #1f2937; margin-top: 0; font-size: 20px;"">{subject}</h2>
-                            <p style=""color: #4b5563; font-size: 16px; line-height: 1.5;"">{bodyText}</p>
+                            <h2 class=""em-title"" style=""color: #1f2937; margin-top: 0; font-size: 20px;"">{subject}</h2>
+                            <p class=""em-text"" style=""color: #4b5563; font-size: 16px; line-height: 1.5;"">{bodyText}</p>
                             <div style=""text-align: center; margin: 32px 0;"">
-                                <span style=""display: inline-block; font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #2563eb; padding: 14px 28px; background-color: #eff6ff; border: 1px dashed #93c5fd; border-radius: 8px;"">
+                                <span class=""em-code--verify"" style=""display: inline-block; font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #2563eb; padding: 14px 28px; background-color: #eff6ff; border: 1px dashed #93c5fd; border-radius: 8px;"">
                                     {otpCode}
                                 </span>
                             </div>
-                            <p style=""color: #6b7280; font-size: 14px; line-height: 1.4; text-align: center;"">
+                            <p class=""em-note"" style=""color: #6b7280; font-size: 14px; line-height: 1.4; text-align: center;"">
                                 This verification code will expire in {expiryMinutes} minutes.
                             </p>
                         </td>
                     </tr>
                     <tr>
-                        <td style=""background-color: #f9fafb; padding: 16px 24px; text-align: center; border-top: 1px solid #e5e7eb;"">
-                            <p style=""color: #9ca3af; font-size: 12px; margin: 0;"">
+                        <td class=""em-foot"" style=""background-color: #f9fafb; padding: 16px 24px; text-align: center; border-top: 1px solid #e5e7eb;"">
+                            <p class=""em-foottext"" style=""color: #6b7280; font-size: 12px; margin: 0;"">
                                 &copy; {DateTime.UtcNow.Year} Welco. All rights reserved.
                             </p>
                         </td>
@@ -154,32 +169,47 @@ namespace Welco.Shared.Common.Services
             <head>
                 <meta charset=""utf-8"">
                 <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+                <meta name=""color-scheme"" content=""light dark"">
+                <meta name=""supported-color-schemes"" content=""light dark"">
                 <title>{subject}</title>
+                <style>
+                    @media (prefers-color-scheme: dark) {{
+                        .em-page {{ background-color: #1E1F22 !important; }}
+                        .em-card {{ background-color: #2B2D31 !important; border: 1px solid #3A3D44 !important; }}
+                        .em-title {{ color: #F2F3F5 !important; }}
+                        .em-text {{ color: #B5BAC1 !important; }}
+                        .em-note {{ color: #949BA4 !important; }}
+                        .em-foot {{ background-color: #232428 !important; border-top: 1px solid #3A3D44 !important; }}
+                        .em-foottext {{ color: #949BA4 !important; }}
+                        .em-band--reset {{ background-color: #ED4245 !important; }}
+                        .em-code--reset {{ color: #FCA5A5 !important; background-color: #313338 !important; border-color: #ED4245 !important; }}
+                    }}
+                </style>
             </head>
-            <body style=""font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px;"">
-                <table align=""center"" border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);"">
+            <body class=""em-page"" style=""font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px;"">
+                <table class=""em-card"" align=""center"" border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""max-width: 600px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);"">
                     <tr>
-                        <td style=""background-color: #dc2626; padding: 24px; text-align: center;"">
+                        <td class=""em-band--reset"" style=""background-color: #dc2626; padding: 24px; text-align: center;"">
                             <h1 style=""color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;"">Welco</h1>
                         </td>
                     </tr>
                     <tr>
                         <td style=""padding: 32px 24px;"">
-                            <h2 style=""color: #1f2937; margin-top: 0; font-size: 20px;"">Password Reset Request</h2>
-                            <p style=""color: #4b5563; font-size: 16px; line-height: 1.5;"">{bodyText}</p>
+                            <h2 class=""em-title"" style=""color: #1f2937; margin-top: 0; font-size: 20px;"">Password Reset Request</h2>
+                            <p class=""em-text"" style=""color: #4b5563; font-size: 16px; line-height: 1.5;"">{bodyText}</p>
                             <div style=""text-align: center; margin: 32px 0;"">
-                                <span style=""display: inline-block; font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #dc2626; padding: 14px 28px; background-color: #fef2f2; border: 1px dashed #fca5a5; border-radius: 8px;"">
+                                <span class=""em-code--reset"" style=""display: inline-block; font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #dc2626; padding: 14px 28px; background-color: #fef2f2; border: 1px dashed #fca5a5; border-radius: 8px;"">
                                     {otpCode}
                                 </span>
                             </div>
-                            <p style=""color: #6b7280; font-size: 14px; line-height: 1.4; text-align: center;"">
+                            <p class=""em-note"" style=""color: #6b7280; font-size: 14px; line-height: 1.4; text-align: center;"">
                                 This code will expire in {expiryMinutes} minutes. If you did not request a password reset, please ignore this email.
                             </p>
                         </td>
                     </tr>
                     <tr>
-                        <td style=""background-color: #f9fafb; padding: 16px 24px; text-align: center; border-top: 1px solid #e5e7eb;"">
-                            <p style=""color: #9ca3af; font-size: 12px; margin: 0;"">
+                        <td class=""em-foot"" style=""background-color: #f9fafb; padding: 16px 24px; text-align: center; border-top: 1px solid #e5e7eb;"">
+                            <p class=""em-foottext"" style=""color: #6b7280; font-size: 12px; margin: 0;"">
                                 &copy; {DateTime.UtcNow.Year} Welco. All rights reserved.
                             </p>
                         </td>

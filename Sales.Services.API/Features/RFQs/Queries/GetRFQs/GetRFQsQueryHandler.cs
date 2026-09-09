@@ -21,7 +21,7 @@ namespace Sales.Services.API.Features.RFQs.Queries.GetRFQs
             // Organization users only see their own company's requests.
             var caller = await BuyerScope.GetAsync(_uow, _cur, ct);
             if (caller.IsOrganizationUser) q = q.Where(x => x.CompanyId == caller.CompanyId);
-            return await q.OrderByDescending(x => x.CreatedAt).ToPaginatedListAsync(x => new RFQDto { Id = x.Id, RFQNumber = x.RFQNumber, CompanyId = x.CompanyId, Status = x.Status.ToString(), AssignedSalesRepId = x.AssignedSalesRepId, CreatedAt = x.CreatedAt, Items = x.Items.Where(i => !i.IsDeleted).Select(i => new RFQItemDto { Id = i.Id, RFQId = i.RFQId, ProductId = i.ProductId, Quantity = i.Quantity, UnitPrice = i.UnitPrice, Notes = i.Notes }).ToList() }, r.PageNumber, r.PageSize, LocalizationKeys.RFQ.ListFetched, ct);
+            return await q.OrderByDescending(x => x.CreatedAt).ToPaginatedListAsync(x => new RFQDto { Id = x.Id, RFQNumber = x.RFQNumber, CompanyId = x.CompanyId, Status = x.Status.ToString(), AssignedSalesRepId = x.AssignedSalesRepId, CreatedAt = x.CreatedAt, Items = x.Items.Where(i => !i.IsDeleted).Select(i => new RFQItemDto { Id = i.Id, RFQId = i.RFQId, ProductId = i.ProductId, ProductNameEn = i.Product != null ? i.Product.NameEn : null, ProductNameAr = i.Product != null ? i.Product.NameAr : null, Quantity = i.Quantity, UnitPrice = i.UnitPrice, Notes = i.Notes }).ToList() }, r.PageNumber, r.PageSize, LocalizationKeys.RFQ.ListFetched, ct);
         }
     }
 }
