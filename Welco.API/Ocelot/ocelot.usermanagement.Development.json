@@ -91,6 +91,21 @@
                        "DangerousAcceptAnyServerCertificateValidator":  true
                    },
                    {
+                       "DownstreamPathTemplate":  "/api/v1/user-management/companies",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "localhost",
+                                                          "Port":  7204
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/user-management/companies",
+                       "UpstreamHttpMethod":  [
+                                                  "GET"
+                                              ],
+                       "DangerousAcceptAnyServerCertificateValidator":  true
+                   },
+                   {
                        "DownstreamPathTemplate":  "/api/v1/user-management/distributor-applications",
                        "DownstreamScheme":  "https",
                        "DownstreamHostAndPorts":  [
