@@ -65,7 +65,7 @@ public class ExchangeRateServiceTests : IDisposable
     {
         var opts = new DbContextOptionsBuilder<WelcoDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning)).Options;
         _db = new WelcoDbContext(opts, null);
-        // Seed USD + target currencies
+        
         var usd = Currency.Create("US Dollar", "دولار أمريكي", "USD", "$", "Test", "$", 2);
         var egp = Currency.Create("Egyptian Pound", "جنيه مصري", "EGP", "E£", "Test", "E£", 2);
         var eur = Currency.Create("Euro", "يورو", "EUR", "€", "Test", "€", 2);
@@ -105,7 +105,7 @@ public class ExchangeRateServiceTests : IDisposable
     {
         await SeedRatesAsync();
         var r = await _svc.ConvertWithDetailsAsync(100m, "USD", "EGP", CancellationToken.None);
-        Assert.Equal(5094.67m, r.ConvertedAmount); // 100 * 50.9467
+        Assert.Equal(5094.67m, r.ConvertedAmount); 
         Assert.Equal(50.9467m, r.Rate);
     }
 
@@ -113,7 +113,7 @@ public class ExchangeRateServiceTests : IDisposable
     {
         await SeedRatesAsync();
         var r = await _svc.ConvertWithDetailsAsync(5094.67m, "EGP", "USD", CancellationToken.None);
-        // 5094.67 * (1 / 50.9467) ≈ 100
+        
         Assert.InRange(r.ConvertedAmount, 99.99m, 100.01m);
     }
 
@@ -123,7 +123,7 @@ public class ExchangeRateServiceTests : IDisposable
         var r = await _svc.ConvertWithDetailsAsync(100m, "EUR", "EGP", CancellationToken.None);
         var expectedRate = 50.9467m / 0.85m;
         Assert.InRange(r.Rate, expectedRate - 0.0001m, expectedRate + 0.0001m);
-        Assert.InRange(r.ConvertedAmount, 5993m, 5994m); // 100 * 59.937...
+        Assert.InRange(r.ConvertedAmount, 5993m, 5994m); 
     }
 
     [Fact] public async Task EGP_EUR_ReverseCross()
@@ -154,12 +154,12 @@ public class ExchangeRateServiceTests : IDisposable
 
     [Fact] public async Task MissingExchangeRate_Throws()
     {
-        // No seed, clear DB
+        
         _db.ExchangeRates.RemoveRange(_db.ExchangeRates);
         await _db.SaveChangesAsync();
         _provider.Rates.Remove("EGP");
         _cache.Remove($"exchange-rates:USD:{DateOnly.FromDateTime(DateTime.UtcNow.Date):yyyy-MM-dd}");
-        // Now EGP missing, should throw after sync tries but filtered? Actually provider has no EGP, so conversion should fail
+        
         await Assert.ThrowsAsync<InvalidOperationException>(() => _svc.ConvertWithDetailsAsync(10m, "USD", "EGP", CancellationToken.None));
     }
 
@@ -167,16 +167,16 @@ public class ExchangeRateServiceTests : IDisposable
     {
         await SeedRatesAsync();
         _provider.ShouldFail = true;
-        // Should serve from DB/cache, not throw
+        
         var r = await _svc.ConvertWithDetailsAsync(10m, "USD", "EGP", CancellationToken.None);
-        Assert.Equal(509.47m, r.ConvertedAmount); // 10 * 50.9467 = 509.467 -> 509.47
+        Assert.Equal(509.47m, r.ConvertedAmount); 
     }
 
     [Fact] public async Task CachedRate_Used()
     {
         await SeedRatesAsync();
         var r1 = await _svc.ConvertWithDetailsAsync(10m, "USD", "EUR", CancellationToken.None);
-        // Change provider rate but cache should still return old
+        
         _provider.Rates["EUR"] = 0.90m;
         var r2 = await _svc.ConvertWithDetailsAsync(10m, "USD", "EUR", CancellationToken.None);
         Assert.Equal(r1.Rate, r2.Rate);
@@ -213,7 +213,7 @@ public class ExchangeRateServiceTests : IDisposable
         var r2 = await _svc.SyncLatestRatesAsync(CancellationToken.None);
         Assert.True(r1.Success && r2.Success);
         var count = await _db.ExchangeRates.CountAsync();
-        // Should not duplicate unique (Base,Target,Date)
+        
         Assert.Equal(r1.RatesCount, r2.RatesCount);
     }
 

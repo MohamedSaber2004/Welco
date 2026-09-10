@@ -13,6 +13,10 @@ namespace Welco.Shared.Domain.Models
         public RFQStatus Status { get; set; } = RFQStatus.Pending;
         public Guid? AssignedSalesRepId { get; set; }
         public virtual ApplicationUser? AssignedSalesRep { get; set; }
+        
+        public string? ExternalRfqId { get; set; }
+        
+        public string? SourceMarket { get; set; }
         public virtual ICollection<RFQItem> Items { get; set; } = new List<RFQItem>();
     }
     public class RFQItem : BaseEntity<Guid>

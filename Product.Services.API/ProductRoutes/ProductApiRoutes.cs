@@ -13,7 +13,6 @@ namespace Product.Services.API.ProductRoutes
             public const string Base = CategoriesBase;
             public const string GetAll = "";
             public const string GetById = "{id}";
-            public const string Show = "{id}/show";
             public const string Create = "";
             public const string Update = "{id}";
             public const string Delete = "{id}";
@@ -25,7 +24,6 @@ namespace Product.Services.API.ProductRoutes
             public const string Base = ProductApiRoutes.Base;
             public const string GetAll = "";
             public const string GetById = "{id}";
-            public const string Show = "{id}/show";
             public const string Create = "";
             public const string Update = "{id}";
             public const string Delete = "{id}";

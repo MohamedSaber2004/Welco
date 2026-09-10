@@ -15,14 +15,12 @@ namespace Product.Services.API.Filters
 
             var env = httpContext.RequestServices.GetService<IWebHostEnvironment>();
 
-            // In Development / Local / Test environments, permit access without strict JWT login
-            if (env != null && (env.IsDevelopment() || env.EnvironmentName == "Test" || env.EnvironmentName == "Local"))
+if (env != null && (env.IsDevelopment() || env.EnvironmentName == "Test" || env.EnvironmentName == "Local"))
             {
                 return true;
             }
 
-            // In production, require authenticated user with Admin role
-            var user = httpContext.User;
+var user = httpContext.User;
             if (user?.Identity == null || !user.Identity.IsAuthenticated)
             {
                 return false;

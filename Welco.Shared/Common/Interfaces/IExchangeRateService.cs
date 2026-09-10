@@ -1,4 +1,5 @@
 using Welco.Shared.Common.DTOs.Products;
+using Welco.Shared.Domain.Models;
 
 namespace Welco.Shared.Common.Interfaces
 {
@@ -11,6 +12,7 @@ namespace Welco.Shared.Common.Interfaces
         Task<IReadOnlyCollection<ExchangeRateDto>> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, CancellationToken cancellationToken);
         Task<ExchangeRateSyncResult> SyncLatestRatesAsync(CancellationToken cancellationToken);
         Task<ExchangeRateSyncResult> SyncHistoricalRatesAsync(DateOnly date, CancellationToken cancellationToken);
+        Task<IReadOnlyCollection<ExchangeRateSyncLog>> GetSyncLogsAsync(int take, CancellationToken cancellationToken);
     }
 
     public class ExchangeRateSyncResult

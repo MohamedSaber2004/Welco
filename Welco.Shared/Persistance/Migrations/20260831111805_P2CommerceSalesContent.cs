@@ -1,15 +1,13 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Welco.Shared.Persistance.Migrations
 {
-    /// <inheritdoc />
-    public partial class P2CommerceSalesContent : Migration
+        public partial class P2CommerceSalesContent : Migration
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
+                protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
                 name: "BlogPosts",
@@ -868,8 +866,7 @@ namespace Welco.Shared.Persistance.Migrations
                 column: "ShippingMethodId");
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
+                protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "BlogPosts");

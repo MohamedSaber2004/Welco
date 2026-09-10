@@ -19,6 +19,6 @@ namespace Product.Services.API.Features.Products.Queries.GetProducts
         public decimal? PriceMax { get; set; }
         public bool? InStockOnly { get; set; }
         public Guid? CurrencyId { get; set; }
-        public string? SortBy { get; set; } // price-asc, price-desc, newest, rating
+        public string? SortBy { get; set; } 
     }
 }

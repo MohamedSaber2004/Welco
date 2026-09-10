@@ -5,11 +5,7 @@ using Welco.Shared.Enums;
 
 namespace Sales.Services.API.Features.Shared
 {
-    /// <summary>
-    /// Organization users may only touch their own company's RFQs/quotes.
-    /// Staff and admins operate across all companies. Unknown callers see nothing.
-    /// </summary>
-    internal static class BuyerScope
+        internal static class BuyerScope
     {
         public sealed record Caller(bool IsOrganizationUser, Guid? CompanyId);
 

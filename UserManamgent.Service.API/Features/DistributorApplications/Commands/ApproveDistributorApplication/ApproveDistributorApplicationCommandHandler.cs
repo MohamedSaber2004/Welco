@@ -37,10 +37,7 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
                 ? _currentUserService.UserId.ToString()
                 : "System";
 
-            // Heal path: applications approved before the applicant-link fix left
-            // User.CompanyId null. Re-running approve attaches the applicant to
-            // the approved company instead of failing with AlreadyProcessed.
-            if (app.Status == DistributorApplicationStatus.Approved)
+if (app.Status == DistributorApplicationStatus.Approved)
             {
                 var healCompanyRepo = _unitOfWork.GetRepository<Company, Guid>();
                 var approvedCompany = await healCompanyRepo.GetAll(c => c.Name.ToLower() == app.CompanyName.ToLower() && !c.IsDeleted)
@@ -60,8 +57,7 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
             app.Status = DistributorApplicationStatus.Approved;
             app.MarkAsUpdated(currentUserId);
 
-            // Create or update the Company record
-            var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
+var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
             var existingCompany = await companyRepo.GetAll(c => c.Name.ToLower() == app.CompanyName.ToLower() && !c.IsDeleted)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -92,21 +88,14 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Commands.Ap
                 companyId = newCompany.Id;
             }
 
-            // Link applicant user if available
-            await TryLinkApplicantAsync(app, companyId, currentUserId, cancellationToken);
+await TryLinkApplicantAsync(app, companyId, currentUserId, cancellationToken);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Result<DistributorApplicationDto>.Success(ToDto(app), LocalizationKeys.DistributorApplication.Approved);
         }
 
-        /// <summary>
-        /// Attaches the applicant user to the approved company. Registration-created
-        /// applications store the applicant email in CreatedBy, while staff-created
-        /// ones store the staff user id — both shapes are resolved here.
-        /// Returns true when a missing link was applied.
-        /// </summary>
-        private async Task<bool> TryLinkApplicantAsync(DistributorApplication app, Guid companyId, string currentUserId, CancellationToken cancellationToken)
+                private async Task<bool> TryLinkApplicantAsync(DistributorApplication app, Guid companyId, string currentUserId, CancellationToken cancellationToken)
         {
             var userRepo = _unitOfWork.GetRepository<ApplicationUser, Guid>();
             ApplicationUser? applicant = null;

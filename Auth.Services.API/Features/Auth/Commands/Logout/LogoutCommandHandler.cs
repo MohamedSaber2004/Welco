@@ -23,8 +23,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Logout
         {
             var refreshRepo = _unitOfWork.GetRepository<UserRefreshToken, Guid>();
 
-            // 1. If a specific refresh token is provided, revoke it
-            if (!string.IsNullOrWhiteSpace(request.RefreshToken))
+if (!string.IsNullOrWhiteSpace(request.RefreshToken))
             {
                 var tokenEntity = await refreshRepo.GetFirstAsync(r => r.Token == request.RefreshToken && !r.IsRevoked, cancellationToken);
                 if (tokenEntity != null)
@@ -35,10 +34,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Logout
                 }
             }
 
-            // 2. Only when explicitly requested, revoke active tokens for that user
-            // (all devices). Default logout revokes just the presented token so
-            // other devices stay signed in.
-            var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (request.RevokeAllSessions && !string.IsNullOrWhiteSpace(userIdClaim) && Guid.TryParse(userIdClaim, out var userId))
             {
                 var activeTokens = await refreshRepo.GetAllListAsync(r => r.UserId == userId && !r.IsRevoked, cancellationToken);

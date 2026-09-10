@@ -7,9 +7,8 @@ using Welco.Shared.Common.Options;
 
 namespace Welco.Shared.Infrastructure.ExchangeRate
 {
-    // Primary provider per prompt.txt: https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json
-    // Frankfurter name kept for compatibility; actual BaseUrl is cdn.jsdelivr.net now
-    public class FrankfurterExchangeRateProvider : IExchangeRateProvider
+
+public class FrankfurterExchangeRateProvider : IExchangeRateProvider
     {
         private readonly HttpClient _httpClient;
         private readonly ExchangeRateSettings _settings;
@@ -40,12 +39,11 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
         {
             var code = baseCurrency.Trim().ToLowerInvariant();
             var dateStr = date.ToString("yyyy-MM-dd");
-            // CDN historical: https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2024-03-06/v1/currencies/usd.json
-            // We try dated URL first; if 404, fallback to latest
-            var url = $"{code}.json";
+
+var url = $"{code}.json";
             try
             {
-                // For historical we need to override BaseAddress to dated tag
+                
                 return await FetchCdnHistoricalAsync(code, dateStr, baseCurrency, cancellationToken);
             }
             catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -64,8 +62,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             if (data == null)
                 throw new InvalidOperationException($"Fawazahmed CDN returned empty for {requestedBase}");
 
-            // data is { date: "2024-03-06", usd: { eur: 0.92, egp: 50.94, ... } }
-            var dictRaw = data.Rates;
+var dictRaw = data.Rates;
             if (dictRaw == null || dictRaw.Count == 0)
                 throw new InvalidOperationException($"Fawazahmed CDN returned empty rates for {requestedBase}");
 
@@ -95,7 +92,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
 
         private async Task<ExchangeRateResponse?> FetchCdnHistoricalAsync(string codeLower, string dateStr, string requestedBase, CancellationToken cancellationToken)
         {
-            // Build absolute dated URL — ignore HttpClient BaseAddress for this call
+            
             var datedUrl = $"https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@{dateStr}/v1/currencies/{codeLower}.json";
             _logger.LogInformation("Fetching historical rates from Fawazahmed CDN: {Url}", datedUrl);
             using var req = new HttpRequestMessage(HttpMethod.Get, datedUrl);
@@ -128,9 +125,8 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
         private sealed class FawazahmedResponse
         {
             [JsonPropertyName("date")] public string? Date { get; set; }
-            // The rates object is keyed by base, e.g. "usd": { "eur": 0.92 }
-            // We capture all remaining properties as rates via extension data
-            [JsonExtensionData] public Dictionary<string, System.Text.Json.JsonElement>? ExtensionData { get; set; }
+
+[JsonExtensionData] public Dictionary<string, System.Text.Json.JsonElement>? ExtensionData { get; set; }
 
             [System.Text.Json.Serialization.JsonIgnore]
             public Dictionary<string, decimal>? Rates
@@ -138,7 +134,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 get
                 {
                     if (ExtensionData == null) return null;
-                    // Find the first value that is an object containing rates (e.g. "usd")
+                    
                     foreach (var kv in ExtensionData)
                     {
                         if (kv.Value.ValueKind == System.Text.Json.JsonValueKind.Object)
@@ -151,13 +147,11 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 }
             }
 
-            // Fallback direct properties for frankfurter compatibility
-            [JsonPropertyName("base")] public string? Base { get; set; }
+[JsonPropertyName("base")] public string? Base { get; set; }
             [JsonPropertyName("rates")] public Dictionary<string, decimal>? FrankfurterRates { get; set; }
         }
 
-        // Kept for backward compat parsing
-        private sealed class FrankfurterResponse
+private sealed class FrankfurterResponse
         {
             [JsonPropertyName("amount")] public decimal Amount { get; set; } = 1;
             [JsonPropertyName("base")] public string Base { get; set; } = string.Empty;
@@ -190,7 +184,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 throw new InvalidOperationException("ExchangeRateApi ApiKey is not configured");
 
             var url = $"latest/{Uri.EscapeDataString(baseCurrency.ToUpperInvariant())}";
-            // ExchangeRate-API format: https://v6.exchangerate-api.com/v6/{key}/latest/USD
+            
             _logger.LogInformation("Fetching rates from ExchangeRateApi: {Url}", url);
             var response = await _httpClient.GetAsync(url, cancellationToken);
             response.EnsureSuccessStatusCode();
@@ -211,7 +205,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
 
         public async Task<ExchangeRateResponse?> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, CancellationToken cancellationToken)
         {
-            // ExchangeRate-API free tier does not support historical; return null to fallback to latest
+            
             _logger.LogWarning("ExchangeRateApi does not support historical rates for {Base} {Date}, returning null", baseCurrency, date);
             await Task.CompletedTask;
             return null;

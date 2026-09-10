@@ -1,15 +1,13 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Welco.Shared.Persistance.Migrations
 {
-    /// <inheritdoc />
-    public partial class P1CompanyAndCatalogEnhancements : Migration
+        public partial class P1CompanyAndCatalogEnhancements : Migration
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
+                protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_Products_Providers_ProviderId",
@@ -282,8 +280,7 @@ namespace Welco.Shared.Persistance.Migrations
                 onDelete: ReferentialAction.SetNull);
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
+                protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_Users_Companies_CompanyId",

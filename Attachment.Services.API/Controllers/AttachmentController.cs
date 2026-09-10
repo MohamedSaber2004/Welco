@@ -22,13 +22,7 @@ namespace Attachment.Services.API.Controllers
         {
         }
 
-        /// <summary>
-        /// Upload a file.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPost]
+                [HttpPost]
         [Route(AttachmentApiRoutes.Attachments.Upload)]
         [RoleAuthorize(UserType.OrganizationUser, UserType.WelcoStaff, UserType.Admin)]
         [Consumes("multipart/form-data")]
@@ -40,13 +34,7 @@ namespace Attachment.Services.API.Controllers
             return CreatedResult(result, LocalizationKeys.AttachmentMessages.FileUploaded);
         }
 
-        /// <summary>
-        /// Upload multiple files.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPost]
+                [HttpPost]
         [Route(AttachmentApiRoutes.Attachments.UploadMultiple)]
         [RoleAuthorize(UserType.OrganizationUser, UserType.WelcoStaff, UserType.Admin)]
         [Consumes("multipart/form-data")]
@@ -58,14 +46,7 @@ namespace Attachment.Services.API.Controllers
             return CreatedResult(result, LocalizationKeys.AttachmentMessages.FileUploaded);
         }
 
-        /// <summary>
-        /// Update a file by its name.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPut]
+                [HttpPut]
         [Route(AttachmentApiRoutes.Attachments.Update)]
         [RoleAuthorize(UserType.OrganizationUser, UserType.WelcoStaff, UserType.Admin)]
         [Consumes("multipart/form-data")]
@@ -79,13 +60,7 @@ namespace Attachment.Services.API.Controllers
             return Success(result, LocalizationKeys.AttachmentMessages.FileUploaded);
         }
 
-        /// <summary>
-        /// Download a file by its name.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpGet]
+                [HttpGet]
         [Route(AttachmentApiRoutes.Attachments.Download)]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]

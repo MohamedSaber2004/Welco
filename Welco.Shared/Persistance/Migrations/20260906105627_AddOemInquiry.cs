@@ -1,15 +1,13 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Welco.Shared.Persistance.Migrations
 {
-    /// <inheritdoc />
-    public partial class AddOemInquiry : Migration
+        public partial class AddOemInquiry : Migration
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
+                protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
                 name: "OemInquiries",
@@ -42,8 +40,7 @@ namespace Welco.Shared.Persistance.Migrations
                 column: "Email");
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
+                protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "OemInquiries");

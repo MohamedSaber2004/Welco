@@ -34,8 +34,7 @@ namespace Content.Services.API.Features.SupportContact.Queries.GetSupportContact
                     return Result<SupportContactDto>.Success(contact, LocalizationKeys.SupportContact.Fetched);
                 }
 
-                // If not found in DB, seed a default record
-                var defaultEntity = new SupportContactEntity
+var defaultEntity = new SupportContactEntity
                 {
                     SupportEmail = "support@welco.health",
                     PhoneNumber = "+971 50 000 0000",
@@ -61,7 +60,7 @@ namespace Content.Services.API.Features.SupportContact.Queries.GetSupportContact
             }
             catch
             {
-                // Fallback graceful default if DB table not yet migrated
+                
                 var fallback = new SupportContactDto
                 {
                     Id = Guid.Empty,

@@ -41,8 +41,7 @@ namespace Product.Services.API.Features.Wishlist.Queries.GetWishlist
                 .Select(ProductDtoMapper.Projection)
                 .ToListAsync(cancellationToken);
 
-            // Preserve wishlist order (most recent first via Timestamp)
-            var ordered = await wishlistRepo.GetAll(w => !w.IsDeleted && w.UserId == userId && w.Type == "Wishlist")
+var ordered = await wishlistRepo.GetAll(w => !w.IsDeleted && w.UserId == userId && w.Type == "Wishlist")
                 .OrderByDescending(w => w.Timestamp)
                 .Select(w => w.ProductId)
                 .ToListAsync(cancellationToken);

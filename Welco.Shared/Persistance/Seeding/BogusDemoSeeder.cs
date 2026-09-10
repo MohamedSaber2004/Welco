@@ -10,14 +10,7 @@ using Welco.Shared.Enums;
 
 namespace Welco.Shared.Persistance.Seeding
 {
-    /// <summary>
-    /// Development-only demo data seeder (Bogus). Runs ONLY when the host
-    /// environment is Development AND the SEED_DEMO_DATA environment variable
-    /// is "true". Never runs in Production (defense-in-depth check inside).
-    /// Idempotent: skips entirely when marker rows (CreatedBy = "BogusSeeder")
-    /// already exist; re-runs are no-ops. Deterministic faker seed (1234).
-    /// </summary>
-    public static class BogusDemoSeeder
+        public static class BogusDemoSeeder
     {
         public const string Marker = "BogusSeeder";
         private const int FakerSeed = 1234;
@@ -111,12 +104,7 @@ namespace Welco.Shared.Persistance.Seeding
             return slug.Trim('-');
         }
 
-        /// <summary>
-        /// Crash-safe random subset: Bogus <c>PickRandom(items, n)</c> throws when
-        /// <c>n</c> exceeds the collection size (e.g. a nearly-empty table), so the
-        /// count is clamped to what actually exists.
-        /// </summary>
-        private static List<T> PickSome<T>(Faker faker, IList<T> source, int min, int max)
+                private static List<T> PickSome<T>(Faker faker, IList<T> source, int min, int max)
         {
             if (source.Count == 0) return new List<T>();
             var upper = Math.Min(max, source.Count);
@@ -134,13 +122,7 @@ namespace Welco.Shared.Persistance.Seeding
                 : "Demo123!";
         }
 
-        /// <summary>
-        /// Central opt-in check. Demo data runs ONLY in non-Production AND when
-        /// explicitly enabled via <c>Seeding:SeedDemoData=true</c> (appsettings /
-        /// user-secrets / command-line <c>--Seeding:SeedDemoData true</c>) OR the
-        /// legacy <c>SEED_DEMO_DATA=true</c> environment variable.
-        /// </summary>
-        public static bool ShouldSeedDemoData(IHostEnvironment? env, IConfiguration? config, out string reason)
+                public static bool ShouldSeedDemoData(IHostEnvironment? env, IConfiguration? config, out string reason)
         {
             if (env != null && env.IsProduction())
             {
@@ -152,9 +134,8 @@ namespace Welco.Shared.Persistance.Seeding
             var fromEnvVar = string.Equals(
                 Environment.GetEnvironmentVariable("SEED_DEMO_DATA"),
                 "true", StringComparison.OrdinalIgnoreCase);
-            // Covers AddEnvironmentVariables mapping (SEED_DEMO_DATA is also visible
-            // here) plus docker-style Seeding__SeedDemoData=true.
-            var fromConfigString = string.Equals(
+
+var fromConfigString = string.Equals(
                 config?["SEED_DEMO_DATA"],
                 "true", StringComparison.OrdinalIgnoreCase);
 
@@ -186,9 +167,7 @@ namespace Welco.Shared.Persistance.Seeding
                 var db = services.GetRequiredService<WelcoDbContext>();
                 var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-                // Self-sufficient: ensure Identity roles (incl. Customer) exist
-                // even when the host service never ran RoleSeeder (e.g. Product).
-                var roleManager = services.GetService<RoleManager<IdentityRole<Guid>>>();
+var roleManager = services.GetService<RoleManager<IdentityRole<Guid>>>();
                 if (roleManager != null)
                     await RoleSeeder.SeedRolesAsync(roleManager, logger);
 
@@ -196,8 +175,7 @@ namespace Welco.Shared.Persistance.Seeding
                 var faker = new Faker("en");
                 var year = DateTime.UtcNow.Year;
 
-                // Reference data needed by several sections below.
-                var usd = await db.Currencies.FirstOrDefaultAsync(c => !c.IsDeleted && c.Code == "USD", ct)
+var usd = await db.Currencies.FirstOrDefaultAsync(c => !c.IsDeleted && c.Code == "USD", ct)
                     ?? await db.Currencies.FirstOrDefaultAsync(c => !c.IsDeleted, ct);
                 if (usd == null)
                 {
@@ -220,10 +198,7 @@ namespace Welco.Shared.Persistance.Seeding
                     return;
                 }
 
-                // ── 1. Categories (6 roots + 18 children) ────────────────────
-                // Guarded by emptiness (names/SKUs below are deterministic, so a
-                // re-run or a legacy-seeded DB must not insert them twice).
-                List<Category> leaves;
+List<Category> leaves;
                 if (await db.Categories.AnyAsync(c => !c.IsDeleted, ct))
                 {
                     logger.LogInformation("Categories already present, skipping Bogus category seeding.");
@@ -350,7 +325,7 @@ namespace Welco.Shared.Persistance.Seeding
                             status, null, Marker,
                             $"info@{Slugify(seed.Name)}.example.com",
                             seed.ImageName);
-                        // All companies are providers and can upload products
+                        
                         company.IsProvider = true;
                         companies.Add(company);
                     }
@@ -384,8 +359,7 @@ namespace Welco.Shared.Persistance.Seeding
                 logger.LogInformation("Bogus seeded {Count} companies (+addresses).", companies.Count);
                 }
 
-                // ── 4. Users (via UserManager) ───────────────────────────────
-                var password = DemoPassword(config);
+var password = DemoPassword(config);
                 var staff = new List<ApplicationUser>();
                 for (var i = 1; i <= 2; i++)
                 {
@@ -410,8 +384,7 @@ namespace Welco.Shared.Persistance.Seeding
                     if (u2 != null) orgUsers.Add((u2, approved[i]));
                 }
 
-                // Migrate any legacy users with obsolete UserType (4) to OrganizationUser
-                var legacyCustomers = await db.ApplicationUsers.Where(u => !u.IsDeleted && (int)u.UserType == 4).ToListAsync(ct);
+var legacyCustomers = await db.ApplicationUsers.Where(u => !u.IsDeleted && (int)u.UserType == 4).ToListAsync(ct);
                 if (legacyCustomers.Count > 0 && approved.Count > 0)
                 {
                     for (var i = 0; i < legacyCustomers.Count; i++)
@@ -428,8 +401,7 @@ namespace Welco.Shared.Persistance.Seeding
                 logger.LogInformation("Bogus seeded {Staff} staff, {Org} org users.",
                     staff.Count, orgUsers.Count);
 
-                // Fallbacks in case users were created on a prior run or pre-existing
-                if (staff.Count == 0)
+if (staff.Count == 0)
                     staff = await db.ApplicationUsers.Where(u => !u.IsDeleted && u.UserType == UserType.WelcoStaff).Take(5).ToListAsync(ct);
                 if (orgUsers.Count == 0 && approved.Count > 0)
                 {
@@ -447,9 +419,7 @@ namespace Welco.Shared.Persistance.Seeding
                 if (activeMembers.Count == 0)
                     activeMembers = await db.ApplicationUsers.Where(u => !u.IsDeleted).Take(20).ToListAsync(ct);
 
-                // default address for active members (checkout needs one) —
-                // skip members that already have one so re-runs stay no-ops.
-                var membersWithAddress = new HashSet<Guid>(
+var membersWithAddress = new HashSet<Guid>(
                     await db.UserAddresses.Where(a => !a.IsDeleted).Select(a => a.UserId).ToListAsync(ct));
                 var memberAddresses = new List<UserAddress>();
                 foreach (var c in activeMembers)
@@ -473,10 +443,7 @@ namespace Welco.Shared.Persistance.Seeding
                     await db.SaveChangesAsync(ct);
                 }
 
-                // ── 5. RFQ → Quote → Order chains (12, on approved companies) ─
-                // Numbers are deterministic per year with unique indexes → seed
-                // only when no chain for this year (or no demo chain) exists.
-                var repId = staff.Count > 0 ? staff[0].Id : Guid.NewGuid();
+var repId = staff.Count > 0 ? staff[0].Id : Guid.NewGuid();
                 var chainNo = 0;
                 var chainPrefix = $"WO-{year}-";
                 if (await db.Orders.AnyAsync(o => !o.IsDeleted && (o.CreatedBy == Marker || o.OrderNumber.StartsWith(chainPrefix)), ct))
@@ -576,10 +543,7 @@ namespace Welco.Shared.Persistance.Seeding
                     logger.LogInformation("Bogus seeded {Count} RFQ→Quote→Order chains.", chainNo);
                 }
 
-                // ── 6. Help content, shows, inquiries, tickets, notifications ─
-                // Each group is seeded only into an empty table (re-runs stay
-                // no-ops; slugs below are unique-indexed and deterministic).
-                var catEntities = new List<HelpCategory>();
+var catEntities = new List<HelpCategory>();
                 if (!await db.HelpCategories.AnyAsync(c => !c.IsDeleted, ct))
                 {
                     var helpCats = new[] { "Ordering", "Shipping & Incoterms", "Returns & RMA", "Sterilization", "Warranty" };
@@ -737,9 +701,7 @@ namespace Welco.Shared.Persistance.Seeding
                 }
                 logger.LogInformation("Bogus seeded help content, shows, inquiries, tickets, notifications.");
 
-                // ── 7. Remaining tables (every table gets demo rows) ─────────
-                // Certifications (CertificateNumber is unique → insert missing only).
-                var demoCerts = new[]
+var demoCerts = new[]
                 {
                     ("ISO-13485-2024", "ISO 13485:2016 Quality Management", "BSI Group", 730),
                     ("CE-MDR-2024", "CE Mark — EU MDR 2017/745", "TÜV SÜD", 1095),
@@ -768,9 +730,7 @@ namespace Welco.Shared.Persistance.Seeding
                 }
                 logger.LogInformation("Bogus seeded {Count} certifications.", certsToAdd.Count);
 
-                // ExchangeRates (unique per base/target/date → insert missing only)
-                // + ExchangeRateSyncLogs.
-                var ratesAdded = 0;
+var ratesAdded = 0;
                 if (usd != null)
                 {
                     var targetCodes = new[] { "AED", "EUR", "SAR", "EGP", "GBP", "PKR", "JPY", "CAD", "TRY", "QAR" };
@@ -824,8 +784,7 @@ namespace Welco.Shared.Persistance.Seeding
                 }
                 logger.LogInformation("Bogus seeded {Count} exchange rates (+sync logs).", ratesAdded);
 
-                // Carts + CartItems (user carts + guest session carts).
-                if (!await db.Carts.AnyAsync(c => !c.IsDeleted && c.CreatedBy == Marker, ct) && products.Count > 0)
+if (!await db.Carts.AnyAsync(c => !c.IsDeleted && c.CreatedBy == Marker, ct) && products.Count > 0)
                 {
                     var cartOwners = activeMembers.Take(6).ToList();
                     if (cartOwners.Count == 0)
@@ -871,8 +830,7 @@ namespace Welco.Shared.Persistance.Seeding
                     logger.LogInformation("Bogus seeded {Count} carts (+items).", carts.Count);
                 }
 
-                // UserProductInteractions (unique per user/product/type → skip taken).
-                var interactionUsers = activeMembers.Take(10).ToList();
+var interactionUsers = activeMembers.Take(10).ToList();
                 if (interactionUsers.Count == 0)
                     interactionUsers = await db.ApplicationUsers.Where(u => !u.IsDeleted).Take(10).ToListAsync(ct);
                 if (interactionUsers.Count > 0 && products.Count > 0
@@ -905,8 +863,7 @@ namespace Welco.Shared.Persistance.Seeding
                     logger.LogInformation("Bogus seeded {Count} product interactions.", interactions.Count);
                 }
 
-                // DistributorApplications.
-                if (!await db.DistributorApplications.AnyAsync(d => !d.IsDeleted, ct))
+if (!await db.DistributorApplications.AnyAsync(d => !d.IsDeleted, ct))
                 {
                     var bands = new[] { "Under $100K", "$100K - $500K", "$500K - $1M", "$1M - $5M", "Over $5M" };
                     var appStatuses = new[]
@@ -937,8 +894,7 @@ namespace Welco.Shared.Persistance.Seeding
                     logger.LogInformation("Bogus seeded {Count} distributor applications.", apps.Count);
                 }
 
-                // Documents (metadata + demo file URLs only, no blobs).
-                if (!await db.Documents.AnyAsync(d => !d.IsDeleted, ct))
+if (!await db.Documents.AnyAsync(d => !d.IsDeleted, ct))
                 {
                     var docTypes = new[] { "Catalog", "Brochure", "IFU", "Certificate" };
                     var docs = new List<Document>();
@@ -962,8 +918,7 @@ namespace Welco.Shared.Persistance.Seeding
                     logger.LogInformation("Bogus seeded {Count} documents.", docs.Count);
                 }
 
-                // BlogPosts.
-                if (!await db.BlogPosts.AnyAsync(b => !b.IsDeleted, ct))
+if (!await db.BlogPosts.AnyAsync(b => !b.IsDeleted, ct))
                 {
                     var titles = new[]
                     {
@@ -989,8 +944,7 @@ namespace Welco.Shared.Persistance.Seeding
                     logger.LogInformation("Bogus seeded {Count} blog posts.", posts.Count);
                 }
 
-                // SupportContacts (singleton row).
-                if (!await db.SupportContacts.AnyAsync(s => !s.IsDeleted, ct))
+if (!await db.SupportContacts.AnyAsync(s => !s.IsDeleted, ct))
                 {
                     var contact = new SupportContact
                     {
@@ -1004,8 +958,7 @@ namespace Welco.Shared.Persistance.Seeding
                     logger.LogInformation("Bogus seeded support contact.");
                 }
 
-                // Extra landing pages (about-us comes from LandingPageSeeder).
-                if (!await db.LandingPages.AnyAsync(l => !l.IsDeleted && l.CreatedBy == Marker, ct))
+if (!await db.LandingPages.AnyAsync(l => !l.IsDeleted && l.CreatedBy == Marker, ct))
                 {
                     var existingSlugs = new HashSet<string>(
                         await db.LandingPages.Where(l => !l.IsDeleted).Select(l => l.Slug).ToListAsync(ct),
@@ -1037,8 +990,7 @@ namespace Welco.Shared.Persistance.Seeding
                     logger.LogInformation("Bogus seeded {Count} landing pages.", pagesToAdd.Count);
                 }
 
-                // UserRefreshTokens (one valid token per demo org member).
-                var tokenUsers = activeMembers.Take(5).ToList();
+var tokenUsers = activeMembers.Take(5).ToList();
                 if (tokenUsers.Count == 0)
                     tokenUsers = await db.ApplicationUsers.Where(u => !u.IsDeleted).Take(5).ToListAsync(ct);
                 if (tokenUsers.Count > 0 && !await db.UserRefreshTokens.AnyAsync(t => t.CreatedBy == Marker, ct))
@@ -1054,8 +1006,7 @@ namespace Welco.Shared.Persistance.Seeding
                     logger.LogInformation("Bogus seeded {Count} refresh tokens.", tokens.Count);
                 }
 
-                // AuditLogs are system-generated (captured on every SaveChanges above).
-                logger.LogInformation("AuditLogs auto-captured: {Count}.", await db.AuditLogs.CountAsync(ct));
+logger.LogInformation("AuditLogs auto-captured: {Count}.", await db.AuditLogs.CountAsync(ct));
                 logger.LogInformation("Bogus demo seeding complete.");
             }
             catch (Exception ex)

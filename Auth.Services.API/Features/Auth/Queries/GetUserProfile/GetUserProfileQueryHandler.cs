@@ -125,7 +125,7 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                             phoneCode = companyCountry?.PhoneCode?.Trim();
                         }
                     }
-                    catch { /* optional */ }
+                    catch {  }
                 }
 
                 if (phoneCode == null && addresses.Count > 0)
@@ -184,7 +184,7 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                             countryNameEn = country?.NameEn;
                             countryNameAr = country?.NameAr;
                         }
-                        catch { /* optional */ }
+                        catch {  }
 
                         return new CompanyDto
                         {
@@ -209,8 +209,7 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                 }
             }
 
-            // Fallback: If user is an OrganizationUser without companyId yet, look up their DistributorApplication
-            if (user.UserType == UserType.OrganizationUser)
+if (user.UserType == UserType.OrganizationUser)
             {
                 try
                 {
@@ -230,7 +229,7 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                             countryNameEn = country?.NameEn;
                             countryNameAr = country?.NameAr;
                         }
-                        catch { /* optional */ }
+                        catch {  }
 
                         return new CompanyDto
                         {

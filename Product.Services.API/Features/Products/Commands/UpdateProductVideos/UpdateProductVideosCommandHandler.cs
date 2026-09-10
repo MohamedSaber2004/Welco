@@ -34,8 +34,7 @@ namespace Product.Services.API.Features.Products.Commands.UpdateProductVideos
 
             var mediaRepo = _unitOfWork.GetRepository<ProductMedia, Guid>();
 
-            // Replace the whole video set: soft-delete current videos, then insert the new list.
-            var current = await mediaRepo.GetAll(m => !m.IsDeleted && m.ProductId == request.ProductId && m.Type == ProductMediaType.Video)
+var current = await mediaRepo.GetAll(m => !m.IsDeleted && m.ProductId == request.ProductId && m.Type == ProductMediaType.Video)
                 .ToListAsync(cancellationToken);
             foreach (var m in current)
             {
@@ -62,10 +61,7 @@ namespace Product.Services.API.Features.Products.Commands.UpdateProductVideos
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // NOTE: materialize before the (int) cast — EF translates an explicit
-            // numeric cast of a string-converted enum into CAST([Type] AS int),
-            // which blows up on the stored 'Video'/'Image'/'Document' values.
-            var rows = await mediaRepo.GetAll(m => !m.IsDeleted && m.ProductId == request.ProductId && m.Type == ProductMediaType.Video)
+var rows = await mediaRepo.GetAll(m => !m.IsDeleted && m.ProductId == request.ProductId && m.Type == ProductMediaType.Video)
                 .OrderBy(m => m.SortOrder)
                 .Select(m => new { m.Id, m.ProductId, m.Type, m.Url, m.SortOrder })
                 .ToListAsync(cancellationToken);

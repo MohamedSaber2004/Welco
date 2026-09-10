@@ -50,9 +50,7 @@ namespace Auth.Services.API.Features.Auth.Commands.VerifyEmailOtp
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            // Distributor gate: OrganizationUser must have approved Company/DistributorApplication.
-            // If still pending, keep them logged out: do NOT issue tokens. They can try to log in anytime later once approved.
-            if (user.UserType == UserType.OrganizationUser)
+if (user.UserType == UserType.OrganizationUser)
             {
                 bool isApproved = false;
                 if (user.CompanyId.HasValue)

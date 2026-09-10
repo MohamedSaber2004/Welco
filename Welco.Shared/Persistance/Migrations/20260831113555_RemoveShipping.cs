@@ -1,15 +1,13 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Welco.Shared.Persistance.Migrations
 {
-    /// <inheritdoc />
-    public partial class RemoveShipping : Migration
+        public partial class RemoveShipping : Migration
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
+                protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_Orders_Incoterms_IncotermId",
@@ -33,8 +31,7 @@ namespace Welco.Shared.Persistance.Migrations
                 table: "Orders");
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
+                protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<Guid>(
                 name: "IncotermId",

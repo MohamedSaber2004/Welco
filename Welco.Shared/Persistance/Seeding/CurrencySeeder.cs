@@ -7,7 +7,7 @@ namespace Welco.Shared.Persistance.Seeding
 {
     public static class CurrencySeeder
     {
-        // Full ISO 4217 active currencies — 178 codes, Frankfurter will skip unsupported (logged)
+        
         private static readonly (string Code, string NameEn, string NameAr, string Symbol, string SymbolNative, int Digits)[] Currencies =
         {
             ("AED","UAE Dirham","درهم إماراتي","AED","د.إ",2),
@@ -185,8 +185,7 @@ namespace Welco.Shared.Persistance.Seeding
                 return;
             }
 
-            // Ensure SymbolNative and DecimalDigits for existing currencies that are missing (migrated)
-            var existingEntities = await db.Currencies.Where(c => existingSet.Contains(c.Code)).ToListAsync();
+var existingEntities = await db.Currencies.Where(c => existingSet.Contains(c.Code)).ToListAsync();
             foreach (var e in existingEntities)
             {
                 var meta = Currencies.FirstOrDefault(x => x.Code.Equals(e.Code, StringComparison.OrdinalIgnoreCase));
@@ -194,11 +193,11 @@ namespace Welco.Shared.Persistance.Seeding
                 bool changed = false;
                 if (string.IsNullOrWhiteSpace(e.SymbolNative) || e.SymbolNative == e.Symbol)
                 {
-                    // keep existing Symbol if not empty, but ensure SymbolNative set
+                    
                     if (e.SymbolNative != meta.SymbolNative) { e.SymbolNative = meta.SymbolNative; changed = true; }
                 }
                 if (e.DecimalDigits == 0 && meta.Digits != 0) { e.DecimalDigits = meta.Digits; changed = true; }
-                else if (e.DecimalDigits != meta.Digits && (e.Code != "USD" || e.DecimalDigits != 2)) { /* keep as seeded except fix */ }
+                else if (e.DecimalDigits != meta.Digits && (e.Code != "USD" || e.DecimalDigits != 2)) {  }
                 if (changed) e.MarkAsUpdated("Seeder");
             }
 

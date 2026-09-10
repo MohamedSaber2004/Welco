@@ -1,7 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Product.Services.API.ProductRoutes;
 using Welco.Shared.Common.Attributes;
 using Welco.Shared.Common.DTOs.Products;
@@ -9,7 +8,6 @@ using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Controllers;
 using Welco.Shared.Domain.Models;
 using Welco.Shared.Enums;
-using Welco.Shared.Persistance;
 using Welco.Shared.Results;
 
 namespace Product.Services.API.Controllers
@@ -21,8 +19,7 @@ namespace Product.Services.API.Controllers
 
         public ExchangeRatesController(IMediator mediator, IExchangeRateService service) : base(mediator) => _service = service;
 
-        /// <summary>Latest rates for default base (USD)</summary>
-        [HttpGet]
+                [HttpGet]
         [Route(ProductApiRoutes.ExchangeRates.Latest)]
         [AllowAnonymous]
         public async Task<IActionResult> GetLatest(CancellationToken ct)
@@ -38,8 +35,7 @@ namespace Product.Services.API.Controllers
             }
         }
 
-        /// <summary>Latest rates for baseCurrency</summary>
-        [HttpGet]
+                [HttpGet]
         [Route(ProductApiRoutes.ExchangeRates.LatestByBase)]
         [AllowAnonymous]
         public async Task<IActionResult> GetLatestByBase([FromRoute] string baseCurrency, CancellationToken ct)
@@ -55,8 +51,7 @@ namespace Product.Services.API.Controllers
             }
         }
 
-        /// <summary>Single pair rate</summary>
-        [HttpGet]
+                [HttpGet]
         [Route(ProductApiRoutes.ExchangeRates.Pair)]
         [AllowAnonymous]
         public async Task<IActionResult> GetPair([FromRoute] string from, [FromRoute] string to, CancellationToken ct)
@@ -73,8 +68,7 @@ namespace Product.Services.API.Controllers
             }
         }
 
-        /// <summary>Convert amount</summary>
-        [HttpGet]
+                [HttpGet]
         [Route(ProductApiRoutes.ExchangeRates.Convert)]
         [AllowAnonymous]
         public async Task<IActionResult> Convert([FromQuery] string from, [FromQuery] string to, [FromQuery] decimal amount, CancellationToken ct)
@@ -94,8 +88,7 @@ namespace Product.Services.API.Controllers
             }
         }
 
-        /// <summary>Historical rates</summary>
-        [HttpGet]
+                [HttpGet]
         [Route(ProductApiRoutes.ExchangeRates.History)]
         [AllowAnonymous]
         public async Task<IActionResult> GetHistory([FromRoute] string baseCurrency, [FromRoute] string date, CancellationToken ct)
@@ -113,8 +106,7 @@ namespace Product.Services.API.Controllers
             }
         }
 
-        /// <summary>Manual sync - Admin only</summary>
-        [HttpPost]
+                [HttpPost]
         [Route(ProductApiRoutes.ExchangeRates.Sync)]
         [RoleAuthorize(UserType.Admin)]
         public async Task<IActionResult> Sync(CancellationToken ct)
@@ -136,18 +128,13 @@ namespace Product.Services.API.Controllers
             return ToActionResult(Result<ExchangeRateSyncResult>.Success(result));
         }
 
-        /// <summary>Recent sync logs</summary>
-        [HttpGet]
+                [HttpGet]
         [Route(ProductApiRoutes.ExchangeRates.SyncLogs)]
         [AllowAnonymous]
-        public async Task<IActionResult> GetSyncLogs([FromServices] WelcoDbContext db, [FromQuery] int take = 10, CancellationToken ct = default)
+        public async Task<IActionResult> GetSyncLogs([FromQuery] int take = 10, CancellationToken ct = default)
         {
-            var logs = await db.ExchangeRateSyncLogs
-                .AsNoTracking()
-                .OrderByDescending(l => l.StartedAt)
-                .Take(Math.Clamp(take, 1, 100))
-                .ToListAsync(ct);
-            return ToActionResult(Result<List<ExchangeRateSyncLog>>.Success(logs));
+            var logs = await _service.GetSyncLogsAsync(take, ct);
+            return ToActionResult(Result<IReadOnlyCollection<ExchangeRateSyncLog>>.Success(logs));
         }
     }
 }

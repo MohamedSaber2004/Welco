@@ -73,13 +73,7 @@ namespace Content.Services.API.ContentRoutes
             public const string Update = "";
         }
         public const string TradeShowsBase = Root + "/" + Version + "/trade-shows";
-        public const string OemServicesBase = Root + "/" + Version + "/oem-services";
         public const string OemInquiriesBase = Root + "/" + Version + "/oem-inquiries";
-        public static class OemServices
-        {
-            public const string Base = OemServicesBase;
-            public const string GetAll = "";
-        }
         public static class OemInquiries
         {
             public const string Base = OemInquiriesBase;

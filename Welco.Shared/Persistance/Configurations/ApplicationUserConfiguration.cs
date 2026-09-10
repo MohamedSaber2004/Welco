@@ -21,12 +21,7 @@ namespace Welco.Shared.Persistance.Configurations
             builder.Property(u => u.Language)
                 .HasConversion<string>();
 
-            // Legacy rows may store UserType values removed from the enum
-            // (e.g. 'Customer'). A plain string conversion throws on read and
-            // 500s every query touching the row (reported via the admin Users
-            // page). Fall back to OrganizationUser - the old buyer role - so a
-            // single stale row can never take down a whole listing again.
-            builder.Property(u => u.UserType)
+builder.Property(u => u.UserType)
                 .HasConversion(new ValueConverter<UserType, string>(
                     toProvider => toProvider.ToString(),
                     fromProvider => ToUserType(fromProvider)));

@@ -1,15 +1,13 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace Welco.Shared.Persistance.Migrations
 {
-    /// <inheritdoc />
-    public partial class P0IdentityRolesAudit : Migration
+        public partial class P0IdentityRolesAudit : Migration
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
+                protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<Guid>(
                 name: "CompanyId",
@@ -62,8 +60,7 @@ namespace Welco.Shared.Persistance.Migrations
                 "WHERE [UserType] IN ('Doctor', 'Provider', 'Marketing', 'OrderFulfillmentOfficer')");
         }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
+                protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "AuditLogs");

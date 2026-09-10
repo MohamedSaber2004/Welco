@@ -8,7 +8,6 @@ using Product.Services.API.Features.Categories.Commands.UpdateCategory;
 using Product.Services.API.Features.Categories.Queries.GetCategories;
 using Product.Services.API.Features.Categories.Queries.GetCategoryById;
 using Product.Services.API.Features.Categories.Queries.GetCategoryProducts;
-using Product.Services.API.Features.Categories.Queries.ShowCategory;
 using Product.Services.API.ProductRoutes;
 using Welco.Shared.Common.Attributes;
 using Welco.Shared.Controllers;
@@ -24,13 +23,7 @@ namespace Product.Services.API.Controllers
         {
         }
 
-        /// <summary>
-        /// Get All Categories
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpGet]
+                [HttpGet]
         [Route(ProductApiRoutes.Categories.GetAll)]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -40,13 +33,7 @@ namespace Product.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Get Category By Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpGet]
+                [HttpGet]
         [Route(ProductApiRoutes.Categories.GetById)]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -57,30 +44,7 @@ namespace Product.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Show Categories
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route(ProductApiRoutes.Categories.Show)]
-        [AllowAnonymous]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Show([FromRoute] Guid id, CancellationToken cancellationToken)
-        {
-            var result = await _mediator.Send(new ShowCategoryQuery { Id = id }, cancellationToken);
-            return ToActionResult(result);
-        }
-
-        /// <summary>
-        /// Create Category
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPost]
+[HttpPost]
         [Route(ProductApiRoutes.Categories.Create)]
         [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -91,14 +55,7 @@ namespace Product.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Update Category
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPut]
+                [HttpPut]
         [Route(ProductApiRoutes.Categories.Update)]
         [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -111,13 +68,7 @@ namespace Product.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Delete  Category
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpDelete]
+                [HttpDelete]
         [Route(ProductApiRoutes.Categories.Delete)]
         [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         [ProducesResponseType(StatusCodes.Status200OK)]

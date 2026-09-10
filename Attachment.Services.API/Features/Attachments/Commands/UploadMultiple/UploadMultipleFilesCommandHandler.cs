@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Welco.Shared.Common.Interfaces;
 
 namespace Attachment.Services.API.Features.Attachments.Commands.UploadMultiple
@@ -26,22 +26,19 @@ namespace Attachment.Services.API.Features.Attachments.Commands.UploadMultiple
         {
             var results = new List<string>();
 
-            // Process Images
-            if (request.Images != null && request.Images.Any())
+if (request.Images != null && request.Images.Any())
             {
                 var (uploaded, result) = await _imageValidator.UploadMultipleImage(request.Images, request.ImagesPlace);
                 if (uploaded) results.AddRange(result.Split(','));
             }
 
-            // Process Videos
-            if (request.Videos != null && request.Videos.Any())
+if (request.Videos != null && request.Videos.Any())
             {
                 var (uploaded, result) = await _videoValidator.UploadMultipleVideo(request.Videos, request.VideosPlace);
                 if (uploaded) results.AddRange(result.Split(','));
             }
 
-            // Process Audios
-            if (request.Audios != null && request.Audios.Any())
+if (request.Audios != null && request.Audios.Any())
             {
                 foreach (var audio in request.Audios)
                 {
@@ -50,8 +47,7 @@ namespace Attachment.Services.API.Features.Attachments.Commands.UploadMultiple
                 }
             }
 
-            // Process Documents
-            if (request.Documents != null && request.Documents.Any())
+if (request.Documents != null && request.Documents.Any())
             {
                 var (uploaded, result) = await _fileValidator.UploadMultipleFile(request.Documents, request.DocumentsPlace);
                 if (uploaded) results.AddRange(result.Split(','));

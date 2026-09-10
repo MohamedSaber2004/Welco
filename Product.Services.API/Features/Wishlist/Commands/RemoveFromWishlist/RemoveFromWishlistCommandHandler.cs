@@ -30,7 +30,7 @@ namespace Product.Services.API.Features.Wishlist.Commands.RemoveFromWishlist
                 .ToListAsync(cancellationToken);
 
             if (!interactions.Any())
-                return Result<string>.Success(request.ProductId.ToString(), LocalizationKeys.Product.RemovedFromWishlist); // Idempotent remove
+                return Result<string>.Success(request.ProductId.ToString(), LocalizationKeys.Product.RemovedFromWishlist); 
 
             foreach (var interaction in interactions)
             {

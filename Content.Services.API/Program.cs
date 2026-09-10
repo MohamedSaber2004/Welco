@@ -56,7 +56,10 @@ namespace Content.Services.API
                 builder.WebHost.UseUrls($"http://*:{port}");
             }
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options =>
+            {
+                options.Conventions.Add(new IntegrationRouteConvention(builder.Configuration));
+            });
             builder.Services.AddJsonLocalization();
             builder.Services.AddWelcoSharedDependencies(builder.Configuration);
             builder.Services.AddWelcoIdentity(builder.Configuration);
@@ -98,7 +101,7 @@ namespace Content.Services.API
             }
 
             app.UseCors("AllowAll");
-            // Downstream services re-validate the JWT forwarded by the Welco.API Gateway (Ocelot).
+            
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -111,8 +114,7 @@ namespace Content.Services.API
             });
             app.MapControllers();
 
-            // Auto-migrate and seed the default about-us page - non-destructive
-            if (!app.Environment.IsEnvironment("Test"))
+if (!app.Environment.IsEnvironment("Test"))
             {
                 try
                 {

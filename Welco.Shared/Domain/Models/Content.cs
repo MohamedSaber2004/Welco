@@ -4,7 +4,7 @@ namespace Welco.Shared.Domain.Models
     public class Document : BaseEntity<Guid>
     {
         public string Title { get; set; } = null!;
-        public string DocType { get; set; } = null!; // Catalog, Brochure, IFU, Certificate
+        public string DocType { get; set; } = null!; 
         public string FileUrl { get; set; } = null!;
         public int FileSizeKB { get; set; }
         public Guid? ProductId { get; set; }
@@ -13,7 +13,7 @@ namespace Welco.Shared.Domain.Models
     }
     public class LandingPage : BaseEntity<Guid>
     {
-        public string Type { get; set; } = null!; // Brand, Specialty, Procedure
+        public string Type { get; set; } = null!; 
         public string Slug { get; set; } = null!;
         public string HeroTitle { get; set; } = null!;
         public string? HeroBody { get; set; }
@@ -66,7 +66,7 @@ namespace Welco.Shared.Domain.Models
         public virtual ApplicationUser? User { get; set; }
         public string Subject { get; set; } = null!;
         public string Message { get; set; } = null!;
-        public string Status { get; set; } = "Open"; // Open, Answered, Closed
+        public string Status { get; set; } = "Open"; 
         public string? Reply { get; set; }
         public DateTime? RepliedAt { get; set; }
         public Guid? RepliedBy { get; set; }

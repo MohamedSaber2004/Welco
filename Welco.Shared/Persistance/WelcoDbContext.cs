@@ -15,8 +15,7 @@ namespace Welco.Shared.Persistance
     {
         private readonly ICurrentUserService? _currentUserService;
 
-
-        public DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
+public DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
         public DbSet<UserRefreshToken> UserRefreshTokens => Set<UserRefreshToken>();
         public DbSet<Country> Countries => Set<Country>();
         public DbSet<City> Cities => Set<City>();
@@ -149,10 +148,8 @@ namespace Welco.Shared.Persistance
                     switch (entry.State)
                     {
                         case EntityState.Added:
-                            // Preserve an explicitly assigned creator (e.g. seeders
-                            // stamping CreatedBy = "BogusSeeder"/"Seeder"); only
-                            // default to the ambient user when nothing was set.
-                            if (string.IsNullOrWhiteSpace(baseEntity.CreatedBy))
+
+if (string.IsNullOrWhiteSpace(baseEntity.CreatedBy))
                                 baseEntity.MarkAsCreated(currentUserId);
                             break;
 

@@ -21,8 +21,7 @@ namespace Welco.Shared.Localization
         {
             var assembly = typeof(JsonLocalizationProvider).Assembly;
 
-            // 1. Load from Embedded Resources (Always guaranteed to be available in-memory)
-            foreach (var langCode in AppLanguageExtensions.GetAllCodes())
+foreach (var langCode in AppLanguageExtensions.GetAllCodes())
             {
                 var resourceName = $"Welco.Shared.Localization.Resources.messages.{langCode}.json";
                 using var stream = assembly.GetManifestResourceStream(resourceName);
@@ -43,8 +42,7 @@ namespace Welco.Shared.Localization
                 }
             }
 
-            // 2. Also check physical disk files if present
-            var baseDirectory = AppContext.BaseDirectory;
+var baseDirectory = AppContext.BaseDirectory;
             var assemblyLocation = Path.GetDirectoryName(assembly.Location);
 
             var possiblePaths = new List<string>();
@@ -121,8 +119,7 @@ namespace Welco.Shared.Localization
                 return value;
             }
 
-            // Fallback to English
-            var englishCode = AppLanguage.En.ToCode();
+var englishCode = AppLanguage.En.ToCode();
             if (normalizedCode != englishCode && _localizations.TryGetValue(englishCode, out var enData) && enData.TryGetValue(key, out var enValue))
             {
                 return enValue;

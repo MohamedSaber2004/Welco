@@ -105,8 +105,7 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                     }
                 }
 
-                // Validate country, city, zone references for every incoming address
-                foreach (var addrDto in request.Addresses)
+foreach (var addrDto in request.Addresses)
                 {
                     var country = await countryRepo.GetByIdAsync(addrDto.CountryId, cancellationToken);
                     if (country == null || country.IsDeleted)
@@ -133,8 +132,7 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                     }
                 }
 
-                // Soft-delete addresses that are not present in incoming list
-                foreach (var existing in existingAddresses)
+foreach (var existing in existingAddresses)
                 {
                     if (!incomingAddressIds.Contains(existing.Id))
                     {
@@ -143,8 +141,7 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                     }
                 }
 
-                // Update existing or create new addresses — supports many same/different country with IsDefault
-                var newAddresses = new List<UserAddress>();
+var newAddresses = new List<UserAddress>();
                 var hasExplicitDefault = request.Addresses.Any(a => a.IsDefault == true);
                 foreach (var addrDto in request.Addresses)
                 {
@@ -182,13 +179,12 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                     }
                 }
 
-                // Enforce single default per user (clean multi-address)
-                if (hasExplicitDefault)
+if (hasExplicitDefault)
                 {
-                    // Find last incoming with IsDefault == true as the intended default
+                    
                     var defaultDto = request.Addresses.LastOrDefault(a => a.IsDefault == true);
                     Guid? defaultId = defaultDto?.Id;
-                    // Resolve default entity (existing updated or newly created)
+                    
                     UserAddress? intendedDefault = null;
                     if (defaultDto != null)
                     {
@@ -198,13 +194,13 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                         }
                         else
                         {
-                            // New address default — find by matching street/country (last new with IsDefault true)
+                            
                             intendedDefault = newAddresses.LastOrDefault(a => a.IsDefault);
                         }
                     }
-                    // Clear all other defaults for this user
+                    
                     var allRemaining = existingAddresses.Where(a => incomingAddressIds.Contains(a.Id) || newAddresses.Contains(a)).Concat(newAddresses).ToList();
-                    // Actually collect all tracked remaining: existing not deleted + new
+                    
                     var remainingForDefault = new List<UserAddress>();
                     remainingForDefault.AddRange(existingAddresses.Where(a => incomingAddressIds.Contains(a.Id)));
                     remainingForDefault.AddRange(newAddresses);
@@ -222,7 +218,7 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                 }
                 else
                 {
-                    // No explicit default in payload — ensure at least one default remains (first address becomes default if none)
+                    
                     var remaining = new List<UserAddress>();
                     remaining.AddRange(existingAddresses.Where(a => incomingAddressIds.Contains(a.Id)));
                     remaining.AddRange(newAddresses);
@@ -288,7 +284,7 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                 }
                 catch
                 {
-                    /* optional */
+                    
                 }
 
                 if (phoneCode == null && user.CompanyId.HasValue && user.CompanyId.Value != Guid.Empty)
@@ -304,7 +300,7 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                             phoneCode = companyCountry?.PhoneCode?.Trim();
                         }
                     }
-                    catch { /* optional */ }
+                    catch {  }
                 }
 
                 if (phoneCode == null && addresses.Count > 0)
@@ -359,7 +355,7 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                     var country = await countryRepo.GetByIdAsync(company.CountryId, cancellationToken);
                     countryNameEn = country?.NameEn;
                 }
-                catch { /* optional */ }
+                catch {  }
                 return new CompanyDto
                 {
                     Id = company.Id,

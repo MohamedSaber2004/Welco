@@ -52,8 +52,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Login
                     new List<string> { LocalizationKeys.Auth.EmailNotConfirmed });
             }
 
-            // Distributor gate: OrganizationUser must have approved Company/DistributorApplication
-            if (user.UserType == UserType.OrganizationUser)
+if (user.UserType == UserType.OrganizationUser)
             {
                 if (user.CompanyId.HasValue)
                 {

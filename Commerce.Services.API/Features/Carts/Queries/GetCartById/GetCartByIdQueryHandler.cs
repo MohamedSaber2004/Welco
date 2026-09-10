@@ -24,9 +24,7 @@ namespace Commerce.Services.API.Features.Carts.Queries.GetCartById
             if (cart == null)
                 return Result<CartDto>.NotFound(LocalizationKeys.Cart.NotFound);
 
-            // Load Product names for items if needed
-            // Use mapper ToDto that handles IsDeleted filter
-            var dto = CommerceDtoMapper.ToDto(cart);
+var dto = CommerceDtoMapper.ToDto(cart);
             return Result<CartDto>.Success(dto, LocalizationKeys.Cart.Fetched);
         }
     }

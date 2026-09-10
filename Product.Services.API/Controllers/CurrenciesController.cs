@@ -23,13 +23,7 @@ namespace Product.Services.API.Controllers
         {
         }
 
-        /// <summary>
-        /// Get All Currencies
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpGet]
+                [HttpGet]
         [Route(ProductApiRoutes.Currencies.GetAll)]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -39,13 +33,7 @@ namespace Product.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Get Currency By Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpGet]
+                [HttpGet]
         [Route(ProductApiRoutes.Currencies.GetById)]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -67,13 +55,7 @@ namespace Product.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Create Currency
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPost]
+                [HttpPost]
         [Route(ProductApiRoutes.Currencies.Create)]
         [RoleAuthorize(UserType.Admin)]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -85,14 +67,7 @@ namespace Product.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Update Currency
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPut]
+                [HttpPut]
         [Route(ProductApiRoutes.Currencies.Update)]
         [RoleAuthorize(UserType.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -106,13 +81,7 @@ namespace Product.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Delete Currency
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpDelete]
+                [HttpDelete]
         [Route(ProductApiRoutes.Currencies.Delete)]
         [RoleAuthorize(UserType.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]

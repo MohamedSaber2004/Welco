@@ -30,7 +30,7 @@ namespace Welco.API.Services
             var cacheDir = Path.Combine(ocelotDir, "Cache");
             if (!Directory.Exists(cacheDir))
             {
-                try { Directory.CreateDirectory(cacheDir); } catch { /* ignore */ }
+                try { Directory.CreateDirectory(cacheDir); } catch {  }
             }
 
             var downstreamEndpoints = await GetDownstreamOpenApiEndpointsAsync(cancellationToken);
@@ -88,8 +88,7 @@ namespace Welco.API.Services
             {
                 if (serviceObj == null) continue;
 
-                // Merge Paths
-                if (serviceObj.TryGetPropertyValue("paths", out var pathsNode) && pathsNode is JsonObject pathsObj)
+if (serviceObj.TryGetPropertyValue("paths", out var pathsNode) && pathsNode is JsonObject pathsObj)
                 {
                     foreach (var (pathKey, pathValue) in pathsObj)
                     {
@@ -101,8 +100,7 @@ namespace Welco.API.Services
                     }
                 }
 
-                // Merge Components -> Schemas
-                if (serviceObj.TryGetPropertyValue("components", out var componentsNode) && componentsNode is JsonObject componentsObj)
+if (serviceObj.TryGetPropertyValue("components", out var componentsNode) && componentsNode is JsonObject componentsObj)
                 {
                     if (componentsObj.TryGetPropertyValue("schemas", out var schemasNode) && schemasNode is JsonObject schemasObj)
                     {
@@ -116,8 +114,7 @@ namespace Welco.API.Services
                     }
                 }
 
-                // Merge Tags
-                if (serviceObj.TryGetPropertyValue("tags", out var tagsNode) && tagsNode is JsonArray tagsArray)
+if (serviceObj.TryGetPropertyValue("tags", out var tagsNode) && tagsNode is JsonArray tagsArray)
                 {
                     foreach (var tag in tagsArray)
                     {
@@ -184,7 +181,7 @@ namespace Welco.API.Services
             var cacheDir = Path.Combine(ocelotDir, "Cache");
             if (!Directory.Exists(cacheDir))
             {
-                try { Directory.CreateDirectory(cacheDir); } catch { /* ignore */ }
+                try { Directory.CreateDirectory(cacheDir); } catch {  }
             }
 
             var endpoints = await GetDownstreamOpenApiEndpointsAsync(cancellationToken);
@@ -271,7 +268,7 @@ namespace Welco.API.Services
                         }
                         catch
                         {
-                            // ignore file caching errors
+                            
                         }
 
                         var serviceNode = JsonNode.Parse(content);
@@ -295,8 +292,7 @@ namespace Welco.API.Services
                 }
             }
 
-            // Fallback to cached schema on disk if available
-            if (File.Exists(cacheFile))
+if (File.Exists(cacheFile))
             {
                 try
                 {
@@ -344,7 +340,7 @@ namespace Welco.API.Services
             }
             catch
             {
-                // return raw if parsing fails
+                
             }
 
             return openApiJson;

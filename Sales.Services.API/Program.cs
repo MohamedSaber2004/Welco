@@ -52,7 +52,10 @@ namespace Sales.Services.API
                 builder.WebHost.UseUrls($"http://*:{port}");
             }
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options =>
+            {
+                options.Conventions.Add(new Welco.Shared.Common.Extensions.IntegrationRouteConvention(builder.Configuration));
+            });
             builder.Services.AddJsonLocalization();
             builder.Services.AddWelcoSharedDependencies(builder.Configuration);
             builder.Services.AddWelcoIdentity(builder.Configuration);
@@ -94,7 +97,7 @@ namespace Sales.Services.API
             }
 
             app.UseCors("AllowAll");
-            // Downstream services re-validate the JWT forwarded by the Welco.API Gateway (Ocelot).
+            
             app.UseAuthentication();
             app.UseAuthorization();
 

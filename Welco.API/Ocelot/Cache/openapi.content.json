@@ -640,6 +640,174 @@
         }
       }
     },
+    "/api/integration/help/articles": {
+      "get": {
+        "tags": [
+          "IntegrationHelp"
+        ],
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/integration/help/faqs": {
+      "get": {
+        "tags": [
+          "IntegrationHelp"
+        ],
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/integration/support/tickets": {
+      "get": {
+        "tags": [
+          "IntegrationSupport"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/integration/support/tickets/{id}": {
+      "get": {
+        "tags": [
+          "IntegrationSupport"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/integration/support/tickets/{id}/reply": {
+      "post": {
+        "tags": [
+          "IntegrationSupport"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplySupportTicketRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplySupportTicketRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplySupportTicketRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/integration/support/tickets/{id}/close": {
+      "post": {
+        "tags": [
+          "IntegrationSupport"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/landing-pages": {
       "get": {
         "tags": [
@@ -956,25 +1124,6 @@
               "format": "uuid"
             }
           },
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/v1/oem-services": {
-      "get": {
-        "tags": [
-          "OemServices"
-        ],
-        "parameters": [
           {
             "name": "Accept-Language",
             "in": "header",
@@ -1482,6 +1631,14 @@
           }
         }
       },
+      "ReplySupportTicketRequest": {
+        "type": "object",
+        "properties": {
+          "reply": {
+            "type": "string"
+          }
+        }
+      },
       "ReplyTicketCommand": {
         "type": "object",
         "properties": {
@@ -1650,13 +1807,16 @@
       "name": "HelpCategories"
     },
     {
+      "name": "IntegrationHelp"
+    },
+    {
+      "name": "IntegrationSupport"
+    },
+    {
       "name": "LandingPages"
     },
     {
       "name": "OemInquiries"
-    },
-    {
-      "name": "OemServices"
     },
     {
       "name": "SupportContact"

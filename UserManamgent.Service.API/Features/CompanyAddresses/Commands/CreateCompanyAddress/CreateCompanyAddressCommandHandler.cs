@@ -56,7 +56,7 @@ namespace UserManamgent.Service.API.Features.CompanyAddresses.Commands.CreateCom
                 : "System";
 
             var addressRepo = _unitOfWork.GetRepository<CompanyAddress, Guid>();
-            // Support many addresses same country or across countries — each has own CountryId
+            
             var existing = await addressRepo.GetAllListAsync(a => a.CompanyId == request.CompanyId && !a.IsDeleted, cancellationToken);
             var isFirst = !existing.Any();
             var shouldBeDefault = request.IsDefault || isFirst;

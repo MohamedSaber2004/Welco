@@ -26,10 +26,8 @@ namespace Product.Services.API.Features.Products.Queries.GetProductVideos
                 return Result<IReadOnlyList<ProductMediaDto>>.NotFound(LocalizationKeys.Product.NotFound);
 
             var mediaRepo = _unitOfWork.GetRepository<ProductMedia, Guid>();
-            // NOTE: materialize before the (int) cast — EF translates an explicit
-            // numeric cast of a string-converted enum into CAST([Type] AS int),
-            // which blows up on the stored 'Video'/'Image'/'Document' values.
-            var rows = await mediaRepo.GetAll(m => !m.IsDeleted && m.ProductId == request.ProductId && m.Type == ProductMediaType.Video)
+
+var rows = await mediaRepo.GetAll(m => !m.IsDeleted && m.ProductId == request.ProductId && m.Type == ProductMediaType.Video)
                 .OrderBy(m => m.SortOrder)
                 .Select(m => new { m.Id, m.ProductId, m.Type, m.Url, m.SortOrder })
                 .ToListAsync(cancellationToken);

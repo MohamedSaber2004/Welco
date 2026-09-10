@@ -20,34 +20,22 @@ namespace Content.Services.API.Controllers
     {
         public LandingPagesController(IMediator mediator) : base(mediator) { }
 
-        /// <summary>
-        /// Get All LandingPages
-        /// </summary>
-        [HttpGet]
+                [HttpGet]
         [Route(ContentApiRoutes.LandingPages.GetAll)]
         [AllowAnonymous]
         public async Task<IActionResult> GetAll([FromQuery] GetLandingPagesQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
 
-        /// <summary>
-        /// Get LandingPage By Slug
-        /// </summary>
-        [HttpGet]
+                [HttpGet]
         [Route(ContentApiRoutes.LandingPages.GetBySlug)]
         [AllowAnonymous]
         public async Task<IActionResult> GetBySlug([FromRoute] string slug, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetLandingPageBySlugQuery { Slug = slug }, ct));
 
-        /// <summary>
-        /// Create LandingPage
-        /// </summary>
-        [HttpPost]
+                [HttpPost]
         [Route(ContentApiRoutes.LandingPages.Create)]
         [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> Create([FromBody] CreateLandingPageCommand cmd, CancellationToken ct) => ToActionResult(await _mediator.Send(cmd, ct));
 
-        /// <summary>
-        /// Update LandingPage
-        /// </summary>
-        [HttpPut]
+                [HttpPut]
         [Route(ContentApiRoutes.LandingPages.Update)]
         [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateLandingPageCommand cmd, CancellationToken ct)
@@ -56,10 +44,7 @@ namespace Content.Services.API.Controllers
             return ToActionResult(await _mediator.Send(cmd, ct));
         }
 
-        /// <summary>
-        /// Delete LandingPage
-        /// </summary>
-        [HttpDelete]
+                [HttpDelete]
         [Route(ContentApiRoutes.LandingPages.Delete)]
         [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken ct)

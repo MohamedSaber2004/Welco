@@ -86,8 +86,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             var baseCurrency = _settings.BaseCurrency.Trim().ToUpperInvariant();
             if (string.IsNullOrWhiteSpace(baseCurrency)) baseCurrency = "USD";
 
-            // Load latest rates for base currency (cached)
-            var rates = await GetLatestRatesInternalAsync(baseCurrency, cancellationToken);
+var rates = await GetLatestRatesInternalAsync(baseCurrency, cancellationToken);
 
             var fromRate = fromCurrency == baseCurrency ? 1m : GetRateForCurrency(rates, fromCurrency);
             var toRate = toCurrency == baseCurrency ? 1m : GetRateForCurrency(rates, toCurrency);
@@ -105,12 +104,10 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             else
                 rate = toRate!.Value / fromRate!.Value;
 
-            // Financial precision: only round final converted amount per target currency
-            var decimalDigits = GetDecimalDigits(toCurrency);
+var decimalDigits = GetDecimalDigits(toCurrency);
             var converted = Decimal.Round(amount * rate, decimalDigits, MidpointRounding.AwayFromZero);
 
-            // Determine RateDate and Source from cached entry
-            var rateDate = rates.Values.FirstOrDefault()?.RateDate ?? DateOnly.FromDateTime(DateTime.UtcNow.Date);
+var rateDate = rates.Values.FirstOrDefault()?.RateDate ?? DateOnly.FromDateTime(DateTime.UtcNow.Date);
             var source = rates.Values.FirstOrDefault()?.Source ?? _provider.ProviderName;
 
             return new ConversionResultDto
@@ -159,7 +156,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
 
             if (rates.Count == 0)
             {
-                // Fallback to latest if no historical
+                
                 return await GetLatestRatesAsync(baseCurrency, cancellationToken);
             }
 
@@ -224,13 +221,11 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 if (response.Rates == null || response.Rates.Count == 0)
                     throw new InvalidOperationException("Provider returned empty rates");
 
-                // Validate base currency exists
-                var baseCurr = await _db.Currencies.FirstOrDefaultAsync(c => c.Code == baseCurrency && !c.IsDeleted, cancellationToken);
+var baseCurr = await _db.Currencies.FirstOrDefaultAsync(c => c.Code == baseCurrency && !c.IsDeleted, cancellationToken);
                 if (baseCurr == null)
                     throw new InvalidOperationException($"Base currency {baseCurrency} not found in Currencies table (seed required)");
 
-                // Validate and filter rates
-                var validRates = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
+var validRates = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
                 foreach (var kv in response.Rates)
                 {
                     var code = kv.Key?.Trim().ToUpperInvariant();
@@ -243,22 +238,16 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 if (validRates.Count == 0)
                     throw new InvalidOperationException("No valid rates after validation");
 
-                // Bulk upsert for today's RateDate (do not overwrite history)
-                var targetDate = response.Date;
+var targetDate = response.Date;
                 var currencies = await _db.Currencies.Where(c => !c.IsDeleted).ToDictionaryAsync(c => c.Code, c => c, StringComparer.OrdinalIgnoreCase, cancellationToken);
 
-                // Fetch all existing rates for base currency & targetDate in a single batch query
-                var existingRates = await _db.ExchangeRates
+var existingRates = await _db.ExchangeRates
                     .Where(r => r.BaseCurrencyId == baseCurr.Id && r.RateDate == targetDate && !r.IsDeleted)
                     .ToDictionaryAsync(r => r.TargetCurrencyId, cancellationToken);
 
                 var count = 0;
-                // NOTE: DbContext is configured with EnableRetryOnFailure, whose
-                // SqlServerRetryingExecutionStrategy forbids user-initiated
-                // transactions. All transactional work must run inside
-                // CreateExecutionStrategy().ExecuteAsync so retries wrap the
-                // whole transaction as a retriable unit.
-                var strategy = _db.Database.CreateExecutionStrategy();
+
+var strategy = _db.Database.CreateExecutionStrategy();
                 await strategy.ExecuteAsync(async () =>
                 {
                     using var tx = await _db.Database.BeginTransactionAsync(cancellationToken);
@@ -274,7 +263,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
 
                             if (existingRates.TryGetValue(targetCurr.Id, out var existing))
                             {
-                                // Update today's rate if changed (idempotent)
+                                
                                 if (existing.Rate != kv.Value || existing.Source != response.Source)
                                 {
                                     existing.Rate = kv.Value;
@@ -312,10 +301,9 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                     }
                 });
 
-                // Invalidate cache
-                var cacheKey = CacheKey(baseCurrency, targetDate);
+var cacheKey = CacheKey(baseCurrency, targetDate);
                 _cache.Remove(cacheKey);
-                // Also cache latest (today)
+                
                 var latestKey = CacheKey(baseCurrency, targetDate);
                 _cache.Remove(latestKey);
 
@@ -374,14 +362,13 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
 
         private async Task<Dictionary<string, CachedRate>> GetLatestRatesInternalAsync(string baseCurrency, CancellationToken cancellationToken)
         {
-            // Try cache first: key for today
+            
             var today = DateOnly.FromDateTime(DateTime.UtcNow.Date);
             var cacheKey = CacheKey(baseCurrency, today);
             if (_cache.TryGetValue(cacheKey, out Dictionary<string, CachedRate>? cached) && cached != null)
                 return cached;
 
-            // DB: get latest RateDate for base
-            var baseCurr = await _db.Currencies.AsNoTracking().FirstOrDefaultAsync(c => c.Code == baseCurrency && !c.IsDeleted, cancellationToken);
+var baseCurr = await _db.Currencies.AsNoTracking().FirstOrDefaultAsync(c => c.Code == baseCurrency && !c.IsDeleted, cancellationToken);
             if (baseCurr == null)
                 throw new InvalidOperationException($"Base currency {baseCurrency} not found");
 
@@ -419,9 +406,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 FetchedAt = r.FetchedAt
             }, StringComparer.OrdinalIgnoreCase);
 
-            // Also include base->self implied 1? Not stored.
-
-            _cache.Set(cacheKey, dict, TimeSpan.FromMinutes(_settings.CacheExpirationMinutes > 0 ? _settings.CacheExpirationMinutes : 60));
+_cache.Set(cacheKey, dict, TimeSpan.FromMinutes(_settings.CacheExpirationMinutes > 0 ? _settings.CacheExpirationMinutes : 60));
             return dict;
         }
 
@@ -433,10 +418,19 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
 
         private int GetDecimalDigits(string code)
         {
-            // Try to get from DB cache? For simplicity use 2, but we can lookup currency's DecimalDigits
-            // This is called sync; we do fast DB lookup fallback to 2
-            var cur = _db.Currencies.AsNoTracking().FirstOrDefault(c => c.Code == code && !c.IsDeleted);
+
+var cur = _db.Currencies.AsNoTracking().FirstOrDefault(c => c.Code == code && !c.IsDeleted);
             return cur?.DecimalDigits ?? 2;
+        }
+
+        public async Task<IReadOnlyCollection<ExchangeRateSyncLog>> GetSyncLogsAsync(int take, CancellationToken cancellationToken)
+        {
+            var logs = await _db.ExchangeRateSyncLogs
+                .AsNoTracking()
+                .OrderByDescending(l => l.StartedAt)
+                .Take(Math.Clamp(take, 1, 100))
+                .ToListAsync(cancellationToken);
+            return logs;
         }
 
         private static string NormalizeCode(string code) => string.IsNullOrWhiteSpace(code) ? "USD" : code.Trim().ToUpperInvariant();

@@ -19,43 +19,28 @@ namespace Commerce.Services.API.Controllers
     {
         public OrdersController(IMediator mediator) : base(mediator) { }
 
-        /// <summary>
-        /// Get All Orders
-        /// </summary>
-        [HttpGet]
+                [HttpGet]
         [Route(CommerceApiRoutes.Orders.GetAll)]
         [RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> GetAll([FromQuery] GetOrdersQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
 
-        /// <summary>
-        /// Get Order By Id
-        /// </summary>
-        [HttpGet]
+                [HttpGet]
         [Route(CommerceApiRoutes.Orders.GetById)]
         [RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetOrderByIdQuery { Id = id }, ct));
 
-        /// <summary>
-        /// Track Order by Order Number
-        /// </summary>
-        [HttpGet]
+                [HttpGet]
         [Route(CommerceApiRoutes.Orders.Track)]
         [RoleAuthorize]
         public async Task<IActionResult> Track([FromRoute] string orderNumber, CancellationToken ct)
             => ToActionResult(await _mediator.Send(new TrackOrderQuery { OrderNumber = orderNumber }, ct));
 
-        /// <summary>
-        /// Create Order
-        /// </summary>
-        [HttpPost]
+                [HttpPost]
         [Route(CommerceApiRoutes.Orders.Create)]
         [RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> Create([FromBody] CreateOrderCommand cmd, CancellationToken ct) => ToActionResult(await _mediator.Send(cmd, ct));
 
-        /// <summary>
-        /// Update Order Status
-        /// </summary>
-        [HttpPut]
+                [HttpPut]
         [Route(CommerceApiRoutes.Orders.UpdateStatus)]
         [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> UpdateStatus([FromRoute] Guid id, [FromBody] UpdateOrderStatusCommand cmd, CancellationToken ct)

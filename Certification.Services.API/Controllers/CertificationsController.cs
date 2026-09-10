@@ -1,4 +1,4 @@
-﻿using Certification.Services.API.CertificationRoutes;
+using Certification.Services.API.CertificationRoutes;
 using Certification.Services.API.Features.Certifications.Commands.CreateCertification;
 using Certification.Services.API.Features.Certifications.Commands.DeleteCertification;
 using Certification.Services.API.Features.Certifications.Commands.UpdateCertification;
@@ -22,13 +22,7 @@ namespace Certification.Services.API.Controllers
         {
         }
 
-        /// <summary>
-        /// Get All Certifications.
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpGet]
+                [HttpGet]
         [Route(CertificationApiRoutes.Certifications.GetAll)]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -38,13 +32,7 @@ namespace Certification.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Get Certification By Id.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpGet]
+                [HttpGet]
         [Route(CertificationApiRoutes.Certifications.GetById)]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -55,13 +43,7 @@ namespace Certification.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Show Certification.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpGet]
+                [HttpGet]
         [Route(CertificationApiRoutes.Certifications.Show)]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -72,13 +54,7 @@ namespace Certification.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Create Certification.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPost]
+                [HttpPost]
         [Route(CertificationApiRoutes.Certifications.Create)]
         [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -90,14 +66,7 @@ namespace Certification.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Update Certification.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPut]
+                [HttpPut]
         [Route(CertificationApiRoutes.Certifications.Update)]
         [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -111,13 +80,7 @@ namespace Certification.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Delete Certification.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpDelete]
+                [HttpDelete]
         [Route(CertificationApiRoutes.Certifications.Delete)]
         [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         [ProducesResponseType(StatusCodes.Status200OK)]

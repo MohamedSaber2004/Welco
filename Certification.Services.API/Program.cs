@@ -52,7 +52,10 @@ namespace Certification.Services.API
                 builder.WebHost.UseUrls($"http://*:{port}");
             }
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options =>
+            {
+                options.Conventions.Add(new IntegrationRouteConvention(builder.Configuration));
+            });
             builder.Services.AddJsonLocalization();
             builder.Services.AddWelcoSharedDependencies(builder.Configuration);
             builder.Services.AddWelcoIdentity(builder.Configuration);

@@ -20,7 +20,7 @@ namespace Sales.Services.API.Features.Quotes.Commands.CreateQuote
             foreach (var it in r.Items) { var qi = new QuoteItemEntity { Id = Guid.NewGuid(), QuoteId = quote.Id, ProductId = it.ProductId, Quantity = it.Quantity, UnitPrice = it.UnitPrice }; qi.MarkAsCreated(curId); quote.Items.Add(qi); }
             var repo = _uow.GetRepository<QuoteEntity, Guid>();
             await repo.AddAsync(quote, ct);
-            // Advance the parent RFQ so it no longer sits in Pending once priced.
+            
             if (r.RFQId.HasValue)
             {
                 var rfqRepo = _uow.GetRepository<RFQEntity, Guid>();

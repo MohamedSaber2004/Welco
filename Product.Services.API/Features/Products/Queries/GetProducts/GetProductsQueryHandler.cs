@@ -68,8 +68,7 @@ namespace Product.Services.API.Features.Products.Queries.GetProducts
             if (request.CurrencyId.HasValue)
                 query = query.Where(p => p.CurrencyId == request.CurrencyId.Value);
 
-            // sorting
-            if (!string.IsNullOrWhiteSpace(request.SortBy))
+if (!string.IsNullOrWhiteSpace(request.SortBy))
             {
                 var s = request.SortBy.Trim().ToLowerInvariant();
                 if (s == "price-asc") query = query.OrderBy(p => p.Price);

@@ -18,11 +18,11 @@ namespace Sales.Services.API.Features.RFQs.Commands.CreateRFQ
         {
             var companyRepo = _uow.GetRepository<Welco.Shared.Domain.Models.Company, Guid>();
             if (!await companyRepo.ExistsAsync(c => !c.IsDeleted && c.Id == r.CompanyId, ct)) return Result<RFQDto>.NotFound(LocalizationKeys.Company.NotFound);
-            // Organization users may only request for their own company.
+            
             var caller = await BuyerScope.GetAsync(_uow, _cur, ct);
             if (caller.IsOrganizationUser && caller.CompanyId != r.CompanyId) return Result<RFQDto>.NotFound(LocalizationKeys.Company.NotFound);
             if (r.Items == null || !r.Items.Any()) return Result<RFQDto>.BadRequest(LocalizationKeys.RFQ.ItemsRequired);
-            // Reject unknown products so lines always resolve to real catalog items.
+            
             var productRepo = _uow.GetRepository<Welco.Shared.Domain.Models.Product, Guid>();
             var wantedIds = r.Items.Select(i => i.ProductId).Distinct().ToList();
             var found = await productRepo.GetAll(p => !p.IsDeleted && wantedIds.Contains(p.Id)).Select(p => p.Id).ToListAsync(ct);

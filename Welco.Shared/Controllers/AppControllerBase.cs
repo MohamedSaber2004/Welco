@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,8 +14,7 @@ namespace Welco.Shared.Controllers
     {
         protected readonly IMediator _mediator;
 
-
-        protected AppControllerBase(IMediator mediator)
+protected AppControllerBase(IMediator mediator)
         {
             _mediator = mediator;
         }

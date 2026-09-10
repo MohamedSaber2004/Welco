@@ -9,7 +9,7 @@ namespace Welco.Shared.Domain.Models
         public virtual ApplicationUser? User { get; set; }
         public Guid ProductId { get; set; }
         public virtual Product? Product { get; set; }
-        public string Type { get; set; } = null!; // Wishlist, RecentlyViewed, Compare
+        public string Type { get; set; } = null!; 
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     }
 }

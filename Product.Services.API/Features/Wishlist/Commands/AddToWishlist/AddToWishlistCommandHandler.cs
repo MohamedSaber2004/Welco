@@ -27,8 +27,7 @@ namespace Product.Services.API.Features.Wishlist.Commands.AddToWishlist
 
             var userId = _currentUserService.UserId;
 
-            // Ensure the user exists in database to prevent FK constraint violations
-            var userRepo = _unitOfWork.GetRepository<ApplicationUser, Guid>();
+var userRepo = _unitOfWork.GetRepository<ApplicationUser, Guid>();
             var existsUser = await userRepo.ExistsAsync(u => !u.IsDeleted && u.Id == userId, cancellationToken);
             if (!existsUser)
                 return Result<string>.Unauthorized(LocalizationKeys.ExceptionMessages.Unauthorized);
@@ -40,8 +39,7 @@ namespace Product.Services.API.Features.Wishlist.Commands.AddToWishlist
 
             var wishlistRepo = _unitOfWork.GetRepository<UserProductInteraction, Guid>();
 
-            // Query including soft-deleted items to prevent duplicate key constraint violations on IX_UserProductInteractions_UserId_ProductId_Type
-            var existing = await wishlistRepo.GetAll()
+var existing = await wishlistRepo.GetAll()
                 .IgnoreQueryFilters()
                 .FirstOrDefaultAsync(w => w.UserId == userId && w.ProductId == request.ProductId && w.Type == "Wishlist", cancellationToken);
 
@@ -75,7 +73,7 @@ namespace Product.Services.API.Features.Wishlist.Commands.AddToWishlist
             }
             catch (DbUpdateException)
             {
-                // Concurrency safe fallback: if already inserted by a parallel request, return success
+                
                 return Result<string>.Success(interaction.Id.ToString(), LocalizationKeys.Product.AddedToWishlist);
             }
 

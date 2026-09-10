@@ -18,11 +18,11 @@ namespace Sales.Services.API.Features.Quotes.Commands.ApproveQuote
             var repo = _uow.GetRepository<QuoteEntity, Guid>();
             var q = await repo.GetByIdAsync(r.Id, ct);
             if (q == null || q.IsDeleted) return Result<string>.NotFound(LocalizationKeys.Quote.NotFound);
-            // Organization users may only decide quotes issued to their own company.
+            
             var caller = await BuyerScope.GetAsync(_uow, _cur, ct);
             if (caller.IsOrganizationUser && !await OwnsQuoteAsync(q.RFQId, caller.CompanyId, ct)) return Result<string>.NotFound(LocalizationKeys.Quote.NotFound);
             q.Status = Welco.Shared.Domain.Models.QuoteStatus.Approved; q.MarkAsUpdated("System"); repo.Update(q);
-            // An approved quote converts the parent RFQ into an order-stage RFQ.
+            
             if (q.RFQId.HasValue)
             {
                 var rfqRepo = _uow.GetRepository<RFQEntity, Guid>();

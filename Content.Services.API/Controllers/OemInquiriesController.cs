@@ -28,8 +28,7 @@ namespace Content.Services.API.Controllers
         public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct)
             => ToActionResult(await _mediator.Send(new GetOemInquiryByIdQuery { Id = id }, ct));
 
-        // Guest lead-capture (no account needed) — must stay anonymous.
-        [HttpPost]
+[HttpPost]
         [Route(ContentApiRoutes.OemInquiries.Create)]
         [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateOemInquiryCommand c, CancellationToken ct)

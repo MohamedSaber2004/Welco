@@ -59,7 +59,7 @@ namespace UserManamgent.Service.API.Features.Addresses.Commands.CreateAddress
                 : "System";
 
             var addressRepo = _unitOfWork.GetRepository<UserAddress, Guid>();
-            // Clean multi-address: if IsDefault or first address, ensure single default per user
+            
             var existing = await addressRepo.GetAllListAsync(a => a.UserId == request.UserId && !a.IsDeleted, cancellationToken);
             var isFirst = !existing.Any();
             var shouldBeDefault = request.IsDefault || isFirst;

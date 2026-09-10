@@ -103,14 +103,6 @@
       "DangerousAcceptAnyServerCertificateValidator": false
     },
     {
-      "DownstreamPathTemplate": "/api/v1/oem-services/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [{ "Host": "welco-content.runasp.net", "Port": 443 }],
-      "UpstreamPathTemplate": "/api/v1/oem-services/{everything}",
-      "UpstreamHttpMethod": [ "GET" ],
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
       "DownstreamPathTemplate": "/api/v1/oem-inquiries/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [{ "Host": "welco-content.runasp.net", "Port": 443 }],

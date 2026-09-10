@@ -16,23 +16,14 @@ using Welco.Shared.Controllers;
 
 namespace Auth.Services.API.Controllers
 {
-    /// <summary>
-    /// Authentication and User Management Controller
-    /// </summary>
-    [Route(AuthApiRoutes.Base)]
+        [Route(AuthApiRoutes.Base)]
     public class AuthController : AppControllerBase
     {
         public AuthController(IMediator mediator) : base(mediator)
         {
         }
 
-        /// <summary>
-        /// Register a new user with email and password.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPost]
+                [HttpPost]
         [Route(AuthApiRoutes.Authentication.Register)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -42,13 +33,7 @@ namespace Auth.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Login a user with email and password.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPost]
+                [HttpPost]
         [Route(AuthApiRoutes.Authentication.Login)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -59,13 +44,7 @@ namespace Auth.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Verify the OTP sent to the user's email during registration.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPost]
+                [HttpPost]
         [Route(AuthApiRoutes.Authentication.VerifyEmailOtp)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -76,13 +55,7 @@ namespace Auth.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Initiate the forgot password process by sending an OTP to the user's email.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPost]
+                [HttpPost]
         [Route(AuthApiRoutes.Authentication.ForgotPassword)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -93,13 +66,7 @@ namespace Auth.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Verify the OTP sent to the user's email for password reset.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPost]
+                [HttpPost]
         [Route(AuthApiRoutes.Authentication.VerifyPasswordOtp)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -110,13 +77,7 @@ namespace Auth.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Reset the password for a user after verifying the OTP.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPost]
+                [HttpPost]
         [Route(AuthApiRoutes.Authentication.ResetPassword)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -127,13 +88,7 @@ namespace Auth.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Refresh the access token using a valid refresh token.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPost]
+                [HttpPost]
         [Route(AuthApiRoutes.Authentication.RefreshToken)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -143,13 +98,7 @@ namespace Auth.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Logout the user and revoke refresh tokens.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPost]
+                [HttpPost]
         [Route(AuthApiRoutes.Authentication.Logout)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Logout([FromBody] LogoutCommand? command, CancellationToken cancellationToken)
@@ -158,12 +107,7 @@ namespace Auth.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Get the profile of the currently authenticated user.
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpGet]
+                [HttpGet]
         [RoleAuthorize]
         [Route(AuthApiRoutes.Authentication.Profile)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -176,13 +120,7 @@ namespace Auth.Services.API.Controllers
             return ToActionResult(result);
         }
 
-        /// <summary>
-        /// Update the profile of the currently authenticated user, including addresses.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpPut]
+                [HttpPut]
         [RoleAuthorize]
         [Route(AuthApiRoutes.Authentication.Profile)]
         [ProducesResponseType(StatusCodes.Status200OK)]

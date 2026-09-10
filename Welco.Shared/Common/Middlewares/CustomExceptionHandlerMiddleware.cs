@@ -30,14 +30,36 @@ namespace Welco.Shared.Common.Middlewares
             {
                 await _next(context);
             }
+            catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+            {
+                _logger.LogDebug("Request was cancelled by the client.");
+            }
             catch (Exception ex)
             {
+                if (context.Response.HasStarted)
+                {
+                    _logger.LogWarning(ex, "The response has already started, the custom error handler will not be executed.");
+                    return;
+                }
+
                 await HandleExceptionAsync(context, ex);
             }
         }
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
+            if (context.Response.HasStarted)
+            {
+                _logger.LogWarning("The response has already started, skipping custom error response.");
+                return;
+            }
+
+            if (exception is OperationCanceledException)
+            {
+                _logger.LogDebug("Operation was canceled.");
+                return;
+            }
+
             var localizationProvider = context.RequestServices.GetService<ILocalizationProvider>();
             var culture = GetRequestCulture(context);
 

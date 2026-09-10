@@ -47,9 +47,8 @@ namespace Sales.Services.API.Controllers
     public class ProductInquiriesController : AppControllerBase
     {
         public ProductInquiriesController(IMediator mediator) : base(mediator) { }
-        // Guest inquiry (no account needed) — must stay anonymous at controller
-        // level; the gateway exposes POST anonymously, GET/DELETE for staff.
-        [HttpGet][RoleAuthorize(UserType.Admin, UserType.WelcoStaff)] public async Task<IActionResult> GetAll([FromQuery] GetProductInquiriesQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
+
+[HttpGet][RoleAuthorize(UserType.Admin, UserType.WelcoStaff)] public async Task<IActionResult> GetAll([FromQuery] GetProductInquiriesQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
         [HttpGet][Route(SalesApiRoutes.ProductInquiries.GetById)][RoleAuthorize(UserType.Admin, UserType.WelcoStaff)] public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetProductInquiryByIdQuery { Id = id }, ct));
         [HttpPost]
         [AllowAnonymous]

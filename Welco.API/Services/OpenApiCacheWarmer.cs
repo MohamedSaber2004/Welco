@@ -13,7 +13,7 @@ namespace Welco.API.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            // Give downstream services a moment to finish starting before polling them.
+            
             try
             {
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
@@ -30,7 +30,7 @@ namespace Welco.API.Services
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
-                // shutdown
+                
             }
             catch (Exception ex)
             {

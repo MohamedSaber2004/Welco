@@ -55,7 +55,10 @@ namespace UserManamgent.Service.API
                 builder.WebHost.UseUrls($"http://*:{port}");
             }
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options =>
+            {
+                options.Conventions.Add(new IntegrationRouteConvention(builder.Configuration));
+            });
             builder.Services.AddJsonLocalization();
             builder.Services.AddWelcoSharedDependencies(builder.Configuration);
             builder.Services.AddWelcoIdentity(builder.Configuration);
@@ -82,10 +85,7 @@ namespace UserManamgent.Service.API
 
             var app = builder.Build();
 
-            // Ensure Identity roles exist (seeded from the UserType enum)
-            // so admin-created users can be assigned any role even if
-            // the Auth service hasn't started yet. Idempotent.
-            using (var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
             {
                 try
                 {
@@ -113,7 +113,7 @@ namespace UserManamgent.Service.API
             }
 
             app.UseCors("AllowAll");
-            // Downstream services re-validate the JWT forwarded by the Welco.API Gateway (Ocelot).
+            
             app.UseAuthentication();
             app.UseAuthorization();
 

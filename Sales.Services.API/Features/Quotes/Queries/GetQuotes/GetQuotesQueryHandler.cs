@@ -18,7 +18,7 @@ namespace Sales.Services.API.Features.Quotes.Queries.GetQuotes
         {
             var repo = _uow.GetRepository<QuoteEntity, Guid>();
             var q = repo.GetAll(x => !x.IsDeleted).AsNoTracking();
-            // Organization users only see quotes issued against their own company's RFQs.
+            
             var caller = await BuyerScope.GetAsync(_uow, _cur, ct);
             if (caller.IsOrganizationUser) q = q.Where(x => x.RFQ != null && x.RFQ.CompanyId == caller.CompanyId);
             return await q.OrderByDescending(x => x.CreatedAt).ToPaginatedListAsync(x => new QuoteDto { Id = x.Id, QuoteNumber = x.QuoteNumber, RFQId = x.RFQId, Amount = x.Amount, ValidUntil = x.ValidUntil, Status = x.Status.ToString(), CreatedAt = x.CreatedAt }, r.PageNumber, r.PageSize, LocalizationKeys.Quote.ListFetched, ct);

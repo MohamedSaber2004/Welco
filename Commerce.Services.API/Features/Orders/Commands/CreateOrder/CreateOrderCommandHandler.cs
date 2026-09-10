@@ -71,8 +71,7 @@ namespace Commerce.Services.API.Features.Orders.Commands.CreateOrder
 
             var currentUserId = _currentUser.UserId != Guid.Empty ? _currentUser.UserId.ToString() : "System";
 
-            // Snapshot exchange rate for historical financial consistency (do not recalculate old orders with today's rate)
-            string? snapshotBase = null;
+string? snapshotBase = null;
             string? snapshotCode = null;
             decimal? snapshotRate = null;
             DateOnly? snapshotDate = null;

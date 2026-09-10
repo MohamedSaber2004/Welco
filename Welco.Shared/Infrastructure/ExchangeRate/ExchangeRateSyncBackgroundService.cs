@@ -28,8 +28,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             var intervalHours = _settings.SyncIntervalHours > 0 ? _settings.SyncIntervalHours : 24;
             _logger.LogInformation("ExchangeRate sync background service started, interval {Hours}h, base {Base}", intervalHours, _settings.BaseCurrency);
 
-            // Initial delay to let app start
-            try { await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken); } catch { return; }
+try { await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken); } catch { return; }
 
             while (!stoppingToken.IsCancellationRequested)
             {

@@ -102,8 +102,7 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetMyCompany
                 UpdatedAt = company.UpdatedAt
             };
 
-            // Try to populate CountryNameEn and CountryNameAr
-            try
+try
             {
                 var countryRepo = _unitOfWork.GetRepository<Country, Guid>();
                 var country = await countryRepo.GetByIdAsync(company.CountryId, cancellationToken);
@@ -113,7 +112,7 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetMyCompany
                     dto.CountryNameAr = country.NameAr;
                 }
             }
-            catch { /* ignore */ }
+            catch {  }
 
             return Result<CompanyDto>.Success(dto, LocalizationKeys.Company.Fetched);
         }

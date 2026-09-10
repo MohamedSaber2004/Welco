@@ -1,7 +1,7 @@
 using Welco.Shared.Common.Classes;
 namespace Welco.Shared.Domain.Models
 {
-    public enum OrderStatus { Pending = 1, Confirmed = 2, Shipped = 3, Delivered = 4, Cancelled = 5 }
+    public enum OrderStatus { Pending = 1, Confirmed = 2, Processing = 3, Ready = 4, Completed = 5, Cancelled = 6, Rejected = 7 }
     public enum InvoiceStatus { Draft = 1, Issued = 2, Paid = 3, Overdue = 4, Cancelled = 5 }
     public class Cart : BaseEntity<Guid>
     {
@@ -33,12 +33,16 @@ namespace Welco.Shared.Domain.Models
         public virtual Currency? Currency { get; set; }
         public Guid? QuoteId { get; set; }
         public decimal TotalAmount { get; set; }
-        // Snapshot of currency context at creation — do not recalculate historical orders with today's rate
+        
         public string? SnapshotBaseCurrency { get; set; }
         public string? SnapshotCurrencyCode { get; set; }
         public decimal? SnapshotRate { get; set; }
         public DateOnly? SnapshotRateDate { get; set; }
         public string? SnapshotSource { get; set; }
+        
+        public string? ExternalOrderId { get; set; }
+        
+        public string? SourceMarket { get; set; }
         public virtual ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
         public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
     }

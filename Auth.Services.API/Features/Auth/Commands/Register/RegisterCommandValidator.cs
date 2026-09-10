@@ -40,8 +40,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
             RuleFor(x => x.PhoneCountryId)
                 .Must(id => id == null || id != Guid.Empty).WithMessage(LocalizationKeys.Country.NotFound);
 
-            // Unified distributor fields — required for OrganizationUser
-            RuleFor(x => x.CompanyName)
+RuleFor(x => x.CompanyName)
                 .NotEmpty().WithMessage(LocalizationKeys.Company.NameRequired)
                 .When(x => x.UserType == UserType.OrganizationUser);
             RuleFor(x => x.DistributorCountryId)

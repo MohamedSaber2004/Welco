@@ -37,9 +37,7 @@ namespace Product.Services.API
                 ContentRootPath = AppContext.BaseDirectory
             });
 
-
-
-            var env = builder.Environment;
+var env = builder.Environment;
 
             builder.Configuration.Sources.Clear();
             builder.Configuration
@@ -62,7 +60,10 @@ namespace Product.Services.API
                 builder.WebHost.UseUrls($"http://*:{port}");
             }
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options =>
+            {
+                options.Conventions.Add(new Welco.Shared.Common.Extensions.IntegrationRouteConvention(builder.Configuration));
+            });
             builder.Services.AddJsonLocalization();
             builder.Services.AddWelcoSharedDependencies(builder.Configuration);
             builder.Services.AddWelcoIdentity(builder.Configuration);
@@ -87,8 +88,7 @@ namespace Product.Services.API
                 });
             });
 
-            // Hangfire background jobs (exclusively hosted in Product.Services.API)
-            var connectionString = builder.Configuration.GetConnectionString("DatabaseConnection")
+var connectionString = builder.Configuration.GetConnectionString("DatabaseConnection")
                 ?? builder.Configuration["DatabaseConnection"];
 
             if (!string.IsNullOrWhiteSpace(connectionString))
@@ -133,7 +133,7 @@ namespace Product.Services.API
             }
 
             app.UseCors("AllowAll");
-            // Downstream services re-validate the JWT forwarded by the Welco.API Gateway (Ocelot).
+            
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -155,8 +155,7 @@ namespace Product.Services.API
                 });
             }
 
-            // Auto-migrate and seed currencies + world locations - non-destructive
-            if (!app.Environment.IsEnvironment("Test"))
+if (!app.Environment.IsEnvironment("Test"))
             {
                 try
                 {
@@ -166,10 +165,8 @@ namespace Product.Services.API
                     await db.Database.MigrateAsync();
                     await CurrencySeeder.SeedAsync(db, logger);
                     await WorldLocationSeeder.SeedAsync(db, logger);
-                    // Bogus demo data: Development only + explicit opt-in flag
-                    // (Seeding:SeedDemoData=true in config OR SEED_DEMO_DATA=true env var).
-                    // Never runs in Production (re-checked inside the seeder).
-                    if (BogusDemoSeeder.ShouldSeedDemoData(app.Environment, app.Configuration, out var demoReason))
+
+if (BogusDemoSeeder.ShouldSeedDemoData(app.Environment, app.Configuration, out var demoReason))
                     {
                         logger.LogInformation("Bogus demo seeding {Reason}", demoReason);
                         await BogusDemoSeeder.SeedDemoAsync(scope.ServiceProvider, logger);
@@ -185,8 +182,7 @@ namespace Product.Services.API
                     logger.LogError(ex, "Seeding / migration failed");
                 }
 
-                // Register Recurring Hangfire Job for Exchange Rate Sync
-                if (!string.IsNullOrWhiteSpace(connectionString))
+if (!string.IsNullOrWhiteSpace(connectionString))
                 {
                     try
                     {

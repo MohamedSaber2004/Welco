@@ -69,8 +69,7 @@ namespace UserManamgent.Service.API.Features.Addresses.Commands.UpdateAddress
                 ? _currentUserService.UserId.ToString()
                 : "System";
 
-            // If setting as default, clear other defaults for same user (clean multi-address)
-            if (request.IsDefault == true)
+if (request.IsDefault == true)
             {
                 var others = await addressRepo.GetAllListAsync(a => a.UserId == address.UserId && a.Id != address.Id && !a.IsDeleted && a.IsDefault, cancellationToken);
                 foreach (var o in others)
