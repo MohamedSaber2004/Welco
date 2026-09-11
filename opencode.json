@@ -1,0 +1,55 @@
+{
+    "$schema": "https://opencode.ai/config.json",
+    "model": "agentrouter/deepseek-v4-flash",
+    "permission": {
+        "edit": "ask"
+    },
+    "provider": {
+        "apinex": {
+            "npm": "@ai-sdk/openai-compatible",
+            "name": "APInex",
+            "options": {
+                "baseURL": "https://api.apinex.bond/v1",
+                "apiKey": "{env:APINEX_API_KEY}"
+            },
+            "models": {
+                "claude/opus-5": {
+                "name": "Claude Opus 5"
+                },
+                "claude/sonnet-5": {
+                "name": "Claude Sonnet 5"
+                },
+                "free/deepseek-v4-flash-0731": {
+                "name": "DeepSeek V4 Flash"
+                },
+                "deepseek/v4-flash": {
+                "name": "DeepSeek V4 Flash"
+                },
+                "free/deepseek-v4-pro-0813": {
+                "name": "DeepSeek V4 Pro"
+                },
+                "deepseek/v4-pro": {
+                "name": "DeepSeek V4 Pro"
+                },
+                "glm/5.3": {
+                "name": "GLM 5.3"
+                },
+                "free/glm-5.3-flash": {
+                "name": "GLM 5.3 Flash"
+                },
+                "glm/5.3-flash": {
+                "name": "GLM 5.3 Flash"
+                },
+                "gemini/3.1-pro": {
+                "name": "Gemini 3.1 Pro"
+                },
+                "free/gemini-3.1-pro": {
+                "name": "Gemini 3.1 Pro"
+                },
+                "gemini/3.8-flash": {
+                "name": "Gemini 3.8 Flash"
+                }
+            }
+        }
+    }
+}
