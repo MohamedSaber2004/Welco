@@ -66,14 +66,53 @@ namespace Welco.Shared.Common.Attributes
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(settings.ServiceSecret) || settings.ServiceSecret.Length < 32)
+                var handler = new JwtSecurityTokenHandler();
+
+                JwtSecurityToken? jwt;
+                try
                 {
-                    logger.LogError("[ServiceAuth] WelcoServiceSettings.ServiceSecret is not configured (min 32 chars).");
+                    jwt = handler.ReadJwtToken(token);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex, "[ServiceAuth] Unable to read service token.");
                     return false;
                 }
 
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.ServiceSecret));
-                var handler = new JwtSecurityTokenHandler();
+                var clientId = jwt.Claims.FirstOrDefault(c => c.Type == "client_id")?.Value;
+
+                string secret;
+                if (!string.IsNullOrWhiteSpace(clientId))
+                {
+                    var match = settings.Clients?
+                        .FirstOrDefault(kvp => string.Equals(kvp.Key, clientId, StringComparison.OrdinalIgnoreCase));
+
+                    if (match?.Value is null || string.IsNullOrWhiteSpace(match.Value.Value.Secret))
+                    {
+                        logger.LogWarning("[ServiceAuth] Unknown integration client ClientId={ClientId}.", clientId);
+                        return false;
+                    }
+
+                    secret = match.Value.Value.Secret;
+                    if (secret.Length < 32)
+                    {
+                        logger.LogWarning("[ServiceAuth] Misconfigured secret for integration client ClientId={ClientId} (min 32 chars).", clientId);
+                        return false;
+                    }
+                }
+                else
+                {
+                    logger.LogWarning("[ServiceAuth] Legacy service token without client_id.");
+                    if (string.IsNullOrWhiteSpace(settings.ServiceSecret) || settings.ServiceSecret.Length < 32)
+                    {
+                        logger.LogError("[ServiceAuth] WelcoServiceSettings.ServiceSecret is not configured (min 32 chars).");
+                        return false;
+                    }
+
+                    secret = settings.ServiceSecret;
+                }
+
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
 
                 handler.ValidateToken(token, new TokenValidationParameters
                 {

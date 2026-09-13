@@ -127,6 +127,14 @@
       "UpstreamPathTemplate": "/api/integration/certifications",
       "UpstreamHttpMethod": [ "GET" ],
       "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/integration/token",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-auth.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/integration/token",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
     }
   ]
 }
