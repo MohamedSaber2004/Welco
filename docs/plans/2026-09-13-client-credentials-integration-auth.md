@@ -93,7 +93,7 @@ git commit -m "feat(welco): issue integration JWT from token endpoint"
 
 ### Task 4: Rollout + verify (Test first, per your target)
 
-- [ ] **Step 1: Wire Test env vars** — set `WelcoServiceSettings__Clients__snul__Secret` on Welco Auth (Test) and `WelcoIntegration__ClientSecret` on SNUL services (Test) to the SAME value; restart Auth, gateway, one SNUL caller.
+- [ ] **Step 1: Generate + wire Test credentials** — on your machine run `.\scripts\New-IntegrationClient.ps1 -ClientId snul` (CSPRNG, 48-char secret, shown once); set `WelcoServiceSettings__Clients__snul__Secret` on Welco Auth (Test) and `WelcoIntegration__ClientSecret` on SNUL services (Test) to the SAME value; restart Auth, gateway, one SNUL caller.
 - [ ] **Step 2: Live Test checks**
   - `POST https://welco-gateway.runasp.net/api/integration/token` with creds → 200 + `accessToken`; wrong secret → 401 (identical message).
   - SNUL→Welco call (e.g. products) works end-to-end on fetched token; `GET .../api/integration/support/tickets` (no token) → 401.
@@ -115,3 +115,12 @@ git commit -m "feat(welco): issue integration JWT from token endpoint"
 - SNUL Test fetches + caches (one token call per ~50 min per instance); integration calls for quotes/support/help succeed on fetched tokens.
 - ServiceAuth accepts per-client tokens, still accepts legacy during window, rejects unknown/wrong with 401.
 - No secret in git; Production untouched until Test is green.
+
+## Execution Status (2026-09-13, all uncommitted unless noted)
+
+- [x] Welco token endpoint + per-client ServiceAuth + Ocelot routes + Auth Clients blocks (29/29 tests; user committed as `a127498`)
+- [x] SNUL ClientId/ClientSecret config + fetch/cache + overhaul (ServiceAuth-only controller, mint deleted, secrets scrubbed; 21/21 tests)
+- [x] `scripts/New-IntegrationClient.ps1` CSPRNG generator (verified, secret never in repo)
+- [x] Secret scrub: real ClientSecret value found in all 12 SNUL appsettings removed (0 hits, JSON valid, 21/21)
+- [ ] USER: set env vars on Test hosts (same pair both sides), deploy Welco Auth + gateway + SNUL Commerce, run Task 4 live checks
+- [ ] Follow-up: delete SNUL local-mint fallback + Welco legacy path + old secrets; rotate to distinct per-client secrets; decide on `prompt.txt` live Admin JWT (delete + rotate) and SNUL gateway JwtSettings secret (move to env)
