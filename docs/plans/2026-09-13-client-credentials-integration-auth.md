@@ -101,6 +101,14 @@ git commit -m "feat(welco): issue integration JWT from token endpoint"
   - Logs: zero `Unknown client` / unexpected `Token validation failed` for legit traffic.
 - [ ] **Step 3: Remove legacy** — after Test green one release: delete SNUL local-mint fallback + Welco legacy shared-secret path + old flat secrets; rotate to distinct per-client secrets. Never commit secrets.
 
+### Task 5: SNUL TEST-ONLY token endpoint (SUPERSEDES public-issuer variant — no credentials in request)
+
+- No public client-credentials endpoint in SNUL. Instead ONE test-only endpoint in `Commerce.Services.API` (home of `IntegrationController`): `GET api/v1/integration/test/token`, `[AllowAnonymous]`, HARD-GATED to non-Production (`IWebHostEnvironment` Development/Test only → 404 otherwise). No gateway Ocelot change (direct service access in Test).
+- Reads `ClientId` + `ClientSecret`-else-`ServiceSecret` from `IOptions<WelcoIntegrationOptions>` (option pattern, env-backed values); misconfigured/short → 500 misconfiguration (no leak). No request body, no query credentials.
+- Mints via shared `WelcoIntegrationCredentials` resolver semantics so SNUL's own `[ServiceAuth]` accepts the token (claims identical to Welco-issued: iss/aud, `client_id`, 55-min, no `azp`).
+- Automatic Authorization on integrated calls is EXISTING (`AttachHeadersAsync` fetch+cache+Bearer on all Send paths) — verify, don't rebuild.
+- Tests: minted token passes SNUL filter; Production gate returns 404; misconfigured secret → 500; full suites green; no commits; no secrets.
+
 ## Risks / Assumptions
 
 - Token endpoint is intentionally public (like Login) — its security IS the client_secret + HTTPS + gateway rate limiting; weak secrets (<32 chars rejected) or HTTP would void it.
