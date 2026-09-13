@@ -776,6 +776,65 @@
           }
         }
       }
+    },
+    "/api/integration/token": {
+      "post": {
+        "tags": [
+          "IntegrationToken"
+        ],
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIntegrationTokenCommand"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIntegrationTokenCommand"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIntegrationTokenCommand"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -785,6 +844,17 @@
       },
       "CompanyType": {
         "type": "integer"
+      },
+      "CreateIntegrationTokenCommand": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string"
+          },
+          "clientSecret": {
+            "type": "string"
+          }
+        }
       },
       "ForgotPasswordCommand": {
         "type": "object",
@@ -1097,6 +1167,9 @@
     },
     {
       "name": "Auth"
+    },
+    {
+      "name": "IntegrationToken"
     }
   ]
 }

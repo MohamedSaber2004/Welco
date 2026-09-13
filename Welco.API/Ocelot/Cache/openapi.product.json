@@ -323,54 +323,6 @@
         }
       }
     },
-    "/api/v1/categories/{id}/show": {
-      "get": {
-        "tags": [
-          "Categories"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/categories/{categoryId}/products": {
       "get": {
         "tags": [
@@ -1039,6 +991,145 @@
         }
       }
     },
+    "/api/integration/products": {
+      "get": {
+        "tags": [
+          "IntegrationProducts"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32",
+              "default": 50
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/integration/products/{id}": {
+      "get": {
+        "tags": [
+          "IntegrationProducts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/integration/providers": {
+      "get": {
+        "tags": [
+          "IntegrationProviders"
+        ],
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/integration/categories": {
+      "get": {
+        "tags": [
+          "IntegrationCategories"
+        ],
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/integration/categories/{id}": {
+      "get": {
+        "tags": [
+          "IntegrationCategories"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/products": {
       "get": {
         "tags": [
@@ -1379,54 +1470,6 @@
         }
       },
       "delete": {
-        "tags": [
-          "Products"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/products/{id}/show": {
-      "get": {
         "tags": [
           "Products"
         ],
@@ -2052,6 +2095,15 @@
     },
     {
       "name": "ExchangeRates"
+    },
+    {
+      "name": "IntegrationProducts"
+    },
+    {
+      "name": "IntegrationProviders"
+    },
+    {
+      "name": "IntegrationCategories"
     },
     {
       "name": "Products"

@@ -812,6 +812,21 @@
       "DangerousAcceptAnyServerCertificateValidator": true
     },
     {
+      "DownstreamPathTemplate": "/api/integration/token",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7203
+        }
+      ],
+      "UpstreamPathTemplate": "/api/integration/token",
+      "UpstreamHttpMethod": [
+        "POST"
+      ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
       "DownstreamPathTemplate": "/api/v1/products",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
