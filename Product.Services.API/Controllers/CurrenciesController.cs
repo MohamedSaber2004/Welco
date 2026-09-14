@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Product.Services.API.Features.Currencies.Commands.CreateCurrency;
 using Product.Services.API.Features.Currencies.Commands.DeleteCurrency;
 using Product.Services.API.Features.Currencies.Commands.UpdateCurrency;
+using Product.Services.API.Features.Currencies.Queries.GetAllCurrencies;
 using Product.Services.API.Features.Currencies.Queries.GetCurrencies;
 using Product.Services.API.Features.Currencies.Queries.GetCurrencyByCode;
 using Product.Services.API.Features.Currencies.Queries.GetCurrencyById;
@@ -30,6 +31,16 @@ namespace Product.Services.API.Controllers
         public async Task<IActionResult> GetAll([FromQuery] GetCurrenciesQuery query, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(query, cancellationToken);
+            return ToActionResult(result);
+        }
+
+                [HttpGet]
+        [Route(ProductApiRoutes.Currencies.GetAllList)]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllList(CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetAllCurrenciesQuery(), cancellationToken);
             return ToActionResult(result);
         }
 

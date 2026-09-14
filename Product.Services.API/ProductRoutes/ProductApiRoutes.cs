@@ -35,6 +35,7 @@ namespace Product.Services.API.ProductRoutes
         {
             public const string Base = CurrenciesBase;
             public const string GetAll = "";
+            public const string GetAllList = "all";
             public const string GetById = "{id}";
             public const string GetByCode = "code/{code}";
             public const string Create = "";
