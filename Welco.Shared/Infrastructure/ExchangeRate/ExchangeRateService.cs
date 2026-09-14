@@ -155,6 +155,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                     Key = line.Key ?? string.Empty,
                     FromCurrency = details.FromCurrency,
                     UnitAmount = line.UnitAmount,
+                    CeiledUnitAmount = nativeCeiled,
                     Quantity = line.Quantity,
                     Rate = details.Rate,
                     ConvertedUnitAmount = ceiledUnit,
@@ -456,6 +457,28 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 .Include(r => r.TargetCurrency)
                 .Where(r => r.BaseCurrencyId == baseCurr.Id && r.RateDate == latestDate && !r.IsDeleted)
                 .ToListAsync(cancellationToken);
+
+            var currentProvider = _provider.ProviderName;
+            var hasMismatch = rates.Any(r => !r.IsManual && !string.Equals(r.Source, currentProvider, StringComparison.OrdinalIgnoreCase));
+            if (hasMismatch)
+            {
+                _logger.LogInformation("Exchange rate source mismatch for {Base} (cached={Cached}, current={Current}), triggering re-sync", baseCurrency, rates.First(r => !r.IsManual).Source, currentProvider);
+                var sync = await SyncLatestRatesAsync(cancellationToken);
+                if (sync.Success)
+                {
+                    latestDate = sync.RateDate;
+                    rates = await _db.ExchangeRates
+                        .AsNoTracking()
+                        .Include(r => r.BaseCurrency)
+                        .Include(r => r.TargetCurrency)
+                        .Where(r => r.BaseCurrencyId == baseCurr.Id && r.RateDate == latestDate && !r.IsDeleted)
+                        .ToListAsync(cancellationToken);
+                }
+                else
+                {
+                    _logger.LogWarning("Re-sync failed for {Base}: {Error}", baseCurrency, sync.ErrorMessage);
+                }
+            }
 
             var dict = rates.ToDictionary(r => r.TargetCurrency.Code, r => new CachedRate
             {

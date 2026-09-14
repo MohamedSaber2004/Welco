@@ -54,6 +54,36 @@ public class FakeProvider : IExchangeRateProvider
     }
 }
 
+public class FakeProvider2 : IExchangeRateProvider
+{
+    public string ProviderName => "Fake2";
+    public Dictionary<string, decimal> Rates { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+    public Task<ExchangeRateResponse> GetLatestRatesAsync(string baseCurrency, IReadOnlyCollection<string>? targetCodes, CancellationToken ct)
+    {
+        return Task.FromResult(new ExchangeRateResponse
+        {
+            BaseCurrency = baseCurrency.ToUpperInvariant(),
+            Date = Date,
+            Rates = new Dictionary<string, decimal>(Rates, StringComparer.OrdinalIgnoreCase),
+            Source = ProviderName,
+            FetchedAt = DateTime.UtcNow
+        });
+    }
+
+    public Task<ExchangeRateResponse?> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, IReadOnlyCollection<string>? targetCodes, CancellationToken ct)
+    {
+        return Task.FromResult<ExchangeRateResponse?>(new ExchangeRateResponse
+        {
+            BaseCurrency = baseCurrency.ToUpperInvariant(),
+            Date = date,
+            Rates = new Dictionary<string, decimal>(Rates, StringComparer.OrdinalIgnoreCase),
+            Source = ProviderName,
+            FetchedAt = DateTime.UtcNow
+        });
+    }
+}
+
 public class ExchangeRateServiceTests : IDisposable
 {
     private readonly WelcoDbContext _db;
@@ -313,9 +343,12 @@ public class ExchangeRateServiceTests : IDisposable
         // 311 * 50.9467 = 15844.4247 -> 15845 ; 10*50.9467 = 509.467 -> 510.
         Assert.Equal("EGP", res.ToCurrency);
         Assert.Equal(3, res.Lines.Count);
+        Assert.Equal(311m, res.Lines[0].CeiledUnitAmount);
         Assert.Equal(15845m, res.Lines[0].ConvertedUnitAmount);
         Assert.Equal(15845m, res.Lines[0].LineTotal);
+        Assert.Equal(10m, res.Lines[1].CeiledUnitAmount);
         Assert.Equal(1020m, res.Lines[1].LineTotal);
+        Assert.Equal(11m, res.Lines[2].CeiledUnitAmount);
         Assert.Equal(561m, res.Lines[2].ConvertedUnitAmount);
         Assert.Equal(16865m + 561m, res.Subtotal);
         Assert.Equal(16865m + 561m, res.Total);
@@ -335,6 +368,7 @@ public class ExchangeRateServiceTests : IDisposable
             }
         }, CancellationToken.None);
         // 1 * 110.5 = 110.5 -> AwayFromZero 111 ; ceiling(111) = 111
+        Assert.Equal(1m, res.Lines[0].CeiledUnitAmount);
         Assert.Equal(111m, res.Lines[0].ConvertedUnitAmount);
         Assert.Equal(111m, res.Subtotal);
         Assert.Equal(111m, res.Total);
@@ -353,5 +387,22 @@ public class ExchangeRateServiceTests : IDisposable
                 new() { Key = "p1", UnitAmount = 5m, Quantity = 1, FromCurrency = "USD" },
             }
         }, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task GetLatestRates_ReSyncs_WhenProviderSourceMismatch()
+    {
+        await SeedRatesAsync();
+        var first = await _svc.GetLatestRatesAsync("USD", CancellationToken.None);
+        Assert.Contains(first, r => r.Source == "Fake");
+
+        var newProvider = new FakeProvider2 { Rates = { ["EGP"] = 999m } };
+        var freshCache = new MemoryCache(new MemoryCacheOptions());
+        var newSvc = new ExchangeRateService(_db, newProvider, Options.Create(_settings), freshCache, NullLogger<ExchangeRateService>.Instance);
+
+        var afterMismatch = await newSvc.GetLatestRatesAsync("USD", CancellationToken.None);
+        var egp = afterMismatch.First(r => r.TargetCurrency == "EGP");
+        Assert.Equal(999m, egp.Rate);
+        Assert.Equal("Fake2", egp.Source);
     }
 }

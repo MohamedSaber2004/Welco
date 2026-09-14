@@ -36,16 +36,17 @@ namespace Welco.Shared.Common.DTOs.Products
         public List<CartTotalLineRequest> Lines { get; set; } = new();
     }
 
-    public class CartTotalLineResultDto
-    {
-        public string Key { get; set; } = string.Empty;
-        public string FromCurrency { get; set; } = string.Empty;
-        public decimal UnitAmount { get; set; }
-        public int Quantity { get; set; }
-        public decimal Rate { get; set; }
-        public decimal ConvertedUnitAmount { get; set; }
-        public decimal LineTotal { get; set; }
-    }
+public class CartTotalLineResultDto
+{
+    public string Key { get; set; } = string.Empty;
+    public string FromCurrency { get; set; } = string.Empty;
+    public decimal UnitAmount { get; set; }
+    public decimal CeiledUnitAmount { get; set; }
+    public int Quantity { get; set; }
+    public decimal Rate { get; set; }
+    public decimal ConvertedUnitAmount { get; set; }
+    public decimal LineTotal { get; set; }
+}
 
     public class CartTotalResultDto
     {
