@@ -438,121 +438,6 @@
         }
       }
     },
-    "/api/integration/orders": {
-      "post": {
-        "tags": [
-          "IntegrationOrders"
-        ],
-        "parameters": [
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateExternalOrderCommand"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateExternalOrderCommand"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateExternalOrderCommand"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/integration/orders/{id}": {
-      "get": {
-        "tags": [
-          "IntegrationOrders"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/integration/orders/{id}/status": {
-      "put": {
-        "tags": [
-          "IntegrationOrders"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateExternalOrderStatusCommand"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateExternalOrderStatusCommand"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateExternalOrderStatusCommand"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/v1/orders": {
       "get": {
         "tags": [
@@ -827,45 +712,6 @@
           }
         }
       },
-      "CreateExternalOrderCommand": {
-        "type": "object",
-        "properties": {
-          "sourceMarket": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "externalCustomerId": {
-            "type": [
-              "null",
-              "string"
-            ],
-            "format": "uuid"
-          },
-          "currencyId": {
-            "type": [
-              "null",
-              "string"
-            ],
-            "format": "uuid"
-          },
-          "totalAmount": {
-            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
-            "type": [
-              "number",
-              "string"
-            ],
-            "format": "double"
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ExternalOrderItemRequest"
-            }
-          }
-        }
-      },
       "CreateOrderCommand": {
         "type": "object",
         "properties": {
@@ -936,31 +782,6 @@
           }
         }
       },
-      "ExternalOrderItemRequest": {
-        "type": "object",
-        "properties": {
-          "welcoProductId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "quantity": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          },
-          "unitPrice": {
-            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
-            "type": [
-              "number",
-              "string"
-            ],
-            "format": "double"
-          }
-        }
-      },
       "InventoryCheckItem": {
         "type": "object",
         "properties": {
@@ -1010,24 +831,6 @@
           }
         }
       },
-      "UpdateExternalOrderStatusCommand": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "status": {
-            "type": "string"
-          },
-          "notes": {
-            "type": [
-              "null",
-              "string"
-            ]
-          }
-        }
-      },
       "UpdateOrderStatusCommand": {
         "type": "object",
         "properties": {
@@ -1051,9 +854,6 @@
     },
     {
       "name": "IntegrationInventory"
-    },
-    {
-      "name": "IntegrationOrders"
     },
     {
       "name": "Orders"

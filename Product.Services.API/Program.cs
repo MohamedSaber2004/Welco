@@ -118,6 +118,14 @@ var connectionString = builder.Configuration.GetConnectionString("DatabaseConnec
 
             var app = builder.Build();
 
+            var exchangeRateConfig = app.Configuration.GetSection(ExchangeRateSettings.SectionName).Get<ExchangeRateSettings>() ?? new ExchangeRateSettings();
+            var exchangeRateLogger = app.Services.GetRequiredService<ILogger<Program>>();
+            exchangeRateLogger.LogInformation("ExchangeRateSettings loaded: Provider={Provider}, BaseUrl={BaseUrl}, SyncIntervalHours={SyncIntervalHours}, CacheExpirationMinutes={CacheExpirationMinutes}",
+                exchangeRateConfig.Provider,
+                exchangeRateConfig.BaseUrl,
+                exchangeRateConfig.SyncIntervalHours,
+                exchangeRateConfig.CacheExpirationMinutes);
+
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |

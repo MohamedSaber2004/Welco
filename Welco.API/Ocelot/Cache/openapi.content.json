@@ -1404,69 +1404,6 @@
           }
         }
       }
-    },
-    "/api/v1/trade-shows": {
-      "get": {
-        "tags": [
-          "TradeShows"
-        ],
-        "parameters": [
-          {
-            "name": "upcomingOnly",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "TradeShows"
-        ],
-        "parameters": [
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateTradeShowCommand"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateTradeShowCommand"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateTradeShowCommand"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
     }
   },
   "components": {
@@ -1609,25 +1546,6 @@
           },
           "message": {
             "type": "string"
-          }
-        }
-      },
-      "CreateTradeShowCommand": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "location": {
-            "type": "string"
-          },
-          "startDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endDate": {
-            "type": "string",
-            "format": "date-time"
           }
         }
       },
@@ -1823,9 +1741,6 @@
     },
     {
       "name": "SupportTickets"
-    },
-    {
-      "name": "TradeShows"
     }
   ]
 }

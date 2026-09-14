@@ -133,6 +133,7 @@ services.AddScoped<IExchangeRateProvider>(sp =>
                 return (opts.Provider?.Trim() ?? string.Empty) switch
                 {
                     "Frankfurter" => (IExchangeRateProvider)sp.GetRequiredService<FrankfurterProvider>(),
+                    "FawazahmedCDN" => (IExchangeRateProvider)sp.GetRequiredService<FrankfurterExchangeRateProvider>(),
                     "FastForex" => sp.GetRequiredService<FastForexProvider>(),
                     "ExchangeRateApi" => sp.GetRequiredService<ExchangeRateApiProvider>(),
                     _ => sp.GetRequiredService<FrankfurterExchangeRateProvider>(),
