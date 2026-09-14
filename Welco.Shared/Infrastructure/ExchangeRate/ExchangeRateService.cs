@@ -30,8 +30,8 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
         {
             if (string.Equals(fromCurrency, toCurrency, StringComparison.OrdinalIgnoreCase))
             {
-                var now = DateOnly.FromDateTime(DateTime.UtcNow.Date);
-                return new ExchangeRateDto { BaseCurrency = fromCurrency.ToUpperInvariant(), TargetCurrency = toCurrency.ToUpperInvariant(), Rate = 1m, RateDate = now, Source = "identity", FetchedAt = DateTime.UtcNow };
+                var now = DateOnly.FromDateTime(DateTime.Now.Date);
+                return new ExchangeRateDto { BaseCurrency = fromCurrency.ToUpperInvariant(), TargetCurrency = toCurrency.ToUpperInvariant(), Rate = 1m, RateDate = now, Source = "identity", FetchedAt = DateTime.Now };
             }
 
             var details = await ConvertWithDetailsAsync(1m, fromCurrency, toCurrency, cancellationToken);
@@ -42,7 +42,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 Rate = details.Rate,
                 RateDate = details.RateDate,
                 Source = details.Source,
-                FetchedAt = DateTime.UtcNow
+                FetchedAt = DateTime.Now
             };
         }
 
@@ -70,7 +70,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                     ToCurrency = toCurrency,
                     Rate = 1m,
                     ConvertedAmount = Decimal.Round(amount, GetDecimalDigits(toCurrency)),
-                    RateDate = DateOnly.FromDateTime(DateTime.UtcNow.Date),
+                    RateDate = DateOnly.FromDateTime(DateTime.Now.Date),
                     Source = "identity"
                 };
             }
@@ -98,7 +98,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
 
             var toCurrency = request.ToCurrency.Trim().ToUpperInvariant();
             var lines = new List<CartTotalLineResultDto>(request.Lines.Count);
-            DateOnly rateDate = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+            DateOnly rateDate = DateOnly.FromDateTime(DateTime.Now.Date);
             string source = _provider.ProviderName;
 
             foreach (var line in request.Lines)
@@ -139,7 +139,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
         public async Task<IReadOnlyCollection<ExchangeRateDto>> GetLatestRatesAsync(string baseCurrency, CancellationToken cancellationToken)
         {
             baseCurrency = NormalizeCode(baseCurrency);
-            var cacheKey = CacheKey(baseCurrency, DateOnly.FromDateTime(DateTime.UtcNow.Date), _provider.ProviderName);
+            var cacheKey = CacheKey(baseCurrency, DateOnly.FromDateTime(DateTime.Now.Date), _provider.ProviderName);
             if (_cache.TryGetValue(cacheKey, out Dictionary<string, ExchangeRateDto>? cached) && cached != null)
                 return cached.Values.OrderBy(r => r.TargetCurrency).ToList();
 
@@ -188,7 +188,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
         public Task<ExchangeRateSyncResult> SyncLatestRatesAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("SyncLatestRatesAsync is deprecated; rates are fetched live from the provider");
-            return Task.FromResult(new ExchangeRateSyncResult { Success = true, Source = _provider.ProviderName, RatesCount = 0, RateDate = DateOnly.FromDateTime(DateTime.UtcNow.Date) });
+            return Task.FromResult(new ExchangeRateSyncResult { Success = true, Source = _provider.ProviderName, RatesCount = 0, RateDate = DateOnly.FromDateTime(DateTime.Now.Date) });
         }
 
         public Task<ExchangeRateDto> SetManualRateAsync(SetManualRateRequest request, string updatedBy, CancellationToken cancellationToken)

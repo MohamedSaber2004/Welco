@@ -48,7 +48,8 @@ public class FastForexProviderTests
         Assert.Equal(51.7276m, res.Rates["EGP"]);
         Assert.Equal(134.335m, res.Rates["DZD"]);
         Assert.Equal("FastForex", res.Source);
-        Assert.Contains("api_key=test-key", handler.LastRequest!.RequestUri!.ToString());
+        Assert.DoesNotContain("api_key=", handler.LastRequest!.RequestUri!.ToString());
+        Assert.Equal("Bearer test-key", handler.LastRequest!.Headers.Authorization!.ToString());
         Assert.Contains("to=EGP", handler.LastRequest!.RequestUri!.ToString());
     }
 

@@ -505,6 +505,25 @@
         }
       }
     },
+    "/api/v1/currencies/all": {
+      "get": {
+        "tags": [
+          "Currencies"
+        ],
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/currencies/{id}": {
       "get": {
         "tags": [
@@ -878,6 +897,45 @@
         }
       }
     },
+    "/api/v1/exchange-rates/cart-total": {
+      "post": {
+        "tags": [
+          "ExchangeRates"
+        ],
+        "parameters": [
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertCartTotalRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertCartTotalRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertCartTotalRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/exchange-rates/history/{baseCurrency}/{date}": {
       "get": {
         "tags": [
@@ -898,84 +956,6 @@
             "required": true,
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/v1/exchange-rates/sync": {
-      "post": {
-        "tags": [
-          "ExchangeRates"
-        ],
-        "parameters": [
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/v1/exchange-rates/sync/history/{date}": {
-      "post": {
-        "tags": [
-          "ExchangeRates"
-        ],
-        "parameters": [
-          {
-            "name": "date",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/v1/exchange-rates/sync/logs": {
-      "get": {
-        "tags": [
-          "ExchangeRates"
-        ],
-        "parameters": [
-          {
-            "name": "take",
-            "in": "query",
-            "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
-              "format": "int32",
-              "default": 10
             }
           },
           {
@@ -1734,6 +1714,47 @@
   },
   "components": {
     "schemas": {
+      "CartTotalLineRequest": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "unitAmount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "quantity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "fromCurrency": {
+            "type": "string"
+          }
+        }
+      },
+      "ConvertCartTotalRequest": {
+        "type": "object",
+        "properties": {
+          "toCurrency": {
+            "type": "string"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CartTotalLineRequest"
+            }
+          }
+        }
+      },
       "CreateCategoryCommand": {
         "type": "object",
         "properties": {

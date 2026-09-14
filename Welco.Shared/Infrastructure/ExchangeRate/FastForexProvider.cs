@@ -31,6 +31,12 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             _logger = logger;
             if (_httpClient.Timeout == System.Threading.Timeout.InfiniteTimeSpan)
                 _httpClient.Timeout = TimeSpan.FromSeconds(_settings.TimeoutSeconds > 0 ? _settings.TimeoutSeconds : 10);
+
+            if (!string.IsNullOrWhiteSpace(_settings.ApiKey))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _settings.ApiKey.Trim());
+            }
         }
 
         private string ApiKey =>
@@ -53,7 +59,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
         public async Task<ExchangeRateResponse> GetLatestRatesAsync(string baseCurrency, IReadOnlyCollection<string>? targetCodes, CancellationToken cancellationToken)
         {
             var code = baseCurrency.Trim().ToUpperInvariant();
-            var url = $"fetch-multi?from={Uri.EscapeDataString(code)}&to={ToList(targetCodes, code)}&api_key={Uri.EscapeDataString(ApiKey)}";
+            var url = $"fetch-multi?from={Uri.EscapeDataString(code)}&to={ToList(targetCodes, code)}";
             _logger.LogInformation("Fetching rates from FastForex for base {Base}", code);
             var response = await _httpClient.GetAsync(url, cancellationToken);
             response.EnsureSuccessStatusCode();
@@ -65,7 +71,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
         public async Task<ExchangeRateResponse?> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, IReadOnlyCollection<string>? targetCodes, CancellationToken cancellationToken)
         {
             var code = baseCurrency.Trim().ToUpperInvariant();
-            var url = $"historical?date={date:yyyy-MM-dd}&from={Uri.EscapeDataString(code)}&to={ToList(targetCodes, code)}&api_key={Uri.EscapeDataString(ApiKey)}";
+            var url = $"historical?date={date:yyyy-MM-dd}&from={Uri.EscapeDataString(code)}&to={ToList(targetCodes, code)}";
             _logger.LogInformation("Fetching historical rates from FastForex: {Date} base {Base}", date.ToString("yyyy-MM-dd"), code);
             HttpResponseMessage response;
             try
@@ -95,7 +101,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                     ToCurrency = toCurrency.Trim().ToUpperInvariant(),
                     Rate = 1m,
                     ConvertedAmount = amount,
-                    RateDate = DateOnly.FromDateTime(DateTime.UtcNow.Date),
+                    RateDate = DateOnly.FromDateTime(DateTime.Now.Date),
                     Source = ProviderName,
                     DecimalDigits = 2
                 };
@@ -103,7 +109,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
 
             var from = fromCurrency.Trim().ToUpperInvariant();
             var to = toCurrency.Trim().ToUpperInvariant();
-            var url = $"convert?from={Uri.EscapeDataString(from)}&to={Uri.EscapeDataString(to)}&amount={amount}&api_key={Uri.EscapeDataString(ApiKey)}";
+            var url = $"convert?from={Uri.EscapeDataString(from)}&to={Uri.EscapeDataString(to)}&amount={amount}";
             _logger.LogInformation("FastForex convert {Amount} {From}->{To}", amount, from, to);
             var response = await _httpClient.GetAsync(url, cancellationToken);
             response.EnsureSuccessStatusCode();
@@ -121,7 +127,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             else if (!string.IsNullOrWhiteSpace(data.Updated) && DateTime.TryParse(data.Updated, out var dt))
                 rateDate = DateOnly.FromDateTime(dt.Date);
             else
-                rateDate = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+                rateDate = DateOnly.FromDateTime(DateTime.Now.Date);
 
             return new ConversionResult
             {
@@ -154,14 +160,14 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             if (forcedDate.HasValue) date = forcedDate.Value;
             else if (!string.IsNullOrWhiteSpace(data.Updated) && DateTime.TryParse(data.Updated, out var dt)) date = DateOnly.FromDateTime(dt.Date);
             else if (!string.IsNullOrWhiteSpace(data.Date) && DateOnly.TryParse(data.Date, out var dd)) date = dd;
-            else date = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+            else date = DateOnly.FromDateTime(DateTime.Now.Date);
             return new ExchangeRateResponse
             {
                 BaseCurrency = requestedBase,
                 Date = date,
                 Rates = dict,
                 Source = ProviderName,
-                FetchedAt = DateTime.UtcNow
+                FetchedAt = DateTime.Now
             };
         }
 
