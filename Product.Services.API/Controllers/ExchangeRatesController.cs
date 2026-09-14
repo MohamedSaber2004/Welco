@@ -19,7 +19,7 @@ namespace Product.Services.API.Controllers
 
         public ExchangeRatesController(IMediator mediator, IExchangeRateService service) : base(mediator) => _service = service;
 
-                [HttpGet]
+        [HttpGet]
         [Route(ProductApiRoutes.ExchangeRates.Latest)]
         [AllowAnonymous]
         public async Task<IActionResult> GetLatest(CancellationToken ct)
@@ -35,7 +35,7 @@ namespace Product.Services.API.Controllers
             }
         }
 
-                [HttpGet]
+        [HttpGet]
         [Route(ProductApiRoutes.ExchangeRates.LatestByBase)]
         [AllowAnonymous]
         public async Task<IActionResult> GetLatestByBase([FromRoute] string baseCurrency, CancellationToken ct)
@@ -51,7 +51,7 @@ namespace Product.Services.API.Controllers
             }
         }
 
-                [HttpGet]
+        [HttpGet]
         [Route(ProductApiRoutes.ExchangeRates.Pair)]
         [AllowAnonymous]
         public async Task<IActionResult> GetPair([FromRoute] string from, [FromRoute] string to, CancellationToken ct)
@@ -68,7 +68,7 @@ namespace Product.Services.API.Controllers
             }
         }
 
-                [HttpGet]
+        [HttpGet]
         [Route(ProductApiRoutes.ExchangeRates.Convert)]
         [AllowAnonymous]
         public async Task<IActionResult> Convert([FromQuery] string from, [FromQuery] string to, [FromQuery] decimal amount, CancellationToken ct)
@@ -88,7 +88,29 @@ namespace Product.Services.API.Controllers
             }
         }
 
-                [HttpGet]
+        [HttpPost]
+        [Route(ProductApiRoutes.ExchangeRates.CartTotal)]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConvertCartTotal([FromBody] ConvertCartTotalRequest request, CancellationToken ct)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.ToCurrency))
+                return ToActionResult(Result<CartTotalResultDto>.BadRequest("toCurrency is required"));
+            if (request.Lines == null || request.Lines.Count == 0)
+                return ToActionResult(Result<CartTotalResultDto>.BadRequest("lines are required"));
+            if (request.Lines.Count > 200)
+                return ToActionResult(Result<CartTotalResultDto>.BadRequest("too many lines (max 200)"));
+            try
+            {
+                var result = await _service.ConvertCartTotalAsync(request, ct);
+                return ToActionResult(Result<CartTotalResultDto>.Success(result));
+            }
+            catch (Exception ex)
+            {
+                return ToActionResult(Result<CartTotalResultDto>.Failure(ex.Message));
+            }
+        }
+
+        [HttpGet]
         [Route(ProductApiRoutes.ExchangeRates.History)]
         [AllowAnonymous]
         public async Task<IActionResult> GetHistory([FromRoute] string baseCurrency, [FromRoute] string date, CancellationToken ct)
@@ -106,7 +128,7 @@ namespace Product.Services.API.Controllers
             }
         }
 
-                [HttpPost]
+        [HttpPost]
         [Route(ProductApiRoutes.ExchangeRates.Sync)]
         [RoleAuthorize(UserType.Admin)]
         public async Task<IActionResult> Sync(CancellationToken ct)
@@ -128,7 +150,7 @@ namespace Product.Services.API.Controllers
             return ToActionResult(Result<ExchangeRateSyncResult>.Success(result));
         }
 
-                [HttpGet]
+        [HttpGet]
         [Route(ProductApiRoutes.ExchangeRates.SyncLogs)]
         [AllowAnonymous]
         public async Task<IActionResult> GetSyncLogs([FromQuery] int take = 10, CancellationToken ct = default)

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Welco.Shared.Common.DTOs.Products;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Options;
 using Welco.Shared.Domain.Models;
@@ -251,5 +252,60 @@ public class ExchangeRateServiceTests : IDisposable
         Assert.NotNull(log);
         Assert.Equal(ExchangeRateSyncStatus.Failed, log.Status);
         Assert.False(string.IsNullOrWhiteSpace(log.ErrorMessage));
+    }
+
+    [Fact]
+    public async Task CartTotal_ConvertsLinesAndCeilingsTotal()
+    {
+        await SeedRatesAsync();
+        var res = await _svc.ConvertCartTotalAsync(new ConvertCartTotalRequest
+        {
+            ToCurrency = "EGP",
+            Lines = new List<CartTotalLineRequest>
+            {
+                new() { Key = "p1", UnitAmount = 311m, Quantity = 1, FromCurrency = "USD" },
+                new() { Key = "p2", UnitAmount = 10m, Quantity = 2, FromCurrency = "USD" },
+            }
+        }, CancellationToken.None);
+        // 311 * 50.9467 = 15844.4247 -> 15844.42 ; 10*50.9467 = 509.467 -> 509.47 each
+        Assert.Equal("EGP", res.ToCurrency);
+        Assert.Equal(2, res.Lines.Count);
+        Assert.Equal(15844.42m, res.Lines[0].LineTotal);
+        Assert.Equal(1018.94m, res.Lines[1].LineTotal);
+        Assert.Equal(16863.36m, res.Subtotal);
+        Assert.Equal(16863.36m, res.Total); // already exact -> ceiling is identity
+    }
+
+    [Fact]
+    public async Task CartTotal_CeilingsFractionalTotal()
+    {
+        await SeedRatesAsync();
+        var res = await _svc.ConvertCartTotalAsync(new ConvertCartTotalRequest
+        {
+            ToCurrency = "JPY", // 0 digits -> whole yen, ceiling keeps it whole
+            Lines = new List<CartTotalLineRequest>
+            {
+                new() { Key = "p1", UnitAmount = 1m, Quantity = 1, FromCurrency = "USD" },
+            }
+        }, CancellationToken.None);
+        // 1 * 110.5 = 110.5 -> AwayFromZero 111 ; ceiling(111) = 111
+        Assert.Equal(111m, res.Lines[0].ConvertedUnitAmount);
+        Assert.Equal(111m, res.Subtotal);
+        Assert.Equal(111m, res.Total);
+        Assert.True(res.Total >= res.Subtotal);
+    }
+
+    [Fact]
+    public async Task CartTotal_MissingRate_Throws()
+    {
+        await SeedRatesAsync();
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _svc.ConvertCartTotalAsync(new ConvertCartTotalRequest
+        {
+            ToCurrency = "DZD", // seeded currency but no rate in FakeProvider
+            Lines = new List<CartTotalLineRequest>
+            {
+                new() { Key = "p1", UnitAmount = 5m, Quantity = 1, FromCurrency = "USD" },
+            }
+        }, CancellationToken.None));
     }
 }

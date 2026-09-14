@@ -86,7 +86,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             var baseCurrency = _settings.BaseCurrency.Trim().ToUpperInvariant();
             if (string.IsNullOrWhiteSpace(baseCurrency)) baseCurrency = "USD";
 
-var rates = await GetLatestRatesInternalAsync(baseCurrency, cancellationToken);
+            var rates = await GetLatestRatesInternalAsync(baseCurrency, cancellationToken);
 
             var fromRate = fromCurrency == baseCurrency ? 1m : GetRateForCurrency(rates, fromCurrency);
             var toRate = toCurrency == baseCurrency ? 1m : GetRateForCurrency(rates, toCurrency);
@@ -104,10 +104,10 @@ var rates = await GetLatestRatesInternalAsync(baseCurrency, cancellationToken);
             else
                 rate = toRate!.Value / fromRate!.Value;
 
-var decimalDigits = GetDecimalDigits(toCurrency);
+            var decimalDigits = GetDecimalDigits(toCurrency);
             var converted = Decimal.Round(amount * rate, decimalDigits, MidpointRounding.AwayFromZero);
 
-var rateDate = rates.Values.FirstOrDefault()?.RateDate ?? DateOnly.FromDateTime(DateTime.UtcNow.Date);
+            var rateDate = rates.Values.FirstOrDefault()?.RateDate ?? DateOnly.FromDateTime(DateTime.UtcNow.Date);
             var source = rates.Values.FirstOrDefault()?.Source ?? _provider.ProviderName;
 
             return new ConversionResultDto
@@ -117,6 +117,51 @@ var rateDate = rates.Values.FirstOrDefault()?.RateDate ?? DateOnly.FromDateTime(
                 ToCurrency = toCurrency,
                 Rate = rate,
                 ConvertedAmount = converted,
+                RateDate = rateDate,
+                Source = source
+            };
+        }
+
+        public async Task<CartTotalResultDto> ConvertCartTotalAsync(ConvertCartTotalRequest request, CancellationToken cancellationToken)
+        {
+            if (request == null) throw new ArgumentException("Request required");
+            if (string.IsNullOrWhiteSpace(request.ToCurrency)) throw new ArgumentException("ToCurrency required");
+            if (request.Lines == null || request.Lines.Count == 0) throw new ArgumentException("Lines required");
+            if (request.Lines.Count > 200) throw new ArgumentException("Too many lines (max 200)");
+
+            var toCurrency = request.ToCurrency.Trim().ToUpperInvariant();
+            var digits = GetDecimalDigits(toCurrency);
+            var lines = new List<CartTotalLineResultDto>(request.Lines.Count);
+            DateOnly rateDate = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+            string source = _provider.ProviderName;
+
+            foreach (var line in request.Lines)
+            {
+                if (line.Quantity <= 0) throw new ArgumentException($"Invalid quantity for '{line.Key}'");
+                if (line.UnitAmount < 0) throw new ArgumentException($"Invalid amount for '{line.Key}'");
+                var details = await ConvertWithDetailsAsync(line.UnitAmount, line.FromCurrency, toCurrency, cancellationToken);
+                var lineTotal = Decimal.Round(details.ConvertedAmount * line.Quantity, digits, MidpointRounding.AwayFromZero);
+                lines.Add(new CartTotalLineResultDto
+                {
+                    Key = line.Key ?? string.Empty,
+                    FromCurrency = details.FromCurrency,
+                    UnitAmount = line.UnitAmount,
+                    Quantity = line.Quantity,
+                    Rate = details.Rate,
+                    ConvertedUnitAmount = details.ConvertedAmount,
+                    LineTotal = lineTotal
+                });
+                rateDate = details.RateDate;
+                source = details.Source;
+            }
+
+            var subtotal = lines.Sum(l => l.LineTotal);
+            return new CartTotalResultDto
+            {
+                ToCurrency = toCurrency,
+                Lines = lines,
+                Subtotal = subtotal,
+                Total = CeilToDigits(subtotal, digits),
                 RateDate = rateDate,
                 Source = source
             };
@@ -156,7 +201,7 @@ var rateDate = rates.Values.FirstOrDefault()?.RateDate ?? DateOnly.FromDateTime(
 
             if (rates.Count == 0)
             {
-                
+
                 return await GetLatestRatesAsync(baseCurrency, cancellationToken);
             }
 
@@ -221,11 +266,11 @@ var rateDate = rates.Values.FirstOrDefault()?.RateDate ?? DateOnly.FromDateTime(
                 if (response.Rates == null || response.Rates.Count == 0)
                     throw new InvalidOperationException("Provider returned empty rates");
 
-var baseCurr = await _db.Currencies.FirstOrDefaultAsync(c => c.Code == baseCurrency && !c.IsDeleted, cancellationToken);
+                var baseCurr = await _db.Currencies.FirstOrDefaultAsync(c => c.Code == baseCurrency && !c.IsDeleted, cancellationToken);
                 if (baseCurr == null)
                     throw new InvalidOperationException($"Base currency {baseCurrency} not found in Currencies table (seed required)");
 
-var validRates = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
+                var validRates = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
                 foreach (var kv in response.Rates)
                 {
                     var code = kv.Key?.Trim().ToUpperInvariant();
@@ -238,16 +283,16 @@ var validRates = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCas
                 if (validRates.Count == 0)
                     throw new InvalidOperationException("No valid rates after validation");
 
-var targetDate = response.Date;
+                var targetDate = response.Date;
                 var currencies = await _db.Currencies.Where(c => !c.IsDeleted).ToDictionaryAsync(c => c.Code, c => c, StringComparer.OrdinalIgnoreCase, cancellationToken);
 
-var existingRates = await _db.ExchangeRates
-                    .Where(r => r.BaseCurrencyId == baseCurr.Id && r.RateDate == targetDate && !r.IsDeleted)
-                    .ToDictionaryAsync(r => r.TargetCurrencyId, cancellationToken);
+                var existingRates = await _db.ExchangeRates
+                                    .Where(r => r.BaseCurrencyId == baseCurr.Id && r.RateDate == targetDate && !r.IsDeleted)
+                                    .ToDictionaryAsync(r => r.TargetCurrencyId, cancellationToken);
 
                 var count = 0;
 
-var strategy = _db.Database.CreateExecutionStrategy();
+                var strategy = _db.Database.CreateExecutionStrategy();
                 await strategy.ExecuteAsync(async () =>
                 {
                     using var tx = await _db.Database.BeginTransactionAsync(cancellationToken);
@@ -263,7 +308,7 @@ var strategy = _db.Database.CreateExecutionStrategy();
 
                             if (existingRates.TryGetValue(targetCurr.Id, out var existing))
                             {
-                                
+
                                 if (existing.Rate != kv.Value || existing.Source != response.Source)
                                 {
                                     existing.Rate = kv.Value;
@@ -301,9 +346,9 @@ var strategy = _db.Database.CreateExecutionStrategy();
                     }
                 });
 
-var cacheKey = CacheKey(baseCurrency, targetDate);
+                var cacheKey = CacheKey(baseCurrency, targetDate);
                 _cache.Remove(cacheKey);
-                
+
                 var latestKey = CacheKey(baseCurrency, targetDate);
                 _cache.Remove(latestKey);
 
@@ -362,13 +407,13 @@ var cacheKey = CacheKey(baseCurrency, targetDate);
 
         private async Task<Dictionary<string, CachedRate>> GetLatestRatesInternalAsync(string baseCurrency, CancellationToken cancellationToken)
         {
-            
+
             var today = DateOnly.FromDateTime(DateTime.UtcNow.Date);
             var cacheKey = CacheKey(baseCurrency, today);
             if (_cache.TryGetValue(cacheKey, out Dictionary<string, CachedRate>? cached) && cached != null)
                 return cached;
 
-var baseCurr = await _db.Currencies.AsNoTracking().FirstOrDefaultAsync(c => c.Code == baseCurrency && !c.IsDeleted, cancellationToken);
+            var baseCurr = await _db.Currencies.AsNoTracking().FirstOrDefaultAsync(c => c.Code == baseCurrency && !c.IsDeleted, cancellationToken);
             if (baseCurr == null)
                 throw new InvalidOperationException($"Base currency {baseCurrency} not found");
 
@@ -406,7 +451,7 @@ var baseCurr = await _db.Currencies.AsNoTracking().FirstOrDefaultAsync(c => c.Co
                 FetchedAt = r.FetchedAt
             }, StringComparer.OrdinalIgnoreCase);
 
-_cache.Set(cacheKey, dict, TimeSpan.FromMinutes(_settings.CacheExpirationMinutes > 0 ? _settings.CacheExpirationMinutes : 60));
+            _cache.Set(cacheKey, dict, TimeSpan.FromMinutes(_settings.CacheExpirationMinutes > 0 ? _settings.CacheExpirationMinutes : 60));
             return dict;
         }
 
@@ -419,8 +464,15 @@ _cache.Set(cacheKey, dict, TimeSpan.FromMinutes(_settings.CacheExpirationMinutes
         private int GetDecimalDigits(string code)
         {
 
-var cur = _db.Currencies.AsNoTracking().FirstOrDefault(c => c.Code == code && !c.IsDeleted);
+            var cur = _db.Currencies.AsNoTracking().FirstOrDefault(c => c.Code == code && !c.IsDeleted);
             return cur?.DecimalDigits ?? 2;
+        }
+
+        private static decimal CeilToDigits(decimal value, int digits)
+        {
+            var factor = 1m;
+            for (var i = 0; i < digits; i++) factor *= 10m;
+            return Math.Ceiling(value * factor) / factor;
         }
 
         public async Task<IReadOnlyCollection<ExchangeRateSyncLog>> GetSyncLogsAsync(int take, CancellationToken cancellationToken)

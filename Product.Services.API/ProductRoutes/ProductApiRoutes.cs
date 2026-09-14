@@ -50,6 +50,7 @@ namespace Product.Services.API.ProductRoutes
             public const string History = "history/{baseCurrency}/{date}";
             public const string Pair = "{from}/{to}";
             public const string Convert = "convert";
+            public const string CartTotal = "cart-total";
             public const string Sync = "sync";
             public const string SyncHistory = "sync/history/{date}";
             public const string SyncLogs = "sync/logs";
