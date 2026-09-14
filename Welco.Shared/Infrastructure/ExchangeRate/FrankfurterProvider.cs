@@ -33,7 +33,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 _httpClient.Timeout = TimeSpan.FromSeconds(_settings.TimeoutSeconds > 0 ? _settings.TimeoutSeconds : 10);
         }
 
-        public async Task<ExchangeRateResponse> GetLatestRatesAsync(string baseCurrency, CancellationToken cancellationToken)
+        public async Task<ExchangeRateResponse> GetLatestRatesAsync(string baseCurrency, IReadOnlyCollection<string>? targetCodes, CancellationToken cancellationToken)
         {
             var code = baseCurrency.Trim().ToUpperInvariant();
             var url = $"latest?base={Uri.EscapeDataString(code)}";
@@ -44,7 +44,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 ?? throw new InvalidOperationException($"Frankfurter returned empty for {code}"), code);
         }
 
-        public async Task<ExchangeRateResponse?> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, CancellationToken cancellationToken)
+        public async Task<ExchangeRateResponse?> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, IReadOnlyCollection<string>? targetCodes, CancellationToken cancellationToken)
         {
             var code = baseCurrency.Trim().ToUpperInvariant();
             var url = $"{date:yyyy-MM-dd}?base={Uri.EscapeDataString(code)}";

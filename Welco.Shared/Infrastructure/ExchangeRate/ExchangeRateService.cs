@@ -143,9 +143,12 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 if (line.Quantity <= 0) throw new ArgumentException($"Invalid quantity for '{line.Key}'");
                 if (line.UnitAmount < 0) throw new ArgumentException($"Invalid amount for '{line.Key}'");
                 var details = await ConvertWithDetailsAsync(line.UnitAmount, line.FromCurrency, toCurrency, cancellationToken);
-                // Ceiling pricing: unit and line totals always round UP to whole
-                // units, so the shop never undercharges dust and no decimals show.
-                var ceiledUnit = CeilToDigits(line.UnitAmount * details.Rate, 0);
+                // Ceiling pricing, whole units everywhere, no decimal points:
+                // 1) ceil the native unit first (310.8 -> 311),
+                // 2) convert and ceil the unit, 3) ceil line total and total.
+                // The shop never charges fractions.
+                var nativeCeiled = CeilToDigits(line.UnitAmount, 0);
+                var ceiledUnit = CeilToDigits(nativeCeiled * details.Rate, 0);
                 var lineTotal = CeilToDigits(ceiledUnit * line.Quantity, 0);
                 lines.Add(new CartTotalLineResultDto
                 {
@@ -256,17 +259,23 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
 
             try
             {
+                // Quoted codes come from the database — the provider quotes
+                // exactly the currencies the shop knows, nothing hardcoded.
+                var targetCodes = await _db.Currencies
+                    .Where(c => !c.IsDeleted)
+                    .Select(c => c.Code)
+                    .ToListAsync(cancellationToken);
                 ExchangeRateResponse response;
                 if (providerDate.HasValue)
                 {
-                    var hist = await _provider.GetHistoricalRatesAsync(baseCurrency, providerDate.Value, cancellationToken);
+                    var hist = await _provider.GetHistoricalRatesAsync(baseCurrency, providerDate.Value, targetCodes, cancellationToken);
                     if (hist == null)
                         throw new InvalidOperationException($"Provider returned no data for {baseCurrency} on {providerDate.Value:yyyy-MM-dd}");
                     response = hist;
                 }
                 else
                 {
-                    response = await _provider.GetLatestRatesAsync(baseCurrency, cancellationToken);
+                    response = await _provider.GetLatestRatesAsync(baseCurrency, targetCodes, cancellationToken);
                 }
 
                 if (response.Rates == null || response.Rates.Count == 0)

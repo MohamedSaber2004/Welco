@@ -40,7 +40,7 @@ public class FrankfurterProviderTests
         };
         var provider = CreateProvider(handler);
 
-        var res = await provider.GetLatestRatesAsync("USD", CancellationToken.None);
+        var res = await provider.GetLatestRatesAsync("USD", new[] { "EUR", "SAR" }, CancellationToken.None);
 
         Assert.Equal("Frankfurter", provider.ProviderName);
         Assert.Equal("USD", res.BaseCurrency);
@@ -59,7 +59,7 @@ public class FrankfurterProviderTests
         };
         var provider = CreateProvider(handler);
 
-        var res = await provider.GetHistoricalRatesAsync("USD", new DateOnly(1999, 1, 1), CancellationToken.None);
+        var res = await provider.GetHistoricalRatesAsync("USD", new DateOnly(1999, 1, 1), new[] { "EUR" }, CancellationToken.None);
 
         Assert.Null(res);
     }

@@ -118,12 +118,22 @@ services.AddHttpClient<FrankfurterProvider>((sp, client) =>
                 client.DefaultRequestHeaders.Clear();
             });
 
+services.AddHttpClient<FastForexProvider>((sp, client) =>
+            {
+                var opts = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
+                var baseUrl = string.IsNullOrWhiteSpace(opts.BaseUrl) ? "https://api.fastforex.io" : opts.BaseUrl.TrimEnd('/');
+                client.BaseAddress = new Uri(baseUrl + "/");
+                client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds > 0 ? opts.TimeoutSeconds : 10);
+                client.DefaultRequestHeaders.Clear();
+            });
+
 services.AddScoped<IExchangeRateProvider>(sp =>
             {
                 var opts = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
                 return (opts.Provider?.Trim() ?? string.Empty) switch
                 {
                     "Frankfurter" => (IExchangeRateProvider)sp.GetRequiredService<FrankfurterProvider>(),
+                    "FastForex" => sp.GetRequiredService<FastForexProvider>(),
                     "ExchangeRateApi" => sp.GetRequiredService<ExchangeRateApiProvider>(),
                     _ => sp.GetRequiredService<FrankfurterExchangeRateProvider>(),
                 };

@@ -28,14 +28,14 @@ public class FrankfurterExchangeRateProvider : IExchangeRateProvider
                 _httpClient.Timeout = TimeSpan.FromSeconds(_settings.TimeoutSeconds > 0 ? _settings.TimeoutSeconds : 10);
         }
 
-        public async Task<ExchangeRateResponse> GetLatestRatesAsync(string baseCurrency, CancellationToken cancellationToken)
+        public async Task<ExchangeRateResponse> GetLatestRatesAsync(string baseCurrency, IReadOnlyCollection<string>? targetCodes, CancellationToken cancellationToken)
         {
             var code = baseCurrency.Trim().ToLowerInvariant();
             var url = $"{code}.json";
             return await FetchCdnAsync(url, baseCurrency, null, cancellationToken);
         }
 
-        public async Task<ExchangeRateResponse?> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, CancellationToken cancellationToken)
+        public async Task<ExchangeRateResponse?> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, IReadOnlyCollection<string>? targetCodes, CancellationToken cancellationToken)
         {
             var code = baseCurrency.Trim().ToLowerInvariant();
             var dateStr = date.ToString("yyyy-MM-dd");
@@ -177,7 +177,7 @@ private sealed class FrankfurterResponse
                 _httpClient.Timeout = TimeSpan.FromSeconds(_settings.TimeoutSeconds > 0 ? _settings.TimeoutSeconds : 10);
         }
 
-        public async Task<ExchangeRateResponse> GetLatestRatesAsync(string baseCurrency, CancellationToken cancellationToken)
+        public async Task<ExchangeRateResponse> GetLatestRatesAsync(string baseCurrency, IReadOnlyCollection<string>? targetCodes, CancellationToken cancellationToken)
         {
             var key = _settings.ApiKey;
             if (string.IsNullOrWhiteSpace(key))
@@ -203,7 +203,7 @@ private sealed class FrankfurterResponse
             };
         }
 
-        public async Task<ExchangeRateResponse?> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, CancellationToken cancellationToken)
+        public async Task<ExchangeRateResponse?> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, IReadOnlyCollection<string>? targetCodes, CancellationToken cancellationToken)
         {
             
             _logger.LogWarning("ExchangeRateApi does not support historical rates for {Base} {Date}, returning null", baseCurrency, date);

@@ -27,7 +27,7 @@ public class FakeProvider : IExchangeRateProvider
     public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow.Date);
     public bool ShouldFail { get; set; }
 
-    public Task<ExchangeRateResponse> GetLatestRatesAsync(string baseCurrency, CancellationToken ct)
+    public Task<ExchangeRateResponse> GetLatestRatesAsync(string baseCurrency, IReadOnlyCollection<string>? targetCodes, CancellationToken ct)
     {
         if (ShouldFail) throw new HttpRequestException("Provider unavailable");
         return Task.FromResult(new ExchangeRateResponse
@@ -40,7 +40,7 @@ public class FakeProvider : IExchangeRateProvider
         });
     }
 
-    public Task<ExchangeRateResponse?> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, CancellationToken ct)
+    public Task<ExchangeRateResponse?> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, IReadOnlyCollection<string>? targetCodes, CancellationToken ct)
     {
         if (ShouldFail) throw new HttpRequestException("Provider unavailable");
         return Task.FromResult<ExchangeRateResponse?>(new ExchangeRateResponse
@@ -305,17 +305,20 @@ public class ExchangeRateServiceTests : IDisposable
             {
                 new() { Key = "p1", UnitAmount = 311m, Quantity = 1, FromCurrency = "USD" },
                 new() { Key = "p2", UnitAmount = 10m, Quantity = 2, FromCurrency = "USD" },
+                new() { Key = "p3", UnitAmount = 10.2m, Quantity = 1, FromCurrency = "USD" },
             }
         }, CancellationToken.None);
-        // Whole-unit ceiling pricing: 311 * 50.9467 = 15844.4247 -> 15845 ;
-        // 10*50.9467 = 509.467 -> 510 each ; no decimal points anywhere.
+        // Whole-unit ceiling pricing: native unit ceiled first (310.8 -> 311),
+        // then converted and ceiled — no decimal points anywhere.
+        // 311 * 50.9467 = 15844.4247 -> 15845 ; 10*50.9467 = 509.467 -> 510.
         Assert.Equal("EGP", res.ToCurrency);
-        Assert.Equal(2, res.Lines.Count);
+        Assert.Equal(3, res.Lines.Count);
         Assert.Equal(15845m, res.Lines[0].ConvertedUnitAmount);
         Assert.Equal(15845m, res.Lines[0].LineTotal);
         Assert.Equal(1020m, res.Lines[1].LineTotal);
-        Assert.Equal(16865m, res.Subtotal);
-        Assert.Equal(16865m, res.Total);
+        Assert.Equal(561m, res.Lines[2].ConvertedUnitAmount);
+        Assert.Equal(16865m + 561m, res.Subtotal);
+        Assert.Equal(16865m + 561m, res.Total);
         Assert.True(res.Total >= res.Subtotal);
     }
 
