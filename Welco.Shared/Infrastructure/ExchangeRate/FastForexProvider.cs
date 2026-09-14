@@ -120,7 +120,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 throw new InvalidOperationException($"FastForex convert missing target {to}");
 
             var converted = data.Result[to];
-            var rate = data.Rate;
+            var rate = data.Result.TryGetValue("rate", out var r) ? r : (amount != 0m ? converted / amount : 0m);
             DateOnly rateDate;
             if (!string.IsNullOrWhiteSpace(data.Date) && DateOnly.TryParse(data.Date, out var dd))
                 rateDate = dd;

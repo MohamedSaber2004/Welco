@@ -70,6 +70,26 @@ public class FastForexProviderTests
     }
 
     [Fact]
+    public async Task Convert_ParsesConvertResponse_And_UsesRateFromResult()
+    {
+        var handler = new StubHandler
+        {
+            Response = JsonResponse("{\"base\":\"USD\",\"amount\":2,\"result\":{\"EGP\":103.22,\"rate\":51.6122},\"ms\":4}")
+        };
+        var provider = CreateProvider(handler);
+
+        var res = await provider.ConvertAsync("USD", "EGP", 2m, CancellationToken.None);
+
+        Assert.Equal(2m, res.Amount);
+        Assert.Equal("USD", res.FromCurrency);
+        Assert.Equal("EGP", res.ToCurrency);
+        Assert.Equal(51.6122m, res.Rate);
+        Assert.Equal(103.22m, res.ConvertedAmount);
+        Assert.Equal("FastForex", res.Source);
+        Assert.Equal(2, res.DecimalDigits);
+    }
+
+    [Fact]
     public async Task GetHistoricalRates_NotFound_ReturnsNull()
     {
         var handler = new StubHandler
