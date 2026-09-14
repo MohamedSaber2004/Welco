@@ -267,13 +267,15 @@ public class ExchangeRateServiceTests : IDisposable
                 new() { Key = "p2", UnitAmount = 10m, Quantity = 2, FromCurrency = "USD" },
             }
         }, CancellationToken.None);
-        // 311 * 50.9467 = 15844.4247 -> 15844.42 ; 10*50.9467 = 509.467 -> 509.47 each
+        // 311 * 50.9467 = 15844.4247 -> ceil 15844.43 ; 10*50.9467 = 509.467 -> ceil 509.47 each
         Assert.Equal("EGP", res.ToCurrency);
         Assert.Equal(2, res.Lines.Count);
-        Assert.Equal(15844.42m, res.Lines[0].LineTotal);
+        Assert.Equal(15844.43m, res.Lines[0].ConvertedUnitAmount);
+        Assert.Equal(15844.43m, res.Lines[0].LineTotal);
         Assert.Equal(1018.94m, res.Lines[1].LineTotal);
-        Assert.Equal(16863.36m, res.Subtotal);
-        Assert.Equal(16863.36m, res.Total); // already exact -> ceiling is identity
+        Assert.Equal(16863.37m, res.Subtotal);
+        Assert.Equal(16863.37m, res.Total); // ceiling of exact-dust sum
+        Assert.True(res.Total >= res.Subtotal);
     }
 
     [Fact]

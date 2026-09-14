@@ -140,7 +140,10 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 if (line.Quantity <= 0) throw new ArgumentException($"Invalid quantity for '{line.Key}'");
                 if (line.UnitAmount < 0) throw new ArgumentException($"Invalid amount for '{line.Key}'");
                 var details = await ConvertWithDetailsAsync(line.UnitAmount, line.FromCurrency, toCurrency, cancellationToken);
-                var lineTotal = Decimal.Round(details.ConvertedAmount * line.Quantity, digits, MidpointRounding.AwayFromZero);
+                // Ceiling pricing: unit and line totals always round UP to the
+                // target currency digits, so the shop never undercharges dust.
+                var ceiledUnit = CeilToDigits(line.UnitAmount * details.Rate, digits);
+                var lineTotal = CeilToDigits(ceiledUnit * line.Quantity, digits);
                 lines.Add(new CartTotalLineResultDto
                 {
                     Key = line.Key ?? string.Empty,
@@ -148,7 +151,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                     UnitAmount = line.UnitAmount,
                     Quantity = line.Quantity,
                     Rate = details.Rate,
-                    ConvertedUnitAmount = details.ConvertedAmount,
+                    ConvertedUnitAmount = ceiledUnit,
                     LineTotal = lineTotal
                 });
                 rateDate = details.RateDate;
@@ -348,9 +351,10 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
 
                 var cacheKey = CacheKey(baseCurrency, targetDate);
                 _cache.Remove(cacheKey);
-
-                var latestKey = CacheKey(baseCurrency, targetDate);
-                _cache.Remove(latestKey);
+                // Reads are keyed by TODAY while writes use the provider date:
+                // when they differ the fresh sync would stay invisible behind
+                // stale cache, so evict both.
+                _cache.Remove(CacheKey(baseCurrency, DateOnly.FromDateTime(DateTime.UtcNow.Date)));
 
                 log.CompletedAt = DateTime.UtcNow;
                 log.RatesCount = count;
