@@ -384,19 +384,7 @@ var password = DemoPassword(config);
                     if (u2 != null) orgUsers.Add((u2, approved[i]));
                 }
 
-var legacyCustomers = await db.ApplicationUsers.Where(u => !u.IsDeleted && (int)u.UserType == 4).ToListAsync(ct);
-                if (legacyCustomers.Count > 0 && approved.Count > 0)
-                {
-                    for (var i = 0; i < legacyCustomers.Count; i++)
-                    {
-                        var lc = legacyCustomers[i];
-                        lc.UserType = UserType.OrganizationUser;
-                        if (!lc.CompanyId.HasValue)
-                            lc.CompanyId = approved[i % approved.Count].Id;
-                    }
-                    await db.SaveChangesAsync(ct);
-                    logger.LogInformation("Migrated {Count} legacy customer users to OrganizationUser.", legacyCustomers.Count);
-                }
+
 
                 logger.LogInformation("Bogus seeded {Staff} staff, {Org} org users.",
                     staff.Count, orgUsers.Count);
@@ -600,28 +588,7 @@ var catEntities = new List<HelpCategory>();
                     await db.SaveChangesAsync(ct);
                     logger.LogInformation("Bogus seeded {Count} FAQs.", faqs.Count);
                 }
-                if (!await db.TradeShowEvents.AnyAsync(t => !t.IsDeleted, ct))
-                {
-                    var shows = new[]
-                    {
-                        ("Arab Health 2025", "Dubai, UAE", -210, -206),
-                        ("Medica 2025", "Düsseldorf, Germany", -120, -116),
-                        ("Arab Health 2026", "Dubai, UAE", 25, 29),
-                        ("FIME 2026", "Miami, USA", 150, 153),
-                    }.Select(s =>
-                    {
-                        var t = new TradeShowEvent
-                        {
-                            Id = Guid.NewGuid(), Name = s.Item1, Location = s.Item2,
-                            StartDate = DateTime.UtcNow.AddDays(s.Item3), EndDate = DateTime.UtcNow.AddDays(s.Item4),
-                        };
-                        t.MarkAsCreated(Marker);
-                        return t;
-                    }).ToList();
-                    await db.TradeShowEvents.AddRangeAsync(shows, ct);
-                    await db.SaveChangesAsync(ct);
-                    logger.LogInformation("Bogus seeded {Count} trade shows.", shows.Count);
-                }
+
                 if (!await db.ProductInquiries.AnyAsync(p => !p.IsDeleted, ct) && products.Count > 0)
                 {
                     var inquiries = Enumerable.Range(1, 6).Select(_ =>
@@ -918,31 +885,7 @@ if (!await db.Documents.AnyAsync(d => !d.IsDeleted, ct))
                     logger.LogInformation("Bogus seeded {Count} documents.", docs.Count);
                 }
 
-if (!await db.BlogPosts.AnyAsync(b => !b.IsDeleted, ct))
-                {
-                    var titles = new[]
-                    {
-                        "How to choose the right surgical scissors",
-                        "Autoclave sterilization at 134°C: best practices",
-                        "German stainless steel vs titanium instruments",
-                        "Setting up a distribution partnership",
-                        "Understanding Incoterms for medical imports",
-                        "Caring for precision instruments",
-                    };
-                    var posts = titles.Select((title, i) =>
-                    {
-                        var b = new BlogPost
-                        {
-                            Id = Guid.NewGuid(), Title = title, Body = faker.Lorem.Paragraphs(3, 4),
-                            PublishedDate = DateTime.UtcNow.AddDays(-(i * 12 + 3)),
-                        };
-                        b.MarkAsCreated(Marker);
-                        return b;
-                    }).ToList();
-                    await db.BlogPosts.AddRangeAsync(posts, ct);
-                    await db.SaveChangesAsync(ct);
-                    logger.LogInformation("Bogus seeded {Count} blog posts.", posts.Count);
-                }
+
 
 if (!await db.SupportContacts.AnyAsync(s => !s.IsDeleted, ct))
                 {

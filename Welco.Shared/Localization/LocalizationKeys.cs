@@ -456,15 +456,7 @@ namespace Welco.Shared.Localization
             public const string Deleted = "Content.Deleted";
             public const string NotFound = "Content.NotFound";
         }
-        public static class TradeShow
-        {
-            public const string Created = "TradeShow.Created";
-            public const string ListFetched = "TradeShow.ListFetched";
-            public const string Fetched = "TradeShow.Fetched";
-            public const string NameRequired = "TradeShow.NameRequired";
-            public const string LocationRequired = "TradeShow.LocationRequired";
-            public const string EndDateMustBeAfterStartDate = "TradeShow.EndDateMustBeAfterStartDate";
-        }
+
         public static class ProductInquiry
         {
             public const string Created = "ProductInquiry.Created";

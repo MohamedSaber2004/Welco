@@ -13,7 +13,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
         public string? PhoneNumber { get; set; }
         public Guid? PhoneCountryId { get; set; }
         public string? PhoneCountryCode { get; set; }
-        public UserType UserType { get; set; } = UserType.OrganizationUser;
+        public UserType UserType { get; set; } = UserType.Client;  // Default: end buyer
         public AppLanguage Language { get; set; } = AppLanguage.En;
 
         public CompanyType? CompanyType { get; set; }

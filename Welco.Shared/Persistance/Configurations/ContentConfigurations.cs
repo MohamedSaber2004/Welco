@@ -60,26 +60,7 @@ namespace Welco.Shared.Persistance.Configurations
             b.Property(x => x.CreatedBy).IsRequired();
         }
     }
-    public class TradeShowEventConfiguration : IEntityTypeConfiguration<TradeShowEvent>
-    {
-        public void Configure(EntityTypeBuilder<TradeShowEvent> b)
-        {
-            b.ToTable("TradeShowEvents"); b.HasKey(x => x.Id);
-            b.Property(x => x.Name).IsRequired().HasMaxLength(200);
-            b.Property(x => x.Location).IsRequired().HasMaxLength(300);
-            b.Property(x => x.CreatedBy).IsRequired();
-        }
-    }
-    public class BlogPostConfiguration : IEntityTypeConfiguration<BlogPost>
-    {
-        public void Configure(EntityTypeBuilder<BlogPost> b)
-        {
-            b.ToTable("BlogPosts"); b.HasKey(x => x.Id);
-            b.Property(x => x.Title).IsRequired().HasMaxLength(300);
-            b.Property(x => x.Body).IsRequired();
-            b.Property(x => x.CreatedBy).IsRequired();
-        }
-    }
+
     public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
     {
         public void Configure(EntityTypeBuilder<Notification> b)

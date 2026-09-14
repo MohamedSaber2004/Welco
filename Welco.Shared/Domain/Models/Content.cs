@@ -39,19 +39,7 @@ namespace Welco.Shared.Domain.Models
         public string Answer { get; set; } = null!;
         public int SortOrder { get; set; }
     }
-    public class TradeShowEvent : BaseEntity<Guid>
-    {
-        public string Name { get; set; } = null!;
-        public string Location { get; set; } = null!;
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-    }
-    public class BlogPost : BaseEntity<Guid>
-    {
-        public string Title { get; set; } = null!;
-        public string Body { get; set; } = null!;
-        public DateTime PublishedDate { get; set; }
-    }
+
     public class Notification : BaseEntity<Guid>
     {
         public Guid UserId { get; set; }

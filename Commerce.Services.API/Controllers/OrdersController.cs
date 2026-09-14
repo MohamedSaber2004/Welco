@@ -21,12 +21,12 @@ namespace Commerce.Services.API.Controllers
 
                 [HttpGet]
         [Route(CommerceApiRoutes.Orders.GetAll)]
-        [RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)]
+        [RoleAuthorize(UserType.Client, UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> GetAll([FromQuery] GetOrdersQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
 
                 [HttpGet]
         [Route(CommerceApiRoutes.Orders.GetById)]
-        [RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)]
+        [RoleAuthorize(UserType.Client, UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetOrderByIdQuery { Id = id }, ct));
 
                 [HttpGet]
@@ -37,7 +37,7 @@ namespace Commerce.Services.API.Controllers
 
                 [HttpPost]
         [Route(CommerceApiRoutes.Orders.Create)]
-        [RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)]
+        [RoleAuthorize(UserType.Client, UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> Create([FromBody] CreateOrderCommand cmd, CancellationToken ct) => ToActionResult(await _mediator.Send(cmd, ct));
 
                 [HttpPut]

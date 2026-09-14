@@ -19,7 +19,7 @@ namespace UserManamgent.Service.API.Controllers
 
 [HttpPost]
         [Route(UserManagementApiRoutes.DistributorApplications.Create)]
-        [RoleAuthorize]
+        [RoleAuthorize(UserType.Client)]
         public async Task<IActionResult> Create([FromBody] CreateDistributorApplicationCommand cmd, CancellationToken ct)
             => ToActionResult(await _mediator.Send(cmd, ct));
 
