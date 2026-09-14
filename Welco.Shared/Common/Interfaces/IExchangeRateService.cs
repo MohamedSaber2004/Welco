@@ -15,7 +15,6 @@ namespace Welco.Shared.Common.Interfaces
         Task<ExchangeRateDto> SetManualRateAsync(SetManualRateRequest request, string updatedBy, CancellationToken cancellationToken);
         Task<bool> ClearManualRateAsync(string baseCurrency, string targetCurrency, CancellationToken cancellationToken);
         Task<ExchangeRateSyncResult> SyncHistoricalRatesAsync(DateOnly date, CancellationToken cancellationToken);
-        Task<IReadOnlyCollection<ExchangeRateSyncLog>> GetSyncLogsAsync(int take, CancellationToken cancellationToken);
     }
 
     public class ExchangeRateSyncResult

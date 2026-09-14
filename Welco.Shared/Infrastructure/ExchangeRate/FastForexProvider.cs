@@ -83,6 +83,59 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             return ToResponse(data, code, date);
         }
 
+        public async Task<ConversionResult> ConvertAsync(string fromCurrency, string toCurrency, decimal amount, CancellationToken cancellationToken)
+        {
+            if (amount < 0) throw new ArgumentException("Amount must be >= 0", nameof(amount));
+            if (string.Equals(fromCurrency.Trim().ToUpperInvariant(), toCurrency.Trim().ToUpperInvariant(), StringComparison.OrdinalIgnoreCase))
+            {
+                return new ConversionResult
+                {
+                    Amount = amount,
+                    FromCurrency = fromCurrency.Trim().ToUpperInvariant(),
+                    ToCurrency = toCurrency.Trim().ToUpperInvariant(),
+                    Rate = 1m,
+                    ConvertedAmount = amount,
+                    RateDate = DateOnly.FromDateTime(DateTime.UtcNow.Date),
+                    Source = ProviderName,
+                    DecimalDigits = 2
+                };
+            }
+
+            var from = fromCurrency.Trim().ToUpperInvariant();
+            var to = toCurrency.Trim().ToUpperInvariant();
+            var url = $"convert?from={Uri.EscapeDataString(from)}&to={Uri.EscapeDataString(to)}&amount={amount}&api_key={Uri.EscapeDataString(ApiKey)}";
+            _logger.LogInformation("FastForex convert {Amount} {From}->{To}", amount, from, to);
+            var response = await _httpClient.GetAsync(url, cancellationToken);
+            response.EnsureSuccessStatusCode();
+            var data = await response.Content.ReadFromJsonAsync<FastForexConvertResponse>(cancellationToken: cancellationToken)
+                ?? throw new InvalidOperationException($"FastForex convert returned empty for {from}->{to}");
+
+            if (data.Result == null || !data.Result.ContainsKey(to))
+                throw new InvalidOperationException($"FastForex convert missing target {to}");
+
+            var converted = data.Result[to];
+            var rate = data.Rate;
+            DateOnly rateDate;
+            if (!string.IsNullOrWhiteSpace(data.Date) && DateOnly.TryParse(data.Date, out var dd))
+                rateDate = dd;
+            else if (!string.IsNullOrWhiteSpace(data.Updated) && DateTime.TryParse(data.Updated, out var dt))
+                rateDate = DateOnly.FromDateTime(dt.Date);
+            else
+                rateDate = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+
+            return new ConversionResult
+            {
+                Amount = amount,
+                FromCurrency = from,
+                ToCurrency = to,
+                Rate = rate,
+                ConvertedAmount = converted,
+                RateDate = rateDate,
+                Source = ProviderName,
+                DecimalDigits = 2
+            };
+        }
+
         private ExchangeRateResponse ToResponse(FastForexResponse data, string requestedBase, DateOnly? forcedDate)
         {
             if (data.Results == null || data.Results.Count == 0)
@@ -118,6 +171,17 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             [JsonPropertyName("results")] public Dictionary<string, decimal>? Results { get; set; }
             [JsonPropertyName("updated")] public string? Updated { get; set; }
             [JsonPropertyName("date")] public string? Date { get; set; }
+        }
+
+        private sealed class FastForexConvertResponse
+        {
+            [JsonPropertyName("base")] public string? Base { get; set; }
+            [JsonPropertyName("amount")] public decimal Amount { get; set; }
+            [JsonPropertyName("result")] public Dictionary<string, decimal>? Result { get; set; }
+            [JsonPropertyName("rate")] public decimal Rate { get; set; }
+            [JsonPropertyName("ms")] public int Ms { get; set; }
+            [JsonPropertyName("date")] public string? Date { get; set; }
+            [JsonPropertyName("updated")] public string? Updated { get; set; }
         }
     }
 }

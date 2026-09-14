@@ -96,29 +96,7 @@ namespace Welco.Shared
             services.AddMemoryCache();
             services.AddScoped<IExchangeRateService, ExchangeRateService>();
 
-services.AddHttpClient<FrankfurterExchangeRateProvider>((sp, client) =>
-            {
-                var opts = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
-                var baseUrl = string.IsNullOrWhiteSpace(opts.BaseUrl) ? "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies" : opts.BaseUrl.TrimEnd('/');
-                client.BaseAddress = new Uri(baseUrl + "/");
-                client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds > 0 ? opts.TimeoutSeconds : 10);
-                client.DefaultRequestHeaders.Clear();
-            });
-
-services.AddHttpClient<FrankfurterProvider>((sp, client) =>
-            {
-                var opts = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
-                var baseUrl = string.IsNullOrWhiteSpace(opts.BaseUrl) ? "https://api.frankfurter.app" : opts.BaseUrl.TrimEnd('/');
-                // The Fawazahmed CDN default belongs to the FawazahmedCDN provider;
-                // a Frankfurter selection with that URL would 404 every call.
-                if (baseUrl.Contains("fawazahmed0/currency-api", StringComparison.OrdinalIgnoreCase))
-                    baseUrl = "https://api.frankfurter.app";
-                client.BaseAddress = new Uri(baseUrl + "/");
-                client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds > 0 ? opts.TimeoutSeconds : 10);
-                client.DefaultRequestHeaders.Clear();
-            });
-
-services.AddHttpClient<FastForexProvider>((sp, client) =>
+            services.AddHttpClient<FastForexProvider>((sp, client) =>
             {
                 var opts = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
                 var baseUrl = string.IsNullOrWhiteSpace(opts.BaseUrl) ? "https://api.fastforex.io" : opts.BaseUrl.TrimEnd('/');
@@ -127,30 +105,7 @@ services.AddHttpClient<FastForexProvider>((sp, client) =>
                 client.DefaultRequestHeaders.Clear();
             });
 
-services.AddScoped<IExchangeRateProvider>(sp =>
-            {
-                var opts = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
-                return (opts.Provider?.Trim() ?? string.Empty) switch
-                {
-                    "Frankfurter" => (IExchangeRateProvider)sp.GetRequiredService<FrankfurterProvider>(),
-                    "FawazahmedCDN" => (IExchangeRateProvider)sp.GetRequiredService<FrankfurterExchangeRateProvider>(),
-                    "FastForex" => sp.GetRequiredService<FastForexProvider>(),
-                    "ExchangeRateApi" => sp.GetRequiredService<ExchangeRateApiProvider>(),
-                    _ => sp.GetRequiredService<FrankfurterExchangeRateProvider>(),
-                };
-            });
-
-services.AddHttpClient<ExchangeRateApiProvider>((sp, client) =>
-            {
-                var opts = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
-                var baseUrl = string.IsNullOrWhiteSpace(opts.BaseUrl) ? "https://v6.exchangerate-api.com" : opts.BaseUrl.TrimEnd('/');
-                
-                if (!string.IsNullOrWhiteSpace(opts.ApiKey) && !baseUrl.Contains("/v6/"))
-                    client.BaseAddress = new Uri($"https://v6.exchangerate-api.com/v6/{opts.ApiKey}/");
-                else
-                    client.BaseAddress = new Uri(baseUrl + "/");
-                client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds > 0 ? opts.TimeoutSeconds : 10);
-            });
+            services.AddScoped<IExchangeRateProvider>(sp => sp.GetRequiredService<FastForexProvider>());
 
             services.AddScoped<IWelcoDbContext>(provider => provider.GetRequiredService<WelcoDbContext>());
 

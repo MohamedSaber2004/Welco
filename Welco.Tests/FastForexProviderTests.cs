@@ -7,6 +7,18 @@ using Welco.Shared.Infrastructure.ExchangeRate;
 
 namespace Welco.Tests;
 
+public class StubHandler : HttpMessageHandler
+{
+    public HttpResponseMessage Response { get; set; } = new(HttpStatusCode.OK);
+    public HttpRequestMessage? LastRequest { get; private set; }
+
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        LastRequest = request;
+        return Task.FromResult(Response);
+    }
+}
+
 public class FastForexProviderTests
 {
     private static FastForexProvider CreateProvider(StubHandler handler, string apiKey = "test-key")

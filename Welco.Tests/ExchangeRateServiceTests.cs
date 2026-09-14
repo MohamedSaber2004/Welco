@@ -1,14 +1,10 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Welco.Shared.Common.DTOs.Products;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Options;
-using Welco.Shared.Domain.Models;
 using Welco.Shared.Infrastructure.ExchangeRate;
-using Welco.Shared.Persistance;
 
 namespace Welco.Tests;
 
@@ -52,6 +48,19 @@ public class FakeProvider : IExchangeRateProvider
             FetchedAt = DateTime.UtcNow
         });
     }
+
+    public Task<ConversionResult> ConvertAsync(string fromCurrency, string toCurrency, decimal amount, CancellationToken cancellationToken)
+    {
+        if (ShouldFail) throw new HttpRequestException("Provider unavailable");
+        var from = fromCurrency.Trim().ToUpperInvariant();
+        var to = toCurrency.Trim().ToUpperInvariant();
+        if (from == to) return Task.FromResult(new ConversionResult { Amount = amount, FromCurrency = from, ToCurrency = to, Rate = 1m, ConvertedAmount = amount, RateDate = Date, Source = ProviderName, DecimalDigits = 2 });
+        decimal rate;
+        if (Rates.TryGetValue(to, out var toRate)) rate = toRate;
+        else if (Rates.TryGetValue(from, out var fromRate)) rate = 1m / fromRate;
+        else throw new InvalidOperationException($"No rate for {from}->{to}");
+        return Task.FromResult(new ConversionResult { Amount = amount, FromCurrency = from, ToCurrency = to, Rate = rate, ConvertedAmount = amount * rate, RateDate = Date, Source = ProviderName, DecimalDigits = 2 });
+    }
 }
 
 public class FakeProvider2 : IExchangeRateProvider
@@ -82,11 +91,22 @@ public class FakeProvider2 : IExchangeRateProvider
             FetchedAt = DateTime.UtcNow
         });
     }
+
+    public Task<ConversionResult> ConvertAsync(string fromCurrency, string toCurrency, decimal amount, CancellationToken cancellationToken)
+    {
+        var from = fromCurrency.Trim().ToUpperInvariant();
+        var to = toCurrency.Trim().ToUpperInvariant();
+        if (from == to) return Task.FromResult(new ConversionResult { Amount = amount, FromCurrency = from, ToCurrency = to, Rate = 1m, ConvertedAmount = amount, RateDate = Date, Source = ProviderName, DecimalDigits = 2 });
+        decimal rate;
+        if (Rates.TryGetValue(to, out var toRate)) rate = toRate;
+        else if (Rates.TryGetValue(from, out var fromRate)) rate = 1m / fromRate;
+        else throw new InvalidOperationException($"No rate for {from}->{to}");
+        return Task.FromResult(new ConversionResult { Amount = amount, FromCurrency = from, ToCurrency = to, Rate = rate, ConvertedAmount = amount * rate, RateDate = Date, Source = ProviderName, DecimalDigits = 2 });
+    }
 }
 
-public class ExchangeRateServiceTests : IDisposable
+public class ExchangeRateServiceTests
 {
-    private readonly WelcoDbContext _db;
     private readonly IMemoryCache _cache;
     private readonly FakeProvider _provider;
     private readonly ExchangeRateService _svc;
@@ -94,35 +114,9 @@ public class ExchangeRateServiceTests : IDisposable
 
     public ExchangeRateServiceTests()
     {
-        var opts = new DbContextOptionsBuilder<WelcoDbContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning)).Options;
-        _db = new WelcoDbContext(opts, null);
-        
-        var usd = Currency.Create("US Dollar", "دولار أمريكي", "USD", "$", "Test", "$", 2);
-        var egp = Currency.Create("Egyptian Pound", "جنيه مصري", "EGP", "E£", "Test", "E£", 2);
-        var eur = Currency.Create("Euro", "يورو", "EUR", "€", "Test", "€", 2);
-        var gbp = Currency.Create("British Pound", "جنيه إسترليني", "GBP", "£", "Test", "£", 2);
-        var sar = Currency.Create("Saudi Riyal", "ريال سعودي", "SAR", "﷼", "Test", "﷼", 2);
-        var jpy = Currency.Create("Japanese Yen", "ين ياباني", "JPY", "¥", "Test", "¥", 0);
-        var aed = Currency.Create("UAE Dirham", "درهم إماراتي", "AED", "AED", "Test", "د.إ", 2);
-        _db.Currencies.AddRange(usd, egp, eur, gbp, sar, jpy, aed);
-        _db.SaveChanges();
-
         _cache = new MemoryCache(new MemoryCacheOptions());
         _provider = new FakeProvider();
-        _svc = new ExchangeRateService(_db, _provider, Options.Create(_settings), _cache, NullLogger<ExchangeRateService>.Instance);
-    }
-
-    public void Dispose()
-    {
-        _db.Dispose();
-        _cache.Dispose();
-    }
-
-    private async Task SeedRatesAsync(DateOnly? date = null)
-    {
-        date ??= DateOnly.FromDateTime(DateTime.UtcNow.Date);
-        var res = await _svc.SyncLatestRatesAsync(CancellationToken.None);
-        if (!res.Success) throw new Exception("Seed failed: " + res.ErrorMessage);
+        _svc = new ExchangeRateService(_provider, Options.Create(_settings), _cache, NullLogger<ExchangeRateService>.Instance);
     }
 
     [Fact] public async Task USD_USD_ReturnsSameAmount()
@@ -134,45 +128,31 @@ public class ExchangeRateServiceTests : IDisposable
 
     [Fact] public async Task USD_EGP_ConvertsCorrectly()
     {
-        await SeedRatesAsync();
         var r = await _svc.ConvertWithDetailsAsync(100m, "USD", "EGP", CancellationToken.None);
-        Assert.Equal(5094.67m, r.ConvertedAmount); 
+        Assert.Equal(5094.67m, r.ConvertedAmount);
         Assert.Equal(50.9467m, r.Rate);
     }
 
     [Fact] public async Task EGP_USD_ConvertsCorrectly()
     {
-        await SeedRatesAsync();
-        var r = await _svc.ConvertWithDetailsAsync(5094.67m, "EGP", "USD", CancellationToken.None);
-        
-        Assert.InRange(r.ConvertedAmount, 99.99m, 100.01m);
+        var r = await _svc.ConvertWithDetailsAsync(50.9467m, "EGP", "USD", CancellationToken.None);
+        Assert.InRange(r.ConvertedAmount, 0.99m, 1.01m);
     }
 
-    [Fact] public async Task EUR_EGP_UsesCrossRate()
+    [Fact] public async Task USD_EUR_ConvertsCorrectly()
     {
-        await SeedRatesAsync();
-        var r = await _svc.ConvertWithDetailsAsync(100m, "EUR", "EGP", CancellationToken.None);
-        var expectedRate = 50.9467m / 0.85m;
-        Assert.InRange(r.Rate, expectedRate - 0.0001m, expectedRate + 0.0001m);
-        Assert.InRange(r.ConvertedAmount, 5993m, 5994m); 
-    }
-
-    [Fact] public async Task EGP_EUR_ReverseCross()
-    {
-        await SeedRatesAsync();
-        var r = await _svc.ConvertWithDetailsAsync(5993.73m, "EGP", "EUR", CancellationToken.None);
-        Assert.InRange(r.ConvertedAmount, 99.9m, 100.1m);
+        var r = await _svc.ConvertWithDetailsAsync(100m, "USD", "EUR", CancellationToken.None);
+        Assert.Equal(85m, r.ConvertedAmount);
+        Assert.Equal(0.85m, r.Rate);
     }
 
     [Fact] public async Task InvalidCurrency_Throws()
     {
-        await SeedRatesAsync();
         await Assert.ThrowsAsync<InvalidOperationException>(() => _svc.ConvertWithDetailsAsync(10m, "USD", "XXX", CancellationToken.None));
     }
 
     [Fact] public async Task ZeroAmount_ReturnsZero()
     {
-        await SeedRatesAsync();
         var r = await _svc.ConvertWithDetailsAsync(0m, "USD", "EGP", CancellationToken.None);
         Assert.Equal(0m, r.ConvertedAmount);
         Assert.Equal(50.9467m, r.Rate);
@@ -183,226 +163,102 @@ public class ExchangeRateServiceTests : IDisposable
         await Assert.ThrowsAsync<ArgumentException>(() => _svc.ConvertWithDetailsAsync(-5m, "USD", "EGP", CancellationToken.None));
     }
 
-    [Fact] public async Task MissingExchangeRate_Throws()
+    [Fact] public async Task MissingRate_Throws()
     {
-        
-        _db.ExchangeRates.RemoveRange(_db.ExchangeRates);
-        await _db.SaveChangesAsync();
         _provider.Rates.Remove("EGP");
-        _cache.Remove($"exchange-rates:USD:{DateOnly.FromDateTime(DateTime.UtcNow.Date):yyyy-MM-dd}");
-        
+        _cache.Remove($"exchange-rates:USD:{DateOnly.FromDateTime(DateTime.UtcNow.Date):yyyy-MM-dd}:FAKE");
         await Assert.ThrowsAsync<InvalidOperationException>(() => _svc.ConvertWithDetailsAsync(10m, "USD", "EGP", CancellationToken.None));
     }
 
-    [Fact] public async Task ManualRate_OverridesProviderAndSurvivesSync()
+    [Fact] public async Task ConvertCartTotal_WholeUnitCeiling()
     {
-        await SeedRatesAsync();
-        var dto = await _svc.SetManualRateAsync(new SetManualRateRequest
-        {
-            BaseCurrency = "USD",
-            TargetCurrency = "EGP",
-            Rate = 51.71m
-        }, "Test", CancellationToken.None);
-        Assert.Equal(51.71m, dto.Rate);
-        Assert.Equal("manual", dto.Source);
-
-        // Conversions price with the manual correction, not the provider feed.
-        var r = await _svc.ConvertWithDetailsAsync(1m, "USD", "EGP", CancellationToken.None);
-        Assert.Equal(51.71m, r.Rate);
-
-        // Daily sync must not overwrite the admin correction.
-        var sync = await _svc.SyncLatestRatesAsync(CancellationToken.None);
-        Assert.True(sync.Success);
-        var after = await _svc.ConvertWithDetailsAsync(1m, "USD", "EGP", CancellationToken.None);
-        Assert.Equal(51.71m, after.Rate);
-    }
-
-    [Fact] public async Task ClearManualRate_ResumesMarketFeed()
-    {
-        await SeedRatesAsync();
-        await _svc.SetManualRateAsync(new SetManualRateRequest
-        {
-            BaseCurrency = "USD",
-            TargetCurrency = "EGP",
-            Rate = 51.71m
-        }, "Test", CancellationToken.None);
-        Assert.True(await _svc.ClearManualRateAsync("USD", "EGP", CancellationToken.None));
-        // Next sync overwrites the unflagged row with the market feed again.
-        var sync = await _svc.SyncLatestRatesAsync(CancellationToken.None);
-        Assert.True(sync.Success);
-        var r = await _svc.ConvertWithDetailsAsync(1m, "USD", "EGP", CancellationToken.None);
-        Assert.Equal(50.9467m, r.Rate);
-    }
-
-    [Fact] public async Task ProviderFailure_FallsBackToDb()
-    {
-        await SeedRatesAsync();
-        _provider.ShouldFail = true;
-        
-        var r = await _svc.ConvertWithDetailsAsync(10m, "USD", "EGP", CancellationToken.None);
-        Assert.Equal(509.47m, r.ConvertedAmount); 
-    }
-
-    [Fact] public async Task CachedRate_Used()
-    {
-        await SeedRatesAsync();
-        var r1 = await _svc.ConvertWithDetailsAsync(10m, "USD", "EUR", CancellationToken.None);
-        
-        _provider.Rates["EUR"] = 0.90m;
-        var r2 = await _svc.ConvertWithDetailsAsync(10m, "USD", "EUR", CancellationToken.None);
-        Assert.Equal(r1.Rate, r2.Rate);
-    }
-
-    [Fact] public async Task HistoricalRate_Retrieved()
-    {
-        var histDate = new DateOnly(2023, 1, 1);
-        var res = await _svc.SyncHistoricalRatesAsync(histDate, CancellationToken.None);
-        Assert.True(res.Success);
-        var rates = await _svc.GetHistoricalRatesAsync("USD", histDate, CancellationToken.None);
-        Assert.NotEmpty(rates);
-    }
-
-    [Fact] public async Task LatestRate_ReturnsToday()
-    {
-        await SeedRatesAsync();
-        var rates = await _svc.GetLatestRatesAsync("USD", CancellationToken.None);
-        Assert.Contains(rates, x => x.TargetCurrency == "EGP" && x.Rate == 50.9467m);
-    }
-
-    [Fact] public async Task RatePrecision_DecimalNotFloat()
-    {
-        await SeedRatesAsync();
-        var r = await _svc.ConvertWithDetailsAsync(1m, "USD", "EGP", CancellationToken.None);
-        Assert.IsType<decimal>(r.Rate);
-        Assert.IsType<decimal>(r.ConvertedAmount);
-        Assert.Equal(50.9467m, r.Rate);
-    }
-
-    [Fact] public async Task SameDaySync_Idempotent()
-    {
-        var r1 = await _svc.SyncLatestRatesAsync(CancellationToken.None);
-        var r2 = await _svc.SyncLatestRatesAsync(CancellationToken.None);
-        Assert.True(r1.Success && r2.Success);
-        var count = await _db.ExchangeRates.CountAsync();
-        
-        Assert.Equal(r1.RatesCount, r2.RatesCount);
-    }
-
-    [Fact] public async Task DuplicateSync_NoDuplicateRows()
-    {
-        await SeedRatesAsync();
-        var before = await _db.ExchangeRates.CountAsync();
-        await _svc.SyncLatestRatesAsync(CancellationToken.None);
-        var after = await _db.ExchangeRates.CountAsync();
-        Assert.Equal(before, after);
-    }
-
-    [Fact]
-    public async Task SyncLatestRates_SetsLogSuccessAndRatesCount()
-    {
-        var res = await _svc.SyncLatestRatesAsync(CancellationToken.None);
-        Assert.True(res.Success);
-        Assert.True(res.RatesCount > 0);
-
-        var log = await _db.ExchangeRateSyncLogs.OrderByDescending(l => l.StartedAt).FirstOrDefaultAsync();
-        Assert.NotNull(log);
-        Assert.Equal(ExchangeRateSyncStatus.Success, log.Status);
-        Assert.Equal(res.RatesCount, log.RatesCount);
-        Assert.Equal("USD", log.BaseCurrency);
-    }
-
-    [Fact]
-    public async Task SyncLatestRates_WhenProviderFails_SetsLogFailed()
-    {
-        _provider.ShouldFail = true;
-        var res = await _svc.SyncLatestRatesAsync(CancellationToken.None);
-        Assert.False(res.Success);
-
-        var log = await _db.ExchangeRateSyncLogs.OrderByDescending(l => l.StartedAt).FirstOrDefaultAsync();
-        Assert.NotNull(log);
-        Assert.Equal(ExchangeRateSyncStatus.Failed, log.Status);
-        Assert.False(string.IsNullOrWhiteSpace(log.ErrorMessage));
-    }
-
-    [Fact]
-    public async Task CartTotal_ConvertsLinesAndCeilingsTotal()
-    {
-        await SeedRatesAsync();
-        var res = await _svc.ConvertCartTotalAsync(new ConvertCartTotalRequest
+        var req = new ConvertCartTotalRequest
         {
             ToCurrency = "EGP",
             Lines = new List<CartTotalLineRequest>
             {
-                new() { Key = "p1", UnitAmount = 311m, Quantity = 1, FromCurrency = "USD" },
-                new() { Key = "p2", UnitAmount = 10m, Quantity = 2, FromCurrency = "USD" },
-                new() { Key = "p3", UnitAmount = 10.2m, Quantity = 1, FromCurrency = "USD" },
+                new() { Key = "p1", UnitAmount = 310.8m, Quantity = 2, FromCurrency = "USD" },
+                new() { Key = "p2", UnitAmount = 10.2m, Quantity = 3, FromCurrency = "USD" },
+                new() { Key = "p3", UnitAmount = 10m, Quantity = 1, FromCurrency = "EGP" }
             }
-        }, CancellationToken.None);
-        // Whole-unit ceiling pricing: native unit ceiled first (310.8 -> 311),
-        // then converted and ceiled — no decimal points anywhere.
-        // 311 * 50.9467 = 15844.4247 -> 15845 ; 10*50.9467 = 509.467 -> 510.
+        };
+        var res = await _svc.ConvertCartTotalAsync(req, CancellationToken.None);
         Assert.Equal("EGP", res.ToCurrency);
         Assert.Equal(3, res.Lines.Count);
         Assert.Equal(311m, res.Lines[0].CeiledUnitAmount);
         Assert.Equal(15845m, res.Lines[0].ConvertedUnitAmount);
-        Assert.Equal(15845m, res.Lines[0].LineTotal);
-        Assert.Equal(10m, res.Lines[1].CeiledUnitAmount);
-        Assert.Equal(1020m, res.Lines[1].LineTotal);
-        Assert.Equal(11m, res.Lines[2].CeiledUnitAmount);
-        Assert.Equal(561m, res.Lines[2].ConvertedUnitAmount);
-        Assert.Equal(16865m + 561m, res.Subtotal);
-        Assert.Equal(16865m + 561m, res.Total);
+        Assert.Equal(31690m, res.Lines[0].LineTotal);
+        Assert.Equal(11m, res.Lines[1].CeiledUnitAmount);
+        Assert.Equal(561m, res.Lines[1].ConvertedUnitAmount);
+        Assert.Equal(1683m, res.Lines[1].LineTotal);
+        Assert.Equal(10m, res.Lines[2].CeiledUnitAmount);
+        Assert.Equal(10m, res.Lines[2].ConvertedUnitAmount);
+        Assert.Equal(10m, res.Lines[2].LineTotal);
+        Assert.Equal(31690m + 1683m + 10m, res.Subtotal);
+        Assert.Equal(31690m + 1683m + 10m, res.Total);
         Assert.True(res.Total >= res.Subtotal);
     }
 
     [Fact]
-    public async Task CartTotal_CeilingsFractionalTotal()
+    public async Task GetLatestRates_ReturnsProviderRates()
     {
-        await SeedRatesAsync();
-        var res = await _svc.ConvertCartTotalAsync(new ConvertCartTotalRequest
-        {
-            ToCurrency = "JPY", // 0 digits -> whole yen, ceiling keeps it whole
-            Lines = new List<CartTotalLineRequest>
-            {
-                new() { Key = "p1", UnitAmount = 1m, Quantity = 1, FromCurrency = "USD" },
-            }
-        }, CancellationToken.None);
-        // 1 * 110.5 = 110.5 -> AwayFromZero 111 ; ceiling(111) = 111
-        Assert.Equal(1m, res.Lines[0].CeiledUnitAmount);
-        Assert.Equal(111m, res.Lines[0].ConvertedUnitAmount);
-        Assert.Equal(111m, res.Subtotal);
-        Assert.Equal(111m, res.Total);
-        Assert.True(res.Total >= res.Subtotal);
+        var rates = await _svc.GetLatestRatesAsync("USD", CancellationToken.None);
+        Assert.Contains(rates, r => r.TargetCurrency == "EGP");
+        Assert.Equal(50.9467m, rates.First(r => r.TargetCurrency == "EGP").Rate);
     }
 
     [Fact]
-    public async Task CartTotal_MissingRate_Throws()
+    public async Task GetLatestRates_CachesResults()
     {
-        await SeedRatesAsync();
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _svc.ConvertCartTotalAsync(new ConvertCartTotalRequest
-        {
-            ToCurrency = "DZD", // seeded currency but no rate in FakeProvider
-            Lines = new List<CartTotalLineRequest>
-            {
-                new() { Key = "p1", UnitAmount = 5m, Quantity = 1, FromCurrency = "USD" },
-            }
-        }, CancellationToken.None));
-    }
-
-    [Fact]
-    public async Task GetLatestRates_ReSyncs_WhenProviderSourceMismatch()
-    {
-        await SeedRatesAsync();
         var first = await _svc.GetLatestRatesAsync("USD", CancellationToken.None);
-        Assert.Contains(first, r => r.Source == "Fake");
+        _provider.Rates["EGP"] = 999m;
+        var second = await _svc.GetLatestRatesAsync("USD", CancellationToken.None);
+        Assert.Equal(50.9467m, second.First(r => r.TargetCurrency == "EGP").Rate);
+    }
 
-        var newProvider = new FakeProvider2 { Rates = { ["EGP"] = 999m } };
-        var freshCache = new MemoryCache(new MemoryCacheOptions());
-        var newSvc = new ExchangeRateService(_db, newProvider, Options.Create(_settings), freshCache, NullLogger<ExchangeRateService>.Instance);
+    [Fact]
+    public async Task GetHistoricalRates_UsesProviderDate()
+    {
+        var date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
+        _provider.Date = date;
+        var rates = await _svc.GetHistoricalRatesAsync("USD", date, CancellationToken.None);
+        Assert.Equal(date, rates.First().RateDate);
+    }
 
-        var afterMismatch = await newSvc.GetLatestRatesAsync("USD", CancellationToken.None);
-        var egp = afterMismatch.First(r => r.TargetCurrency == "EGP");
-        Assert.Equal(999m, egp.Rate);
-        Assert.Equal("Fake2", egp.Source);
+    [Fact]
+    public async Task GetHistoricalRates_FallsBackToLatestWhenProviderReturnsNull()
+    {
+        _provider.Date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-99));
+        var rates = await _svc.GetHistoricalRatesAsync("USD", DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-99)), CancellationToken.None);
+        Assert.NotEmpty(rates);
+    }
+
+    [Fact]
+    public async Task SetManualRate_ThrowsNotSupported()
+    {
+        await Assert.ThrowsAsync<NotSupportedException>(() => _svc.SetManualRateAsync(new SetManualRateRequest { BaseCurrency = "USD", TargetCurrency = "EGP", Rate = 1m }, "test", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task ClearManualRate_ThrowsNotSupported()
+    {
+        await Assert.ThrowsAsync<NotSupportedException>(() => _svc.ClearManualRateAsync("USD", "EGP", CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task SyncLatestRates_ReturnsDeprecatedSuccess()
+    {
+        var res = await _svc.SyncLatestRatesAsync(CancellationToken.None);
+        Assert.True(res.Success);
+        Assert.Equal("Fake", res.Source);
+    }
+
+    [Fact]
+    public async Task SyncHistoricalRates_ReturnsDeprecatedSuccess()
+    {
+        var date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
+        var res = await _svc.SyncHistoricalRatesAsync(date, CancellationToken.None);
+        Assert.True(res.Success);
+        Assert.Equal(date, res.RateDate);
     }
 }

@@ -1,11 +1,8 @@
 using System.Reflection;
 using FluentValidation;
-using Hangfire;
-using Hangfire.SqlServer;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Product.Services.API.Filters;
-using Product.Services.API.Jobs;
 using Scalar.AspNetCore;
 using Welco.Shared;
 using Welco.Shared.Common.Behaviors;
@@ -91,31 +88,6 @@ var env = builder.Environment;
 var connectionString = builder.Configuration.GetConnectionString("DatabaseConnection")
                 ?? builder.Configuration["DatabaseConnection"];
 
-            if (!string.IsNullOrWhiteSpace(connectionString))
-            {
-                builder.Services.AddHangfire(configuration => configuration
-                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                    .UseSimpleAssemblyNameTypeSerializer()
-                    .UseRecommendedSerializerSettings()
-                    .UseSqlServerStorage(connectionString, new SqlServerStorageOptions
-                    {
-                        CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                        SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-                        QueuePollInterval = TimeSpan.Zero,
-                        UseRecommendedIsolationLevel = true,
-                        DisableGlobalLocks = true,
-                        PrepareSchemaIfNecessary = true
-                    }));
-
-                builder.Services.AddHangfireServer(options =>
-                {
-                    options.WorkerCount = Math.Max(Environment.ProcessorCount, 2);
-                    options.ServerName = "ProductService-ExchangeRateServer";
-                });
-
-                builder.Services.AddScoped<ExchangeRateSyncJob>();
-            }
-
             var app = builder.Build();
 
             var exchangeRateConfig = app.Configuration.GetSection(ExchangeRateSettings.SectionName).Get<ExchangeRateSettings>() ?? new ExchangeRateSettings();
@@ -154,15 +126,6 @@ var connectionString = builder.Configuration.GetConnectionString("DatabaseConnec
             });
             app.MapControllers();
 
-            if (!string.IsNullOrWhiteSpace(connectionString))
-            {
-                app.UseHangfireDashboard("/hangfire", new DashboardOptions
-                {
-                    Authorization = new[] { new HangfireAuthorizationFilter() },
-                    DashboardTitle = "Welco - Background Jobs"
-                });
-            }
-
 if (!app.Environment.IsEnvironment("Test"))
             {
                 try
@@ -188,39 +151,6 @@ if (BogusDemoSeeder.ShouldSeedDemoData(app.Environment, app.Configuration, out v
                 {
                     var logger = app.Services.GetRequiredService<ILogger<Program>>();
                     logger.LogError(ex, "Seeding / migration failed");
-                }
-
-if (!string.IsNullOrWhiteSpace(connectionString))
-                {
-                    try
-                    {
-                        var recurringJobManager = app.Services.GetService<IRecurringJobManager>();
-                        if (recurringJobManager != null)
-                        {
-                            var exchangeRateSettings = app.Configuration.GetSection(ExchangeRateSettings.SectionName).Get<ExchangeRateSettings>() ?? new ExchangeRateSettings();
-                            var intervalHours = exchangeRateSettings.SyncIntervalHours > 0 ? exchangeRateSettings.SyncIntervalHours : 24;
-
-                            var cronExpression = intervalHours switch
-                            {
-                                1 => Cron.Hourly(),
-                                > 1 and < 24 => Cron.HourInterval(intervalHours),
-                                _ => Cron.Daily()
-                            };
-
-                            recurringJobManager.AddOrUpdate<ExchangeRateSyncJob>(
-                                "sync-latest-exchange-rates",
-                                job => job.ExecuteAsync(),
-                                cronExpression);
-
-                            var logger = app.Services.GetRequiredService<ILogger<Program>>();
-                            logger.LogInformation("Hangfire recurring job 'sync-latest-exchange-rates' registered (interval: {Hours}h)", intervalHours);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        var logger = app.Services.GetRequiredService<ILogger<Program>>();
-                        logger.LogError(ex, "Failed to register recurring Hangfire jobs");
-                    }
                 }
             }
 
