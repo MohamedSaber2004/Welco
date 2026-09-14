@@ -12,6 +12,8 @@ namespace Welco.Shared.Common.Interfaces
         Task<IReadOnlyCollection<ExchangeRateDto>> GetLatestRatesAsync(string baseCurrency, CancellationToken cancellationToken);
         Task<IReadOnlyCollection<ExchangeRateDto>> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, CancellationToken cancellationToken);
         Task<ExchangeRateSyncResult> SyncLatestRatesAsync(CancellationToken cancellationToken);
+        Task<ExchangeRateDto> SetManualRateAsync(SetManualRateRequest request, string updatedBy, CancellationToken cancellationToken);
+        Task<bool> ClearManualRateAsync(string baseCurrency, string targetCurrency, CancellationToken cancellationToken);
         Task<ExchangeRateSyncResult> SyncHistoricalRatesAsync(DateOnly date, CancellationToken cancellationToken);
         Task<IReadOnlyCollection<ExchangeRateSyncLog>> GetSyncLogsAsync(int take, CancellationToken cancellationToken);
     }

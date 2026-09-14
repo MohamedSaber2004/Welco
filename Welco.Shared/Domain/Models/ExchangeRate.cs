@@ -10,6 +10,8 @@ namespace Welco.Shared.Domain.Models
         public DateOnly RateDate { get; set; }
         public string Source { get; set; } = string.Empty;
         public DateTime FetchedAt { get; set; }
+        /// <summary>Admin-set market correction. Sync never overwrites manual rows.</summary>
+        public bool IsManual { get; set; }
 
         public virtual Currency BaseCurrency { get; set; } = null!;
         public virtual Currency TargetCurrency { get; set; } = null!;

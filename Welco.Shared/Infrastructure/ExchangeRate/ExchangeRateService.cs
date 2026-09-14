@@ -130,7 +130,10 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             if (request.Lines.Count > 200) throw new ArgumentException("Too many lines (max 200)");
 
             var toCurrency = request.ToCurrency.Trim().ToUpperInvariant();
-            var digits = GetDecimalDigits(toCurrency);
+            // Cart pricing is whole currency units: unit, line and total are
+            // all ceiled to integers so no decimal points are ever shown or
+            // charged. Per-currency fractional rounding lives only in the
+            // single-amount /convert endpoint.
             var lines = new List<CartTotalLineResultDto>(request.Lines.Count);
             DateOnly rateDate = DateOnly.FromDateTime(DateTime.UtcNow.Date);
             string source = _provider.ProviderName;
@@ -140,10 +143,10 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 if (line.Quantity <= 0) throw new ArgumentException($"Invalid quantity for '{line.Key}'");
                 if (line.UnitAmount < 0) throw new ArgumentException($"Invalid amount for '{line.Key}'");
                 var details = await ConvertWithDetailsAsync(line.UnitAmount, line.FromCurrency, toCurrency, cancellationToken);
-                // Ceiling pricing: unit and line totals always round UP to the
-                // target currency digits, so the shop never undercharges dust.
-                var ceiledUnit = CeilToDigits(line.UnitAmount * details.Rate, digits);
-                var lineTotal = CeilToDigits(ceiledUnit * line.Quantity, digits);
+                // Ceiling pricing: unit and line totals always round UP to whole
+                // units, so the shop never undercharges dust and no decimals show.
+                var ceiledUnit = CeilToDigits(line.UnitAmount * details.Rate, 0);
+                var lineTotal = CeilToDigits(ceiledUnit * line.Quantity, 0);
                 lines.Add(new CartTotalLineResultDto
                 {
                     Key = line.Key ?? string.Empty,
@@ -164,7 +167,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 ToCurrency = toCurrency,
                 Lines = lines,
                 Subtotal = subtotal,
-                Total = CeilToDigits(subtotal, digits),
+                Total = CeilToDigits(subtotal, 0),
                 RateDate = rateDate,
                 Source = source
             };
@@ -311,7 +314,8 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
 
                             if (existingRates.TryGetValue(targetCurr.Id, out var existing))
                             {
-
+                                // Admin manual corrections win over the provider feed.
+                                if (existing.IsManual) continue;
                                 if (existing.Rate != kv.Value || existing.Source != response.Source)
                                 {
                                     existing.Rate = kv.Value;
@@ -477,6 +481,78 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             var factor = 1m;
             for (var i = 0; i < digits; i++) factor *= 10m;
             return Math.Ceiling(value * factor) / factor;
+        }
+
+        /// <summary>
+        /// Admin market correction (e.g. provider says 51.36 but the real
+        /// market price is 51.71). Writes today's row flagged manual; the
+        /// daily sync never overwrites manual rows. Reads convert with it.
+        /// </summary>
+        public async Task<ExchangeRateDto> SetManualRateAsync(SetManualRateRequest request, string updatedBy, CancellationToken cancellationToken)
+        {
+            if (request == null) throw new ArgumentException("Request required");
+            var baseCode = NormalizeCode(request.BaseCurrency);
+            var targetCode = NormalizeCode(request.TargetCurrency);
+            if (baseCode == targetCode) throw new ArgumentException("Base and target must differ");
+            if (request.Rate <= 0) throw new ArgumentException("Rate must be > 0");
+
+            var baseCurr = await _db.Currencies.FirstOrDefaultAsync(c => c.Code == baseCode && !c.IsDeleted, cancellationToken)
+                ?? throw new InvalidOperationException($"Base currency {baseCode} not found");
+            var targetCurr = await _db.Currencies.FirstOrDefaultAsync(c => c.Code == targetCode && !c.IsDeleted, cancellationToken)
+                ?? throw new InvalidOperationException($"Target currency {targetCode} not found");
+
+            var today = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+            var row = await _db.ExchangeRates.FirstOrDefaultAsync(
+                r => r.BaseCurrencyId == baseCurr.Id && r.TargetCurrencyId == targetCurr.Id && r.RateDate == today && !r.IsDeleted, cancellationToken);
+            if (row == null)
+            {
+                row = new ExchangeRateEntity
+                {
+                    Id = Guid.NewGuid(),
+                    BaseCurrencyId = baseCurr.Id,
+                    TargetCurrencyId = targetCurr.Id,
+                    RateDate = today,
+                };
+                row.MarkAsCreated(updatedBy);
+                _db.ExchangeRates.Add(row);
+            }
+            else
+            {
+                row.MarkAsUpdated(updatedBy);
+            }
+            row.Rate = request.Rate;
+            row.Source = "manual";
+            row.FetchedAt = DateTime.UtcNow;
+            row.IsManual = true;
+            await _db.SaveChangesAsync(cancellationToken);
+            _cache.Remove(CacheKey(baseCode, today));
+
+            return new ExchangeRateDto
+            {
+                Id = row.Id,
+                BaseCurrency = baseCode,
+                TargetCurrency = targetCode,
+                Rate = row.Rate,
+                RateDate = row.RateDate,
+                Source = row.Source,
+                FetchedAt = row.FetchedAt
+            };
+        }
+
+        /// <summary>Resume market feed for a pair: unflag manual so sync owns it again.</summary>
+        public async Task<bool> ClearManualRateAsync(string baseCurrency, string targetCurrency, CancellationToken cancellationToken)
+        {
+            var baseCode = NormalizeCode(baseCurrency);
+            var targetCode = NormalizeCode(targetCurrency);
+            var today = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+            var rows = await _db.ExchangeRates
+                .Where(r => r.BaseCurrency.Code == baseCode && r.TargetCurrency.Code == targetCode && r.RateDate == today && !r.IsDeleted && r.IsManual)
+                .ToListAsync(cancellationToken);
+            if (rows.Count == 0) return false;
+            foreach (var r in rows) { r.IsManual = false; r.MarkAsUpdated("System"); }
+            await _db.SaveChangesAsync(cancellationToken);
+            _cache.Remove(CacheKey(baseCode, today));
+            return true;
         }
 
         public async Task<IReadOnlyCollection<ExchangeRateSyncLog>> GetSyncLogsAsync(int take, CancellationToken cancellationToken)

@@ -96,13 +96,37 @@ namespace Welco.Shared
             services.AddMemoryCache();
             services.AddScoped<IExchangeRateService, ExchangeRateService>();
 
-services.AddHttpClient<IExchangeRateProvider, FrankfurterExchangeRateProvider>((sp, client) =>
+services.AddHttpClient<FrankfurterExchangeRateProvider>((sp, client) =>
             {
                 var opts = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
                 var baseUrl = string.IsNullOrWhiteSpace(opts.BaseUrl) ? "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies" : opts.BaseUrl.TrimEnd('/');
                 client.BaseAddress = new Uri(baseUrl + "/");
                 client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds > 0 ? opts.TimeoutSeconds : 10);
                 client.DefaultRequestHeaders.Clear();
+            });
+
+services.AddHttpClient<FrankfurterProvider>((sp, client) =>
+            {
+                var opts = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
+                var baseUrl = string.IsNullOrWhiteSpace(opts.BaseUrl) ? "https://api.frankfurter.app" : opts.BaseUrl.TrimEnd('/');
+                // The Fawazahmed CDN default belongs to the FawazahmedCDN provider;
+                // a Frankfurter selection with that URL would 404 every call.
+                if (baseUrl.Contains("fawazahmed0/currency-api", StringComparison.OrdinalIgnoreCase))
+                    baseUrl = "https://api.frankfurter.app";
+                client.BaseAddress = new Uri(baseUrl + "/");
+                client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds > 0 ? opts.TimeoutSeconds : 10);
+                client.DefaultRequestHeaders.Clear();
+            });
+
+services.AddScoped<IExchangeRateProvider>(sp =>
+            {
+                var opts = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
+                return (opts.Provider?.Trim() ?? string.Empty) switch
+                {
+                    "Frankfurter" => (IExchangeRateProvider)sp.GetRequiredService<FrankfurterProvider>(),
+                    "ExchangeRateApi" => sp.GetRequiredService<ExchangeRateApiProvider>(),
+                    _ => sp.GetRequiredService<FrankfurterExchangeRateProvider>(),
+                };
             });
 
 services.AddHttpClient<ExchangeRateApiProvider>((sp, client) =>

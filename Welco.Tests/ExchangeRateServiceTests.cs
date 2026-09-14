@@ -164,6 +164,46 @@ public class ExchangeRateServiceTests : IDisposable
         await Assert.ThrowsAsync<InvalidOperationException>(() => _svc.ConvertWithDetailsAsync(10m, "USD", "EGP", CancellationToken.None));
     }
 
+    [Fact] public async Task ManualRate_OverridesProviderAndSurvivesSync()
+    {
+        await SeedRatesAsync();
+        var dto = await _svc.SetManualRateAsync(new SetManualRateRequest
+        {
+            BaseCurrency = "USD",
+            TargetCurrency = "EGP",
+            Rate = 51.71m
+        }, "Test", CancellationToken.None);
+        Assert.Equal(51.71m, dto.Rate);
+        Assert.Equal("manual", dto.Source);
+
+        // Conversions price with the manual correction, not the provider feed.
+        var r = await _svc.ConvertWithDetailsAsync(1m, "USD", "EGP", CancellationToken.None);
+        Assert.Equal(51.71m, r.Rate);
+
+        // Daily sync must not overwrite the admin correction.
+        var sync = await _svc.SyncLatestRatesAsync(CancellationToken.None);
+        Assert.True(sync.Success);
+        var after = await _svc.ConvertWithDetailsAsync(1m, "USD", "EGP", CancellationToken.None);
+        Assert.Equal(51.71m, after.Rate);
+    }
+
+    [Fact] public async Task ClearManualRate_ResumesMarketFeed()
+    {
+        await SeedRatesAsync();
+        await _svc.SetManualRateAsync(new SetManualRateRequest
+        {
+            BaseCurrency = "USD",
+            TargetCurrency = "EGP",
+            Rate = 51.71m
+        }, "Test", CancellationToken.None);
+        Assert.True(await _svc.ClearManualRateAsync("USD", "EGP", CancellationToken.None));
+        // Next sync overwrites the unflagged row with the market feed again.
+        var sync = await _svc.SyncLatestRatesAsync(CancellationToken.None);
+        Assert.True(sync.Success);
+        var r = await _svc.ConvertWithDetailsAsync(1m, "USD", "EGP", CancellationToken.None);
+        Assert.Equal(50.9467m, r.Rate);
+    }
+
     [Fact] public async Task ProviderFailure_FallsBackToDb()
     {
         await SeedRatesAsync();
@@ -267,14 +307,15 @@ public class ExchangeRateServiceTests : IDisposable
                 new() { Key = "p2", UnitAmount = 10m, Quantity = 2, FromCurrency = "USD" },
             }
         }, CancellationToken.None);
-        // 311 * 50.9467 = 15844.4247 -> ceil 15844.43 ; 10*50.9467 = 509.467 -> ceil 509.47 each
+        // Whole-unit ceiling pricing: 311 * 50.9467 = 15844.4247 -> 15845 ;
+        // 10*50.9467 = 509.467 -> 510 each ; no decimal points anywhere.
         Assert.Equal("EGP", res.ToCurrency);
         Assert.Equal(2, res.Lines.Count);
-        Assert.Equal(15844.43m, res.Lines[0].ConvertedUnitAmount);
-        Assert.Equal(15844.43m, res.Lines[0].LineTotal);
-        Assert.Equal(1018.94m, res.Lines[1].LineTotal);
-        Assert.Equal(16863.37m, res.Subtotal);
-        Assert.Equal(16863.37m, res.Total); // ceiling of exact-dust sum
+        Assert.Equal(15845m, res.Lines[0].ConvertedUnitAmount);
+        Assert.Equal(15845m, res.Lines[0].LineTotal);
+        Assert.Equal(1020m, res.Lines[1].LineTotal);
+        Assert.Equal(16865m, res.Subtotal);
+        Assert.Equal(16865m, res.Total);
         Assert.True(res.Total >= res.Subtotal);
     }
 

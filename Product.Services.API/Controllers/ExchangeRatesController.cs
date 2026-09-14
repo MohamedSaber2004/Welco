@@ -128,7 +128,7 @@ namespace Product.Services.API.Controllers
             }
         }
 
-        [HttpPost]
+                [HttpPost]
         [Route(ProductApiRoutes.ExchangeRates.Sync)]
         [RoleAuthorize(UserType.Admin)]
         public async Task<IActionResult> Sync(CancellationToken ct)
@@ -136,6 +136,50 @@ namespace Product.Services.API.Controllers
             var result = await _service.SyncLatestRatesAsync(ct);
             if (!result.Success) return ToActionResult(Result<ExchangeRateSyncResult>.Failure(result.ErrorMessage ?? "Sync failed", 502));
             return ToActionResult(Result<ExchangeRateSyncResult>.Success(result));
+        }
+
+        /// <summary>
+        /// Admin market correction, e.g. { baseCurrency: "USD", targetCurrency: "EGP", rate: 51.71 }.
+        /// Stored flagged manual: the daily sync never overwrites it and all
+        /// conversions price with it until cleared.
+        /// </summary>
+        [HttpPut]
+        [Route(ProductApiRoutes.ExchangeRates.Manual)]
+        [RoleAuthorize(UserType.Admin)]
+        public async Task<IActionResult> SetManualRate([FromBody] SetManualRateRequest request, CancellationToken ct)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.TargetCurrency))
+                return ToActionResult(Result<ExchangeRateDto>.BadRequest("targetCurrency is required"));
+            if (request.Rate <= 0)
+                return ToActionResult(Result<ExchangeRateDto>.BadRequest("rate must be > 0"));
+            try
+            {
+                var user = User?.Identity?.Name ?? "Admin";
+                var dto = await _service.SetManualRateAsync(request, user, ct);
+                return ToActionResult(Result<ExchangeRateDto>.Success(dto));
+            }
+            catch (Exception ex)
+            {
+                return ToActionResult(Result<ExchangeRateDto>.Failure(ex.Message));
+            }
+        }
+
+        /// <summary>Resume market feed for a pair (unflag manual).</summary>
+        [HttpDelete]
+        [Route(ProductApiRoutes.ExchangeRates.ManualPair)]
+        [RoleAuthorize(UserType.Admin)]
+        public async Task<IActionResult> ClearManualRate([FromRoute] string from, [FromRoute] string to, CancellationToken ct)
+        {
+            try
+            {
+                var cleared = await _service.ClearManualRateAsync(from, to, ct);
+                if (!cleared) return ToActionResult(Result<bool>.NotFound($"No manual rate for {from}->{to}"));
+                return ToActionResult(Result<bool>.Success(true));
+            }
+            catch (Exception ex)
+            {
+                return ToActionResult(Result<bool>.Failure(ex.Message));
+            }
         }
 
         [HttpPost]
