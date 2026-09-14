@@ -124,7 +124,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 source = details.Source;
             }
 
-            var subtotal = lines.Sum(l => l.LineTotal);
+            var subtotal = CeilToDigits(lines.Sum(l => l.LineTotal), 0);
             return new CartTotalResultDto
             {
                 ToCurrency = toCurrency,
