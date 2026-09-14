@@ -1,22 +1,6 @@
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/api/integration/orders/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [{ "Host": "localhost", "Port": 7045 }],
-      "UpstreamPathTemplate": "/api/integration/orders/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      "DangerousAcceptAnyServerCertificateValidator": true
-    },
-    {
-      "DownstreamPathTemplate": "/api/integration/orders",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [{ "Host": "localhost", "Port": 7045 }],
-      "UpstreamPathTemplate": "/api/integration/orders",
-      "UpstreamHttpMethod": [ "GET", "POST" ],
-      "DangerousAcceptAnyServerCertificateValidator": true
-    },
-    {
       "DownstreamPathTemplate": "/api/integration/inventory/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [{ "Host": "localhost", "Port": 7045 }],

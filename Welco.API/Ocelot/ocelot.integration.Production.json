@@ -1,22 +1,6 @@
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/api/integration/orders/{everything}",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [{ "Host": "welco-commerce.runasp.net", "Port": 443 }],
-      "UpstreamPathTemplate": "/api/integration/orders/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
-      "DownstreamPathTemplate": "/api/integration/orders",
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [{ "Host": "welco-commerce.runasp.net", "Port": 443 }],
-      "UpstreamPathTemplate": "/api/integration/orders",
-      "UpstreamHttpMethod": [ "GET", "POST" ],
-      "DangerousAcceptAnyServerCertificateValidator": false
-    },
-    {
       "DownstreamPathTemplate": "/api/integration/inventory/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [{ "Host": "welco-commerce.runasp.net", "Port": 443 }],
