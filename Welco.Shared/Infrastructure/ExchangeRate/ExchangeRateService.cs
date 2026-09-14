@@ -196,7 +196,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
         public async Task<IReadOnlyCollection<ExchangeRateDto>> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, CancellationToken cancellationToken)
         {
             baseCurrency = NormalizeCode(baseCurrency);
-            var cacheKey = CacheKey(baseCurrency, date);
+            var cacheKey = CacheKey(baseCurrency, date, _provider.ProviderName);
             if (_cache.TryGetValue(cacheKey, out Dictionary<string, CachedRate>? cached) && cached != null)
             {
                 return cached.Values.Select(v => ToDto(v)).OrderBy(r => r.TargetCurrency).ToList();
@@ -363,11 +363,10 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                     }
                 });
 
-                var cacheKey = CacheKey(baseCurrency, targetDate);
+                var cacheKey = CacheKey(baseCurrency, targetDate, _provider.ProviderName);
                 _cache.Remove(cacheKey);
-                // Reads are keyed by TODAY while writes use the provider date:
-                // when they differ the fresh sync would stay invisible behind
-                // stale cache, so evict both.
+                _cache.Remove(CacheKey(baseCurrency, DateOnly.FromDateTime(DateTime.UtcNow.Date), _provider.ProviderName));
+                _cache.Remove(CacheKey(baseCurrency, targetDate));
                 _cache.Remove(CacheKey(baseCurrency, DateOnly.FromDateTime(DateTime.UtcNow.Date)));
 
                 log.CompletedAt = DateTime.UtcNow;
@@ -427,7 +426,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
         {
 
             var today = DateOnly.FromDateTime(DateTime.UtcNow.Date);
-            var cacheKey = CacheKey(baseCurrency, today);
+            var cacheKey = CacheKey(baseCurrency, today, _provider.ProviderName);
             if (_cache.TryGetValue(cacheKey, out Dictionary<string, CachedRate>? cached) && cached != null)
                 return cached;
 
@@ -557,6 +556,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             row.FetchedAt = DateTime.UtcNow;
             row.IsManual = true;
             await _db.SaveChangesAsync(cancellationToken);
+            _cache.Remove(CacheKey(baseCode, today, _provider.ProviderName));
             _cache.Remove(CacheKey(baseCode, today));
 
             return new ExchangeRateDto
@@ -583,6 +583,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             if (rows.Count == 0) return false;
             foreach (var r in rows) { r.IsManual = false; r.MarkAsUpdated("System"); }
             await _db.SaveChangesAsync(cancellationToken);
+            _cache.Remove(CacheKey(baseCode, today, _provider.ProviderName));
             _cache.Remove(CacheKey(baseCode, today));
             return true;
         }
@@ -598,7 +599,11 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
         }
 
         private static string NormalizeCode(string code) => string.IsNullOrWhiteSpace(code) ? "USD" : code.Trim().ToUpperInvariant();
-        private static string CacheKey(string baseCurrency, DateOnly date) => $"exchange-rates:{baseCurrency}:{date:yyyy-MM-dd}";
+        private static string CacheKey(string baseCurrency, DateOnly date, string? providerName = null)
+        {
+            var suffix = string.IsNullOrWhiteSpace(providerName) ? "" : $":{providerName.Trim().ToUpperInvariant()}";
+            return $"exchange-rates:{baseCurrency}:{date:yyyy-MM-dd}{suffix}";
+        }
         private static ExchangeRateDto ToDto(CachedRate r) => new() { Id = r.Id, BaseCurrency = r.BaseCurrency, TargetCurrency = r.TargetCurrency, Rate = r.Rate, RateDate = r.RateDate, Source = r.Source, FetchedAt = r.FetchedAt };
 
         private sealed class CachedRate
