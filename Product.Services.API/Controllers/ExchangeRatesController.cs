@@ -109,23 +109,5 @@ namespace Product.Services.API.Controllers
                 return ToActionResult(Result<CartTotalResultDto>.Failure(ex.Message));
             }
         }
-
-        [HttpGet]
-        [Route(ProductApiRoutes.ExchangeRates.History)]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetHistory([FromRoute] string baseCurrency, [FromRoute] string date, CancellationToken ct)
-        {
-            if (!DateOnly.TryParse(date, out var d))
-                return ToActionResult(Result<IReadOnlyCollection<ExchangeRateDto>>.BadRequest("Invalid date format, use yyyy-MM-dd"));
-            try
-            {
-                var rates = await _service.GetHistoricalRatesAsync(baseCurrency, d, ct);
-                return ToActionResult(Result<IReadOnlyCollection<ExchangeRateDto>>.Success(rates.ToList()));
-            }
-            catch (Exception ex)
-            {
-                return ToActionResult(Result<IReadOnlyCollection<ExchangeRateDto>>.Failure(ex.Message));
-            }
-        }
     }
 }

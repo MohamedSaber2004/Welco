@@ -58,22 +58,5 @@ public class CartTotalLineResultDto
         public string Source { get; set; } = string.Empty;
     }
 
-    public class ExchangeRateSyncLogDto
-    {
-        public Guid Id { get; set; }
-        public DateTime StartedAt { get; set; }
-        public DateTime? CompletedAt { get; set; }
-        public string Status { get; set; } = string.Empty;
-        public string BaseCurrency { get; set; } = string.Empty;
-        public int RatesCount { get; set; }
-        public string Source { get; set; } = string.Empty;
-        public string? ErrorMessage { get; set; }
-    }
 
-    public class SetManualRateRequest
-    {
-        public string BaseCurrency { get; set; } = "USD";
-        public string TargetCurrency { get; set; } = string.Empty;
-        public decimal Rate { get; set; }
-    }
 }

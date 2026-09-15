@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Welco.Shared.Common.DTOs.Products;
@@ -36,19 +35,6 @@ public class FakeProvider : IExchangeRateProvider
         });
     }
 
-    public Task<ExchangeRateResponse?> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, IReadOnlyCollection<string>? targetCodes, CancellationToken ct)
-    {
-        if (ShouldFail) throw new HttpRequestException("Provider unavailable");
-        return Task.FromResult<ExchangeRateResponse?>(new ExchangeRateResponse
-        {
-            BaseCurrency = baseCurrency.ToUpperInvariant(),
-            Date = date,
-            Rates = new Dictionary<string, decimal>(Rates, StringComparer.OrdinalIgnoreCase),
-            Source = ProviderName,
-            FetchedAt = DateTime.UtcNow
-        });
-    }
-
     public Task<ConversionResult> ConvertAsync(string fromCurrency, string toCurrency, decimal amount, CancellationToken cancellationToken)
     {
         if (ShouldFail) throw new HttpRequestException("Provider unavailable");
@@ -80,18 +66,6 @@ public class FakeProvider2 : IExchangeRateProvider
         });
     }
 
-    public Task<ExchangeRateResponse?> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, IReadOnlyCollection<string>? targetCodes, CancellationToken ct)
-    {
-        return Task.FromResult<ExchangeRateResponse?>(new ExchangeRateResponse
-        {
-            BaseCurrency = baseCurrency.ToUpperInvariant(),
-            Date = date,
-            Rates = new Dictionary<string, decimal>(Rates, StringComparer.OrdinalIgnoreCase),
-            Source = ProviderName,
-            FetchedAt = DateTime.UtcNow
-        });
-    }
-
     public Task<ConversionResult> ConvertAsync(string fromCurrency, string toCurrency, decimal amount, CancellationToken cancellationToken)
     {
         var from = fromCurrency.Trim().ToUpperInvariant();
@@ -107,16 +81,14 @@ public class FakeProvider2 : IExchangeRateProvider
 
 public class ExchangeRateServiceTests
 {
-    private readonly IMemoryCache _cache;
     private readonly FakeProvider _provider;
     private readonly ExchangeRateService _svc;
-    private readonly ExchangeRateSettings _settings = new() { BaseCurrency = "USD", CacheExpirationMinutes = 5, TimeoutSeconds = 5 };
+    private readonly ExchangeRateSettings _settings = new() { BaseCurrency = "USD", TimeoutSeconds = 5 };
 
     public ExchangeRateServiceTests()
     {
-        _cache = new MemoryCache(new MemoryCacheOptions());
         _provider = new FakeProvider();
-        _svc = new ExchangeRateService(_provider, Options.Create(_settings), _cache, NullLogger<ExchangeRateService>.Instance);
+        _svc = new ExchangeRateService(_provider, Options.Create(_settings), NullLogger<ExchangeRateService>.Instance);
     }
 
     [Fact] public async Task USD_USD_ReturnsSameAmount()
@@ -166,7 +138,6 @@ public class ExchangeRateServiceTests
     [Fact] public async Task MissingRate_Throws()
     {
         _provider.Rates.Remove("EGP");
-        _cache.Remove($"exchange-rates:USD:{DateOnly.FromDateTime(DateTime.UtcNow.Date):yyyy-MM-dd}:FAKE");
         await Assert.ThrowsAsync<InvalidOperationException>(() => _svc.ConvertWithDetailsAsync(10m, "USD", "EGP", CancellationToken.None));
     }
 
@@ -208,57 +179,12 @@ public class ExchangeRateServiceTests
     }
 
     [Fact]
-    public async Task GetLatestRates_CachesResults()
+    public async Task GetLatestRates_FetchesLive_EveryCall_NoCache()
     {
         var first = await _svc.GetLatestRatesAsync("USD", CancellationToken.None);
         _provider.Rates["EGP"] = 999m;
         var second = await _svc.GetLatestRatesAsync("USD", CancellationToken.None);
-        Assert.Equal(50.9467m, second.First(r => r.TargetCurrency == "EGP").Rate);
-    }
-
-    [Fact]
-    public async Task GetHistoricalRates_UsesProviderDate()
-    {
-        var date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
-        _provider.Date = date;
-        var rates = await _svc.GetHistoricalRatesAsync("USD", date, CancellationToken.None);
-        Assert.Equal(date, rates.First().RateDate);
-    }
-
-    [Fact]
-    public async Task GetHistoricalRates_FallsBackToLatestWhenProviderReturnsNull()
-    {
-        _provider.Date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-99));
-        var rates = await _svc.GetHistoricalRatesAsync("USD", DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-99)), CancellationToken.None);
-        Assert.NotEmpty(rates);
-    }
-
-    [Fact]
-    public async Task SetManualRate_ThrowsNotSupported()
-    {
-        await Assert.ThrowsAsync<NotSupportedException>(() => _svc.SetManualRateAsync(new SetManualRateRequest { BaseCurrency = "USD", TargetCurrency = "EGP", Rate = 1m }, "test", CancellationToken.None));
-    }
-
-    [Fact]
-    public async Task ClearManualRate_ThrowsNotSupported()
-    {
-        await Assert.ThrowsAsync<NotSupportedException>(() => _svc.ClearManualRateAsync("USD", "EGP", CancellationToken.None));
-    }
-
-    [Fact]
-    public async Task SyncLatestRates_ReturnsDeprecatedSuccess()
-    {
-        var res = await _svc.SyncLatestRatesAsync(CancellationToken.None);
-        Assert.True(res.Success);
-        Assert.Equal("Fake", res.Source);
-    }
-
-    [Fact]
-    public async Task SyncHistoricalRates_ReturnsDeprecatedSuccess()
-    {
-        var date = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-1));
-        var res = await _svc.SyncHistoricalRatesAsync(date, CancellationToken.None);
-        Assert.True(res.Success);
-        Assert.Equal(date, res.RateDate);
+        // No cache: second call sees the live provider value
+        Assert.Equal(999m, second.First(r => r.TargetCurrency == "EGP").Rate);
     }
 }

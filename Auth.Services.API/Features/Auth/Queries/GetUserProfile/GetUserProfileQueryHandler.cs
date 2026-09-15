@@ -125,7 +125,7 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                             phoneCode = companyCountry?.PhoneCode?.Trim();
                         }
                     }
-                    catch {  }
+                    catch { }
                 }
 
                 if (phoneCode == null && addresses.Count > 0)
@@ -184,7 +184,7 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                             countryNameEn = country?.NameEn;
                             countryNameAr = country?.NameAr;
                         }
-                        catch {  }
+                        catch { }
 
                         return new CompanyDto
                         {
@@ -209,7 +209,7 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                 }
             }
 
-if (user.UserType == UserType.OrganizationUser)
+            if (user.UserType == UserType.OrganizationUser)
             {
                 try
                 {
@@ -229,7 +229,7 @@ if (user.UserType == UserType.OrganizationUser)
                             countryNameEn = country?.NameEn;
                             countryNameAr = country?.NameAr;
                         }
-                        catch {  }
+                        catch { }
 
                         return new CompanyDto
                         {

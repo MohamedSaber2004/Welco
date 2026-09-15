@@ -23,7 +23,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Logout
         {
             var refreshRepo = _unitOfWork.GetRepository<UserRefreshToken, Guid>();
 
-if (!string.IsNullOrWhiteSpace(request.RefreshToken))
+            if (!string.IsNullOrWhiteSpace(request.RefreshToken))
             {
                 var tokenEntity = await refreshRepo.GetFirstAsync(r => r.Token == request.RefreshToken && !r.IsRevoked, cancellationToken);
                 if (tokenEntity != null)
@@ -34,7 +34,7 @@ if (!string.IsNullOrWhiteSpace(request.RefreshToken))
                 }
             }
 
-var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (request.RevokeAllSessions && !string.IsNullOrWhiteSpace(userIdClaim) && Guid.TryParse(userIdClaim, out var userId))
             {
                 var activeTokens = await refreshRepo.GetAllListAsync(r => r.UserId == userId && !r.IsRevoked, cancellationToken);

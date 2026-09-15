@@ -7,12 +7,6 @@ using Welco.Shared.Common.Options;
 
 namespace Welco.Shared.Infrastructure.ExchangeRate
 {
-    /// <summary>
-    /// FastForex provider (https://api.fastforex.io). Live market quotes incl.
-    /// MENA (EGP/DZD/SAR/AED). Quoted codes come from the database (via the
-    /// service) — nothing hardcoded here. Requires ExchangeRateSettings:ApiKey.
-    /// Select via ExchangeRateSettings:Provider = "FastForex".
-    /// </summary>
     public class FastForexProvider : IExchangeRateProvider
     {
         private readonly HttpClient _httpClient;
@@ -31,19 +25,22 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             _logger = logger;
             if (_httpClient.Timeout == System.Threading.Timeout.InfiniteTimeSpan)
                 _httpClient.Timeout = TimeSpan.FromSeconds(_settings.TimeoutSeconds > 0 ? _settings.TimeoutSeconds : 10);
+            // NOTE: FastForex uses ?api_key= query param, NOT a Bearer header.
+            // Do not set Authorization here.
+        }
 
-            if (!string.IsNullOrWhiteSpace(_settings.ApiKey))
+        private string ApiKey
+        {
+            get
             {
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _settings.ApiKey.Trim());
+                var key = _settings.ApiKey?.Trim();
+                if (string.IsNullOrWhiteSpace(key))
+                    throw new InvalidOperationException("FastForex ApiKey is not configured (ExchangeRateSettings:ApiKey)");
+                return key;
             }
         }
 
-        private string ApiKey =>
-            _settings.ApiKey?.Trim() ?? throw new InvalidOperationException("FastForex ApiKey is not configured (ExchangeRateSettings:ApiKey)");
-
-        /// <summary>Codes come from the database (via the service), never hardcoded.</summary>
-        private static string ToList(IReadOnlyCollection<string>? targetCodes, string baseCode)
+        private static List<string> NormalizeTargets(IReadOnlyCollection<string>? targetCodes, string baseCode)
         {
             var codes = (targetCodes ?? [])
                 .Where(c => !string.IsNullOrWhiteSpace(c))
@@ -52,142 +49,119 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
             if (codes.Count == 0)
-                throw new InvalidOperationException("No target currencies in database to quote");
-            return string.Join(",", codes);
+                throw new InvalidOperationException("No target currencies to quote");
+            return codes;
+        }
+
+        /// <summary>
+        /// Single fetch-one call: GET fetch-one?from={from}&amp;to={to}&amp;api_key={key}.
+        /// Returns (rate, rateDate) dated from the "updated" field (daily).
+        /// </summary>
+        private async Task<(decimal Rate, DateOnly RateDate)> FetchOneAsync(string from, string to, CancellationToken ct)
+        {
+            from = from.Trim().ToUpperInvariant();
+            to = to.Trim().ToUpperInvariant();
+            var url = $"fetch-one?from={Uri.EscapeDataString(from)}&to={Uri.EscapeDataString(to)}&api_key={Uri.EscapeDataString(ApiKey)}";
+            _logger.LogInformation("FastForex fetch-one {From}->{To}", from, to);
+            var response = await _httpClient.GetAsync(url, ct);
+            response.EnsureSuccessStatusCode();
+            var data = await response.Content.ReadFromJsonAsync<FastForexFetchOneResponse>(cancellationToken: ct)
+                ?? throw new InvalidOperationException($"FastForex fetch-one returned empty for {from}->{to}");
+            var dict = data.Result ?? data.Results;
+            if (dict == null || !dict.TryGetValue(to, out var rate) || rate <= 0)
+                throw new InvalidOperationException($"FastForex fetch-one missing target {to}");
+            return (rate, ParseDailyDate(data.Updated, data.Date));
         }
 
         public async Task<ExchangeRateResponse> GetLatestRatesAsync(string baseCurrency, IReadOnlyCollection<string>? targetCodes, CancellationToken cancellationToken)
         {
             var code = baseCurrency.Trim().ToUpperInvariant();
-            var url = $"fetch-multi?from={Uri.EscapeDataString(code)}&to={ToList(targetCodes, code)}";
-            _logger.LogInformation("Fetching rates from FastForex for base {Base}", code);
-            var response = await _httpClient.GetAsync(url, cancellationToken);
-            response.EnsureSuccessStatusCode();
-            var data = await response.Content.ReadFromJsonAsync<FastForexResponse>(cancellationToken: cancellationToken)
-                ?? throw new InvalidOperationException($"FastForex returned empty for {code}");
-            return ToResponse(data, code, null);
-        }
+            var targets = NormalizeTargets(targetCodes, code);
+            _logger.LogInformation("Fetching daily rates from FastForex fetch-one for base {Base} ({Count} pairs)", code, targets.Count);
 
-        public async Task<ExchangeRateResponse?> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, IReadOnlyCollection<string>? targetCodes, CancellationToken cancellationToken)
-        {
-            var code = baseCurrency.Trim().ToUpperInvariant();
-            var url = $"historical?date={date:yyyy-MM-dd}&from={Uri.EscapeDataString(code)}&to={ToList(targetCodes, code)}";
-            _logger.LogInformation("Fetching historical rates from FastForex: {Date} base {Base}", date.ToString("yyyy-MM-dd"), code);
-            HttpResponseMessage response;
-            try
+            var tasks = targets.Select(async t =>
             {
-                response = await _httpClient.GetAsync(url, cancellationToken);
-            }
-            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+                var (rate, date) = await FetchOneAsync(code, t, cancellationToken);
+                return (Target: t, Rate: rate, Date: date);
+            });
+            var results = await Task.WhenAll(tasks);
+
+            var dict = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
+            var rateDate = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+            foreach (var r in results)
             {
-                return null;
+                dict[r.Target] = r.Rate;
+                if (r.Date > rateDate) rateDate = r.Date;
             }
-            if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
-            if (!response.IsSuccessStatusCode) return null;
-            var data = await response.Content.ReadFromJsonAsync<FastForexResponse>(cancellationToken: cancellationToken);
-            if (data == null || data.Results == null || data.Results.Count == 0) return null;
-            return ToResponse(data, code, date);
+            // Daily dating: all fetch-one "updated" values fall on the same UTC day.
+            // Use the latest day seen so the whole table shares one RateDate.
+            if (results.Length > 0) rateDate = results.Max(r => r.Date);
+
+            return new ExchangeRateResponse
+            {
+                BaseCurrency = code,
+                Date = rateDate,
+                Rates = dict,
+                Source = ProviderName,
+                FetchedAt = DateTime.UtcNow
+            };
         }
 
         public async Task<ConversionResult> ConvertAsync(string fromCurrency, string toCurrency, decimal amount, CancellationToken cancellationToken)
         {
             if (amount < 0) throw new ArgumentException("Amount must be >= 0", nameof(amount));
-            if (string.Equals(fromCurrency.Trim().ToUpperInvariant(), toCurrency.Trim().ToUpperInvariant(), StringComparison.OrdinalIgnoreCase))
+            var from = fromCurrency.Trim().ToUpperInvariant();
+            var to = toCurrency.Trim().ToUpperInvariant();
+            if (from == to)
             {
                 return new ConversionResult
                 {
                     Amount = amount,
-                    FromCurrency = fromCurrency.Trim().ToUpperInvariant(),
-                    ToCurrency = toCurrency.Trim().ToUpperInvariant(),
+                    FromCurrency = from,
+                    ToCurrency = to,
                     Rate = 1m,
                     ConvertedAmount = amount,
-                    RateDate = DateOnly.FromDateTime(DateTime.Now.Date),
+                    RateDate = DateOnly.FromDateTime(DateTime.UtcNow.Date),
                     Source = ProviderName,
                     DecimalDigits = 2
                 };
             }
 
-            var from = fromCurrency.Trim().ToUpperInvariant();
-            var to = toCurrency.Trim().ToUpperInvariant();
-            var url = $"convert?from={Uri.EscapeDataString(from)}&to={Uri.EscapeDataString(to)}&amount={amount}";
-            _logger.LogInformation("FastForex convert {Amount} {From}->{To}", amount, from, to);
-            var response = await _httpClient.GetAsync(url, cancellationToken);
-            response.EnsureSuccessStatusCode();
-            var data = await response.Content.ReadFromJsonAsync<FastForexConvertResponse>(cancellationToken: cancellationToken)
-                ?? throw new InvalidOperationException($"FastForex convert returned empty for {from}->{to}");
-
-            if (data.Result == null || !data.Result.ContainsKey(to))
-                throw new InvalidOperationException($"FastForex convert missing target {to}");
-
-            var converted = data.Result[to];
-            var rate = data.Result.TryGetValue("rate", out var r) ? r : (amount != 0m ? converted / amount : 0m);
-            DateOnly rateDate;
-            if (!string.IsNullOrWhiteSpace(data.Date) && DateOnly.TryParse(data.Date, out var dd))
-                rateDate = dd;
-            else if (!string.IsNullOrWhiteSpace(data.Updated) && DateTime.TryParse(data.Updated, out var dt))
-                rateDate = DateOnly.FromDateTime(dt.Date);
-            else
-                rateDate = DateOnly.FromDateTime(DateTime.Now.Date);
-
+            var (rate, rateDate) = await FetchOneAsync(from, to, cancellationToken);
             return new ConversionResult
             {
                 Amount = amount,
                 FromCurrency = from,
                 ToCurrency = to,
                 Rate = rate,
-                ConvertedAmount = converted,
+                ConvertedAmount = amount * rate,
                 RateDate = rateDate,
                 Source = ProviderName,
                 DecimalDigits = 2
             };
         }
 
-        private ExchangeRateResponse ToResponse(FastForexResponse data, string requestedBase, DateOnly? forcedDate)
+        private static DateOnly ParseDailyDate(string? updated, string? date)
         {
-            if (data.Results == null || data.Results.Count == 0)
-                throw new InvalidOperationException($"FastForex returned empty rates for {requestedBase}");
-            var dict = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
-            foreach (var kv in data.Results)
-            {
-                if (kv.Value <= 0) continue;
-                var c = kv.Key.Trim().ToUpperInvariant();
-                if (c.Length != 3 || c == requestedBase) continue;
-                dict[c] = kv.Value;
-            }
-            if (dict.Count == 0)
-                throw new InvalidOperationException("No valid rates parsed from FastForex response");
-            DateOnly date;
-            if (forcedDate.HasValue) date = forcedDate.Value;
-            else if (!string.IsNullOrWhiteSpace(data.Updated) && DateTime.TryParse(data.Updated, out var dt)) date = DateOnly.FromDateTime(dt.Date);
-            else if (!string.IsNullOrWhiteSpace(data.Date) && DateOnly.TryParse(data.Date, out var dd)) date = dd;
-            else date = DateOnly.FromDateTime(DateTime.Now.Date);
-            return new ExchangeRateResponse
-            {
-                BaseCurrency = requestedBase,
-                Date = date,
-                Rates = dict,
-                Source = ProviderName,
-                FetchedAt = DateTime.Now
-            };
+            if (!string.IsNullOrWhiteSpace(updated) && DateTime.TryParse(updated, out var dt))
+                return DateOnly.FromDateTime(dt.ToUniversalTime().Date);
+            if (!string.IsNullOrWhiteSpace(date) && DateOnly.TryParse(date, out var dd))
+                return dd;
+            return DateOnly.FromDateTime(DateTime.UtcNow.Date);
         }
 
-        private sealed class FastForexResponse
+        /// <summary>
+        /// fetch-one shape: {"base":"USD","result":{"EGP":51.8158},"updated":"2026-09-15T14:17:21Z","ms":4}
+        /// "results" plural accepted for tolerance.
+        /// </summary>
+        private sealed class FastForexFetchOneResponse
         {
             [JsonPropertyName("base")] public string? Base { get; set; }
+            [JsonPropertyName("result")] public Dictionary<string, decimal>? Result { get; set; }
             [JsonPropertyName("results")] public Dictionary<string, decimal>? Results { get; set; }
             [JsonPropertyName("updated")] public string? Updated { get; set; }
             [JsonPropertyName("date")] public string? Date { get; set; }
-        }
-
-        private sealed class FastForexConvertResponse
-        {
-            [JsonPropertyName("base")] public string? Base { get; set; }
-            [JsonPropertyName("amount")] public decimal Amount { get; set; }
-            [JsonPropertyName("result")] public Dictionary<string, decimal>? Result { get; set; }
-            [JsonPropertyName("rate")] public decimal Rate { get; set; }
             [JsonPropertyName("ms")] public int Ms { get; set; }
-            [JsonPropertyName("date")] public string? Date { get; set; }
-            [JsonPropertyName("updated")] public string? Updated { get; set; }
         }
     }
 }

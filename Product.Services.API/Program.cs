@@ -92,11 +92,10 @@ var connectionString = builder.Configuration.GetConnectionString("DatabaseConnec
 
             var exchangeRateConfig = app.Configuration.GetSection(ExchangeRateSettings.SectionName).Get<ExchangeRateSettings>() ?? new ExchangeRateSettings();
             var exchangeRateLogger = app.Services.GetRequiredService<ILogger<Program>>();
-            exchangeRateLogger.LogInformation("ExchangeRateSettings loaded: Provider={Provider}, BaseUrl={BaseUrl}, SyncIntervalHours={SyncIntervalHours}, CacheExpirationMinutes={CacheExpirationMinutes}",
+            exchangeRateLogger.LogInformation("ExchangeRateSettings loaded: Provider={Provider}, BaseUrl={BaseUrl}, TimeoutSeconds={TimeoutSeconds} (no cache, fetch-one per call)",
                 exchangeRateConfig.Provider,
                 exchangeRateConfig.BaseUrl,
-                exchangeRateConfig.SyncIntervalHours,
-                exchangeRateConfig.CacheExpirationMinutes);
+                exchangeRateConfig.TimeoutSeconds);
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {

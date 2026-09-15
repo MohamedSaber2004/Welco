@@ -25,19 +25,17 @@ namespace Welco.Shared.Common.Interfaces
     {
         string ProviderName { get; }
 
-        /// <param name="targetCodes">Currency codes to quote, from the database.
-        /// Providers whose API returns full tables may ignore it.</param>
+        /// <summary>
+        /// Live daily rates via FastForex fetch-one
+        /// (GET fetch-one?from={FROM}&amp;to={TO}&amp;api_key={KEY} per pair).
+        /// </summary>
+        /// <param name="targetCodes">Currency codes to quote.</param>
         Task<ExchangeRateResponse> GetLatestRatesAsync(
             string baseCurrency,
             IReadOnlyCollection<string>? targetCodes,
             CancellationToken cancellationToken);
 
-        Task<ExchangeRateResponse?> GetHistoricalRatesAsync(
-            string baseCurrency,
-            DateOnly date,
-            IReadOnlyCollection<string>? targetCodes,
-            CancellationToken cancellationToken);
-
+        /// <summary>Single-pair conversion via fetch-one; dated from "updated" (daily).</summary>
         Task<ConversionResult> ConvertAsync(
             string fromCurrency,
             string toCurrency,

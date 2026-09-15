@@ -105,7 +105,7 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
                     }
                 }
 
-foreach (var addrDto in request.Addresses)
+                foreach (var addrDto in request.Addresses)
                 {
                     var country = await countryRepo.GetByIdAsync(addrDto.CountryId, cancellationToken);
                     if (country == null || country.IsDeleted)
@@ -132,7 +132,7 @@ foreach (var addrDto in request.Addresses)
                     }
                 }
 
-foreach (var existing in existingAddresses)
+                foreach (var existing in existingAddresses)
                 {
                     if (!incomingAddressIds.Contains(existing.Id))
                     {
@@ -141,7 +141,7 @@ foreach (var existing in existingAddresses)
                     }
                 }
 
-var newAddresses = new List<UserAddress>();
+                var newAddresses = new List<UserAddress>();
                 var hasExplicitDefault = request.Addresses.Any(a => a.IsDefault == true);
                 foreach (var addrDto in request.Addresses)
                 {
@@ -179,12 +179,12 @@ var newAddresses = new List<UserAddress>();
                     }
                 }
 
-if (hasExplicitDefault)
+                if (hasExplicitDefault)
                 {
-                    
+
                     var defaultDto = request.Addresses.LastOrDefault(a => a.IsDefault == true);
                     Guid? defaultId = defaultDto?.Id;
-                    
+
                     UserAddress? intendedDefault = null;
                     if (defaultDto != null)
                     {
@@ -194,13 +194,13 @@ if (hasExplicitDefault)
                         }
                         else
                         {
-                            
+
                             intendedDefault = newAddresses.LastOrDefault(a => a.IsDefault);
                         }
                     }
-                    
+
                     var allRemaining = existingAddresses.Where(a => incomingAddressIds.Contains(a.Id) || newAddresses.Contains(a)).Concat(newAddresses).ToList();
-                    
+
                     var remainingForDefault = new List<UserAddress>();
                     remainingForDefault.AddRange(existingAddresses.Where(a => incomingAddressIds.Contains(a.Id)));
                     remainingForDefault.AddRange(newAddresses);
@@ -218,7 +218,7 @@ if (hasExplicitDefault)
                 }
                 else
                 {
-                    
+
                     var remaining = new List<UserAddress>();
                     remaining.AddRange(existingAddresses.Where(a => incomingAddressIds.Contains(a.Id)));
                     remaining.AddRange(newAddresses);
@@ -284,7 +284,7 @@ if (hasExplicitDefault)
                 }
                 catch
                 {
-                    
+
                 }
 
                 if (phoneCode == null && user.CompanyId.HasValue && user.CompanyId.Value != Guid.Empty)
@@ -300,7 +300,7 @@ if (hasExplicitDefault)
                             phoneCode = companyCountry?.PhoneCode?.Trim();
                         }
                     }
-                    catch {  }
+                    catch { }
                 }
 
                 if (phoneCode == null && addresses.Count > 0)
@@ -355,7 +355,7 @@ if (hasExplicitDefault)
                     var country = await countryRepo.GetByIdAsync(company.CountryId, cancellationToken);
                     countryNameEn = country?.NameEn;
                 }
-                catch {  }
+                catch { }
                 return new CompanyDto
                 {
                     Id = company.Id,

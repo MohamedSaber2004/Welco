@@ -48,7 +48,6 @@ namespace Product.Services.API.ProductRoutes
             public const string Base = Root + "/" + Version + "/exchange-rates";
             public const string Latest = "latest";
             public const string LatestByBase = "latest/{baseCurrency}";
-            public const string History = "history/{baseCurrency}/{date}";
             public const string Pair = "{from}/{to}";
             public const string Convert = "convert";
             public const string CartTotal = "cart-total";

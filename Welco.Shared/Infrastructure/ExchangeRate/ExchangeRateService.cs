@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Welco.Shared.Common.DTOs.Products;
@@ -7,22 +6,22 @@ using Welco.Shared.Common.Options;
 
 namespace Welco.Shared.Infrastructure.ExchangeRate
 {
+    /// <summary>
+    /// No caching: every call hits FastForex fetch-one directly
+    /// (GET fetch-one?from={FROM}&amp;to={TO}&amp;api_key={KEY}).
+    /// </summary>
     public class ExchangeRateService : IExchangeRateService
     {
         private readonly IExchangeRateProvider _provider;
-        private readonly ExchangeRateSettings _settings;
-        private readonly IMemoryCache _cache;
         private readonly ILogger<ExchangeRateService> _logger;
 
         public ExchangeRateService(
             IExchangeRateProvider provider,
             IOptions<ExchangeRateSettings> options,
-            IMemoryCache cache,
             ILogger<ExchangeRateService> logger)
         {
             _provider = provider;
-            _settings = options.Value;
-            _cache = cache;
+            _ = options.Value;
             _logger = logger;
         }
 
@@ -30,8 +29,8 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
         {
             if (string.Equals(fromCurrency, toCurrency, StringComparison.OrdinalIgnoreCase))
             {
-                var now = DateOnly.FromDateTime(DateTime.Now.Date);
-                return new ExchangeRateDto { BaseCurrency = fromCurrency.ToUpperInvariant(), TargetCurrency = toCurrency.ToUpperInvariant(), Rate = 1m, RateDate = now, Source = "identity", FetchedAt = DateTime.Now };
+                var now = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+                return new ExchangeRateDto { BaseCurrency = fromCurrency.ToUpperInvariant(), TargetCurrency = toCurrency.ToUpperInvariant(), Rate = 1m, RateDate = now, Source = "identity", FetchedAt = DateTime.UtcNow };
             }
 
             var details = await ConvertWithDetailsAsync(1m, fromCurrency, toCurrency, cancellationToken);
@@ -42,7 +41,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 Rate = details.Rate,
                 RateDate = details.RateDate,
                 Source = details.Source,
-                FetchedAt = DateTime.Now
+                FetchedAt = DateTime.UtcNow
             };
         }
 
@@ -70,7 +69,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                     ToCurrency = toCurrency,
                     Rate = 1m,
                     ConvertedAmount = Decimal.Round(amount, GetDecimalDigits(toCurrency)),
-                    RateDate = DateOnly.FromDateTime(DateTime.Now.Date),
+                    RateDate = DateOnly.FromDateTime(DateTime.UtcNow.Date),
                     Source = "identity"
                 };
             }
@@ -98,7 +97,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
 
             var toCurrency = request.ToCurrency.Trim().ToUpperInvariant();
             var lines = new List<CartTotalLineResultDto>(request.Lines.Count);
-            DateOnly rateDate = DateOnly.FromDateTime(DateTime.Now.Date);
+            DateOnly rateDate = DateOnly.FromDateTime(DateTime.UtcNow.Date);
             string source = _provider.ProviderName;
 
             foreach (var line in request.Lines)
@@ -139,80 +138,24 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
         public async Task<IReadOnlyCollection<ExchangeRateDto>> GetLatestRatesAsync(string baseCurrency, CancellationToken cancellationToken)
         {
             baseCurrency = NormalizeCode(baseCurrency);
-            var cacheKey = CacheKey(baseCurrency, DateOnly.FromDateTime(DateTime.Now.Date), _provider.ProviderName);
-            if (_cache.TryGetValue(cacheKey, out Dictionary<string, ExchangeRateDto>? cached) && cached != null)
-                return cached.Values.OrderBy(r => r.TargetCurrency).ToList();
-
+            // No cache: fetch live from FastForex fetch-one on every call.
             var targetCodes = new[] { "USD", "EUR", "GBP", "EGP", "SAR", "AED", "DZD" };
             var response = await _provider.GetLatestRatesAsync(baseCurrency, targetCodes, cancellationToken);
-            var dict = response.Rates.ToDictionary(kv => kv.Key, kv => new ExchangeRateDto
-            {
-                BaseCurrency = response.BaseCurrency,
-                TargetCurrency = kv.Key,
-                Rate = kv.Value,
-                RateDate = response.Date,
-                Source = response.Source,
-                FetchedAt = response.FetchedAt
-            }, StringComparer.OrdinalIgnoreCase);
-
-            _cache.Set(cacheKey, dict, TimeSpan.FromMinutes(_settings.CacheExpirationMinutes > 0 ? _settings.CacheExpirationMinutes : 60));
-            return dict.Values.OrderBy(r => r.TargetCurrency).ToList();
-        }
-
-        public async Task<IReadOnlyCollection<ExchangeRateDto>> GetHistoricalRatesAsync(string baseCurrency, DateOnly date, CancellationToken cancellationToken)
-        {
-            baseCurrency = NormalizeCode(baseCurrency);
-            var cacheKey = CacheKey(baseCurrency, date, _provider.ProviderName);
-            if (_cache.TryGetValue(cacheKey, out Dictionary<string, ExchangeRateDto>? cached) && cached != null)
-                return cached.Values.OrderBy(r => r.TargetCurrency).ToList();
-
-            var targetCodes = new[] { "USD", "EUR", "GBP", "EGP", "SAR", "AED", "DZD" };
-            var response = await _provider.GetHistoricalRatesAsync(baseCurrency, date, targetCodes, cancellationToken);
-            if (response == null || response.Rates.Count == 0)
-                return await GetLatestRatesAsync(baseCurrency, cancellationToken);
-
-            var dict = response.Rates.ToDictionary(kv => kv.Key, kv => new ExchangeRateDto
-            {
-                BaseCurrency = response.BaseCurrency,
-                TargetCurrency = kv.Key,
-                Rate = kv.Value,
-                RateDate = response.Date,
-                Source = response.Source,
-                FetchedAt = response.FetchedAt
-            }, StringComparer.OrdinalIgnoreCase);
-
-            _cache.Set(cacheKey, dict, TimeSpan.FromMinutes(_settings.CacheExpirationMinutes > 0 ? _settings.CacheExpirationMinutes : 60));
-            return dict.Values.OrderBy(r => r.TargetCurrency).ToList();
-        }
-
-        public Task<ExchangeRateSyncResult> SyncLatestRatesAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("SyncLatestRatesAsync is deprecated; rates are fetched live from the provider");
-            return Task.FromResult(new ExchangeRateSyncResult { Success = true, Source = _provider.ProviderName, RatesCount = 0, RateDate = DateOnly.FromDateTime(DateTime.Now.Date) });
-        }
-
-        public Task<ExchangeRateDto> SetManualRateAsync(SetManualRateRequest request, string updatedBy, CancellationToken cancellationToken)
-        {
-            throw new NotSupportedException("Manual rates are no longer supported; rates are fetched live from the provider");
-        }
-
-        public Task<bool> ClearManualRateAsync(string baseCurrency, string targetCurrency, CancellationToken cancellationToken)
-        {
-            throw new NotSupportedException("Manual rates are no longer supported; rates are fetched live from the provider");
-        }
-
-        public Task<ExchangeRateSyncResult> SyncHistoricalRatesAsync(DateOnly date, CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("SyncHistoricalRatesAsync is deprecated; rates are fetched live from the provider");
-            return Task.FromResult(new ExchangeRateSyncResult { Success = true, Source = _provider.ProviderName, RatesCount = 0, RateDate = date });
+            return response.Rates
+                .Select(kv => new ExchangeRateDto
+                {
+                    BaseCurrency = response.BaseCurrency,
+                    TargetCurrency = kv.Key,
+                    Rate = kv.Value,
+                    RateDate = response.Date,
+                    Source = response.Source,
+                    FetchedAt = response.FetchedAt
+                })
+                .OrderBy(r => r.TargetCurrency)
+                .ToList();
         }
 
         private static string NormalizeCode(string code) => string.IsNullOrWhiteSpace(code) ? "USD" : code.Trim().ToUpperInvariant();
-        private static string CacheKey(string baseCurrency, DateOnly date, string? providerName = null)
-        {
-            var suffix = string.IsNullOrWhiteSpace(providerName) ? "" : $":{providerName.Trim().ToUpperInvariant()}";
-            return $"exchange-rates:{baseCurrency}:{date:yyyy-MM-dd}{suffix}";
-        }
         private static decimal CeilToDigits(decimal value, int digits)
         {
             var factor = 1m;
