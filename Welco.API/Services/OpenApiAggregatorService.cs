@@ -358,58 +358,9 @@ namespace Welco.API.Services
 
         private async Task<JsonObject?> FetchOpenApiWithCacheAsync(string serviceName, string url, string cacheFile, CancellationToken cancellationToken)
         {
-            var httpClient = _httpClientFactory.CreateClient(GatewayHttpClientExtensions.InsecureClientName);
-            var attempts = Math.Max(1, _options.RetryCount + 1);
-
-            for (var attempt = 1; attempt <= attempts; attempt++)
-            {
-                try
-                {
-                    using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                    linkedCts.CancelAfter(TimeSpan.FromSeconds(Math.Max(1, _options.TimeoutSeconds)));
-
-                    var response = await httpClient.GetAsync(url, linkedCts.Token);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var content = await response.Content.ReadAsStringAsync(linkedCts.Token);
-                        try
-                        {
-                            if (!Directory.Exists(Path.GetDirectoryName(cacheFile))) Directory.CreateDirectory(Path.GetDirectoryName(cacheFile)!);
-                            await File.WriteAllTextAsync(cacheFile, content, cancellationToken);
-                        }
-                        catch
-                        {
-
-                        }
-
-                        var serviceNode = JsonNode.Parse(content);
-                        if (serviceNode is JsonObject serviceObj)
-                        {
-                            return serviceObj;
-                        }
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Failed to fetch OpenAPI schema from {Url}. Status: {StatusCode}", url, response.StatusCode);
-                    }
-                }
-                catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
-                {
-                    _logger.LogWarning("Timed out fetching OpenAPI schema from {Url} (attempt {Attempt}/{Attempts}; downstream service may not be running).", url, attempt, attempts);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Could not reach downstream service at {Url} (attempt {Attempt}/{Attempts})", url, attempt, attempts);
-                }
-
-                // Brief delay before retrying (skip after the last attempt).
-                if (attempt < attempts)
-                {
-                    try { await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken); }
-                    catch (OperationCanceledException) { break; }
-                }
-            }
-
+            // Cache-first: if a cached schema exists, return it immediately and
+            // refresh from the live downstream in the background. This ensures the
+            // UI (Swagger aggregation) loads instantly regardless of downstream health.
             if (File.Exists(cacheFile))
             {
                 try
@@ -418,17 +369,78 @@ namespace Welco.API.Services
                     var cachedNode = JsonNode.Parse(cachedContent);
                     if (cachedNode is JsonObject cachedObj)
                     {
-                        _logger.LogInformation("Using cached OpenAPI specification for '{ServiceName}'.", serviceName);
+                        _logger.LogInformation("Serving cached OpenAPI specification for '{ServiceName}'; refreshing in background.", serviceName);
+                        // Fire-and-forget background refresh — does not block the caller.
+                        _ = RefreshCacheInBackgroundAsync(serviceName, url, cacheFile);
                         return cachedObj;
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Failed to load cached OpenAPI specification for '{ServiceName}'.", serviceName);
+                    _logger.LogWarning(ex, "Failed to load cached OpenAPI specification for '{ServiceName}'; will attempt live fetch.", serviceName);
                 }
             }
 
+            // No cache yet — do a single live fetch with a short timeout.
+            return await FetchLiveAsync(serviceName, url, cacheFile, cancellationToken);
+        }
+
+        private async Task<JsonObject?> FetchLiveAsync(string serviceName, string url, string cacheFile, CancellationToken cancellationToken)
+        {
+            var httpClient = _httpClientFactory.CreateClient(GatewayHttpClientExtensions.InsecureClientName);
+            try
+            {
+                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                linkedCts.CancelAfter(TimeSpan.FromSeconds(Math.Max(1, _options.TimeoutSeconds)));
+
+                var response = await httpClient.GetAsync(url, linkedCts.Token);
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync(linkedCts.Token);
+                    try
+                    {
+                        if (!Directory.Exists(Path.GetDirectoryName(cacheFile)))
+                            Directory.CreateDirectory(Path.GetDirectoryName(cacheFile)!);
+                        await File.WriteAllTextAsync(cacheFile, content, cancellationToken);
+                    }
+                    catch { }
+
+                    var serviceNode = JsonNode.Parse(content);
+                    if (serviceNode is JsonObject serviceObj)
+                        return serviceObj;
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to fetch OpenAPI schema from {Url}. Status: {StatusCode}", url, response.StatusCode);
+                }
+            }
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogWarning("Timed out fetching OpenAPI schema from {Url} (downstream service may not be running).", url);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Could not reach downstream service at {Url}", url);
+            }
+
             return null;
+        }
+
+        private async Task RefreshCacheInBackgroundAsync(string serviceName, string url, string cacheFile)
+        {
+            try
+            {
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(Math.Max(1, _options.TimeoutSeconds)));
+                var result = await FetchLiveAsync(serviceName, url, cacheFile, cts.Token);
+                if (result != null)
+                    _logger.LogInformation("Background refresh of OpenAPI schema for '{ServiceName}' succeeded.", serviceName);
+                else
+                    _logger.LogInformation("Background refresh of OpenAPI schema for '{ServiceName}' found service unreachable; cache retained.", serviceName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Background refresh of OpenAPI schema for '{ServiceName}' failed.", serviceName);
+            }
         }
 
         private static string AdjustServiceOpenApi(string openApiJson, string gatewayBaseUrl)

@@ -1,4 +1,7 @@
 {
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:7166"
+  },
   "Routes": [
     {
       "DownstreamPathTemplate": "/api/v1/attachments/{everything}",
