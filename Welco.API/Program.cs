@@ -97,7 +97,7 @@ namespace Welco.API
                         var mergedPayload = new System.Text.Json.Nodes.JsonObject { ["Routes"] = new System.Text.Json.Nodes.JsonArray(allRoutes.ToArray()) };
                         var mergedJson = mergedPayload.ToJsonString(new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
                         try { File.WriteAllText(mergedPath, mergedJson); } catch (Exception ex) { Log.Warning(ex, "Failed to write merged Ocelot file"); }
-                        builder.Configuration.AddJsonFile(mergedPath, optional: false, reloadOnChange: false);
+                        builder.Configuration.AddJsonFile(mergedPath, optional: false, reloadOnChange: true);
                         Log.Information("Merged {Count} Ocelot routes from {Files} into {Merged}", allRoutes.Count, string.Join(", ", routeFiles.Select(Path.GetFileName)), Path.GetFileName(mergedPath));
                     }
                 }
