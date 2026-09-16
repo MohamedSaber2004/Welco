@@ -223,6 +223,7 @@ namespace Welco.API.Services
             string? IpAddress,
             bool TcpOk,
             double LatencyMs,
+            bool? TcpPort80Ok,
             int? HttpStatus,
             string? Error);
 
@@ -273,6 +274,7 @@ namespace Welco.API.Services
                 ip = addresses.FirstOrDefault()?.ToString();
 
                 var (tcpOk, latencyMs, tcpError) = await ProbeTcpAsync(uri.Host, uri.Port, 5000, cancellationToken);
+                var (tcp80Ok, _, _) = await ProbeTcpAsync(uri.Host, 80, 5000, cancellationToken);
 
                 int? httpStatus = null;
                 var error = tcpError;
@@ -296,11 +298,11 @@ namespace Welco.API.Services
                     }
                 }
 
-                return new DownstreamProbeResult(serviceName, url, ip, tcpOk, Math.Round(latencyMs, 1), httpStatus, error);
+                return new DownstreamProbeResult(serviceName, url, ip, tcpOk, Math.Round(latencyMs, 1), tcp80Ok, httpStatus, error);
             }
             catch (Exception ex)
             {
-                return new DownstreamProbeResult(serviceName, url, ip, false, 0, null, $"{ex.GetType().Name}: {ex.Message}");
+                return new DownstreamProbeResult(serviceName, url, ip, false, 0, null, null, $"{ex.GetType().Name}: {ex.Message}");
             }
         }
 
