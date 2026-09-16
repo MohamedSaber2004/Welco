@@ -26,7 +26,7 @@ namespace Welco.API
             var builder = WebApplication.CreateBuilder(args);
 
             var env = builder.Environment;
-            var port = Environment.GetEnvironmentVariable("PORT") 
+            var port = Environment.GetEnvironmentVariable("PORT")
                        ?? Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS");
             if (!string.IsNullOrEmpty(port))
             {
@@ -92,297 +92,300 @@ namespace Welco.API
                             Log.Warning(ex, "Failed to merge Ocelot file {File}", file);
                         }
                     }
-if (allRoutes.Count > 0)
-            {
-                var mergedPath = Path.Combine(ocelotDir, $"ocelot.merged.{env.EnvironmentName}.json");
-                
-                // Merge GlobalConfiguration from global JSON files into the merged file
-                // (so Ocelot keeps BaseUrl and other global settings when it loads the merged file)
-                var mergedPayload = new System.Text.Json.Nodes.JsonObject();
-                var globalConfig = new System.Text.Json.Nodes.JsonObject();
-                
-                var globalJsonFiles = new[] { "ocelot.global.json", $"ocelot.global.{env.EnvironmentName}.json" };
-                foreach (var fileName in globalJsonFiles)
-                {
-                    var globalPath = Path.Combine(ocelotDir, fileName);
-                    if (File.Exists(globalPath))
+                    if (allRoutes.Count > 0)
                     {
-                        try
+                        var mergedPath = Path.Combine(ocelotDir, $"ocelot.merged.{env.EnvironmentName}.json");
+
+                        // Merge GlobalConfiguration from global JSON files into the merged file
+                        // (so Ocelot keeps BaseUrl and other global settings when it loads the merged file)
+                        var mergedPayload = new System.Text.Json.Nodes.JsonObject();
+                        var globalConfig = new System.Text.Json.Nodes.JsonObject();
+
+                        var globalJsonFiles = new[] { "ocelot.global.json", $"ocelot.global.{env.EnvironmentName}.json" };
+                        foreach (var fileName in globalJsonFiles)
                         {
-                            var globalNode = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(globalPath));
-                            var globalSection = globalNode?["GlobalConfiguration"] as System.Text.Json.Nodes.JsonObject;
-                            if (globalSection != null)
+                            var globalPath = Path.Combine(ocelotDir, fileName);
+                            if (File.Exists(globalPath))
                             {
-                                foreach (var property in globalSection)
+                                try
                                 {
-                                    globalConfig[property.Key] = property.Value?.DeepClone();
+                                    var globalNode = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(globalPath));
+                                    var globalSection = globalNode?["GlobalConfiguration"] as System.Text.Json.Nodes.JsonObject;
+                                    if (globalSection != null)
+                                    {
+                                        foreach (var property in globalSection)
+                                        {
+                                            globalConfig[property.Key] = property.Value?.DeepClone();
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log.Warning(ex, "Failed to read global Ocelot config {File}", fileName);
                                 }
                             }
                         }
-                        catch (Exception ex)
+
+                        if (globalConfig.Count > 0)
                         {
-                            Log.Warning(ex, "Failed to read global Ocelot config {File}", fileName);
+                            mergedPayload["GlobalConfiguration"] = globalConfig;
                         }
+                        mergedPayload["Routes"] = new System.Text.Json.Nodes.JsonArray(allRoutes.ToArray());
+
+                        var mergedJson = mergedPayload.ToJsonString(new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                        try { File.WriteAllText(mergedPath, mergedJson); } catch (Exception ex) { Log.Warning(ex, "Failed to write merged Ocelot file"); }
+                        builder.Configuration.AddJsonFile(mergedPath, optional: false, reloadOnChange: true);
+                        Log.Information("Merged {Count} Ocelot routes from {Files} into {Merged}", allRoutes.Count, string.Join(", ", routeFiles.Select(Path.GetFileName)), Path.GetFileName(mergedPath));
                     }
-                }
-                
-                if (globalConfig.Count > 0)
-                {
-                    mergedPayload["GlobalConfiguration"] = globalConfig;
-                }
-                mergedPayload["Routes"] = new System.Text.Json.Nodes.JsonArray(allRoutes.ToArray());
-                
-                var mergedJson = mergedPayload.ToJsonString(new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-                try { File.WriteAllText(mergedPath, mergedJson); } catch (Exception ex) { Log.Warning(ex, "Failed to write merged Ocelot file"); }
-                builder.Configuration.AddJsonFile(mergedPath, optional: false, reloadOnChange: true);
-Log.Information("Merged {Count} Ocelot routes from {Files} into {Merged}", allRoutes.Count, string.Join(", ", routeFiles.Select(Path.GetFileName)), Path.GetFileName(mergedPath));
-            }
 
-            builder.Services.AddControllers();
-            builder.Services.AddJsonLocalization();
-            builder.Services.AddWelcoSharedDependencies();
+                    builder.Services.AddControllers();
+                    builder.Services.AddJsonLocalization();
+                    builder.Services.AddWelcoSharedDependencies();
 
-            builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
-            var jwtSettings = new JwtSettings();
-            builder.Configuration.GetSection(JwtSettings.SectionName).Bind(jwtSettings);
-            var gatewaySecret = !string.IsNullOrWhiteSpace(jwtSettings.Secret) && jwtSettings.Secret.Length >= 32
-                ? jwtSettings.Secret
-                : "V5B?*77+gzD_pk+2!%ORg<i)<D$DH+Xf.nECc?];2l;";
-            var validIssuers = jwtSettings.GetAllValidIssuers().ToList();
-            var validAudiences = jwtSettings.GetAllValidAudiences().ToList();
+                    builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
+                    var jwtSettings = new JwtSettings();
+                    builder.Configuration.GetSection(JwtSettings.SectionName).Bind(jwtSettings);
+                    var gatewaySecret = !string.IsNullOrWhiteSpace(jwtSettings.Secret) && jwtSettings.Secret.Length >= 32
+                        ? jwtSettings.Secret
+                        : "V5B?*77+gzD_pk+2!%ORg<i)<D$DH+Xf.nECc?];2l;";
+                    var validIssuers = jwtSettings.GetAllValidIssuers().ToList();
+                    var validAudiences = jwtSettings.GetAllValidAudiences().ToList();
 
-            var gatewayValidation = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(gatewaySecret)),
-                ValidateIssuer = validIssuers.Count > 0,
-                ValidIssuers = validIssuers.Count > 0 ? validIssuers : null,
-                ValidateAudience = validAudiences.Count > 0,
-                ValidAudiences = validAudiences.Count > 0 ? validAudiences : null,
-                RequireExpirationTime = true,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.FromMinutes(1)
-            };
-            builder.Services.AddSingleton(gatewayValidation);
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(o =>
-                {
-                    o.SaveToken = true;
-                    o.TokenValidationParameters = gatewayValidation;
-                    o.Events = new JwtBearerEvents
+                    var gatewayValidation = new TokenValidationParameters
                     {
-                        OnChallenge = async ctx =>
-                        {
-                            ctx.HandleResponse();
-                            ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                            ctx.Response.ContentType = "application/json";
-                            var loc = ctx.HttpContext.RequestServices.GetService<ILocalizationProvider>();
-                            var lang = ctx.Request.Headers["Accept-Language"].FirstOrDefault()?.Split(',')[0].Trim().ToLowerInvariant().StartsWith("ar") == true ? "ar" : "en";
-                            var msg = loc?.GetLocalizedString("ExceptionMessages.Unauthorized", lang) ?? "Unauthorized";
-                            await ctx.Response.WriteAsJsonAsync(new { isSuccess = false, statusCode = 401, message = msg, errors = new[] { msg }, data = (object?)null });
-                        }
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(gatewaySecret)),
+                        ValidateIssuer = validIssuers.Count > 0,
+                        ValidIssuers = validIssuers.Count > 0 ? validIssuers : null,
+                        ValidateAudience = validAudiences.Count > 0,
+                        ValidAudiences = validAudiences.Count > 0 ? validAudiences : null,
+                        RequireExpirationTime = true,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.FromMinutes(1)
                     };
-                });
-
-            var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("GatewayCorsPolicy", policy =>
-                {
-                    if (allowedOrigins.Length > 0)
-                    {
-                        policy.WithOrigins(allowedOrigins)
-                              .AllowAnyHeader()
-                              .AllowAnyMethod()
-                              .AllowCredentials();
-                    }
-                    else
-                    {
-                        policy.AllowAnyOrigin()
-                              .AllowAnyHeader()
-                              .AllowAnyMethod();
-                    }
-                });
-            });
-
-            builder.Services.Configure<RateLimitingOptions>(builder.Configuration.GetSection(RateLimitingOptions.SectionName));
-            var rateLimitSettings = builder.Configuration.GetSection(RateLimitingOptions.SectionName).Get<RateLimitingOptions>() ?? new RateLimitingOptions();
-
-            builder.Services.AddRateLimiter(options =>
-            {
-                options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-                options.OnRejected = async (context, token) =>
-                {
-                    var localizer = context.HttpContext.RequestServices.GetService<ILocalizationProvider>();
-                    var lang = context.HttpContext.Request.Headers["Accept-Language"].FirstOrDefault()
-                        ?? context.HttpContext.Request.Headers["Language"].FirstOrDefault()
-                        ?? context.HttpContext.Request.Headers["X-Language"].FirstOrDefault()
-                        ?? "en";
-                    lang = lang.Split(',')[0].Trim().Split(';')[0].Split('-')[0].Trim().ToLowerInvariant().StartsWith("ar") ? "ar" : "en";
-                    var message = localizer?.GetLocalizedString(LocalizationKeys.Auth.TooManyAttempts, lang);
-                    await context.HttpContext.Response.WriteAsJsonAsync(new
-                    {
-                        isSuccess = false,
-                        statusCode = 429,
-                        message = message,
-                        errors = new[] { message },
-                        data = (object?)null
-                    }, cancellationToken: token);
-                };
-
-                options.GlobalLimiter = System.Threading.RateLimiting.PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
-                {
-                    var clientIp = httpContext.Connection.RemoteIpAddress?.ToString()
-                                   ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
-                                   ?? "anonymous";
-
-                    return System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
-                        partitionKey: clientIp,
-                        factory: _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+                    builder.Services.AddSingleton(gatewayValidation);
+                    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                        .AddJwtBearer(o =>
                         {
-                            PermitLimit = rateLimitSettings.PermitLimit,
-                            Window = TimeSpan.FromSeconds(rateLimitSettings.WindowSeconds),
-                            QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst,
-                            QueueLimit = rateLimitSettings.QueueLimit
+                            o.SaveToken = true;
+                            o.TokenValidationParameters = gatewayValidation;
+                            o.Events = new JwtBearerEvents
+                            {
+                                OnChallenge = async ctx =>
+                                {
+                                    ctx.HandleResponse();
+                                    ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                                    ctx.Response.ContentType = "application/json";
+                                    var loc = ctx.HttpContext.RequestServices.GetService<ILocalizationProvider>();
+                                    var lang = ctx.Request.Headers["Accept-Language"].FirstOrDefault()?.Split(',')[0].Trim().ToLowerInvariant().StartsWith("ar") == true ? "ar" : "en";
+                                    var msg = loc?.GetLocalizedString("ExceptionMessages.Unauthorized", lang) ?? "Unauthorized";
+                                    await ctx.Response.WriteAsJsonAsync(new { isSuccess = false, statusCode = 401, message = msg, errors = new[] { msg }, data = (object?)null });
+                                }
+                            };
                         });
-                });
-            });
 
-            builder.Services.AddGatewayOpenApiHttpClient();
-            builder.Services.AddSingleton<Welco.API.Services.OpenApiAggregatorService>();
-            builder.Services.AddHostedService<Welco.API.Services.OpenApiCacheWarmer>();
-            builder.Services.Configure<OpenApiAggregatorOptions>(builder.Configuration.GetSection(OpenApiAggregatorOptions.SectionName));
-
-            builder.Services.AddOcelot(builder.Configuration);
-            builder.Services.AddConfiguredOpenApi();
-
-            var app = builder.Build();
-
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | 
-                                   Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
-            });
-
-            app.UseCustomExceptionHandler();
-            app.UseJsonLocalization();
-
-            app.Use(async (context, next) =>
-            {
-                context.Response.Headers["X-Content-Type-Options"] = "nosniff";
-                context.Response.Headers["X-Frame-Options"] = "DENY";
-                context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
-                context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
-                context.Response.Headers.Remove("Server");
-                context.Response.Headers.Remove("X-Powered-By");
-
-                if (context.Request.IsHttps)
-                {
-                    context.Response.Headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload";
-                }
-
-                var headers = context.Request.Headers;
-                var langHeader = headers["Accept-Language"].FirstOrDefault()
-                                 ?? headers["Language"].FirstOrDefault()
-                                 ?? headers["language"].FirstOrDefault()
-                                 ?? headers["X-Language"].FirstOrDefault()
-                                 ?? headers["Culture"].FirstOrDefault()
-                                 ?? headers["Lang"].FirstOrDefault()
-                                 ?? context.Request.Query["culture"].FirstOrDefault()
-                                 ?? context.Request.Query["lang"].FirstOrDefault()
-                                 ?? context.Request.Query["language"].FirstOrDefault();
-
-                if (!string.IsNullOrWhiteSpace(langHeader))
-                {
-                    var normalizedLang = AppLanguageExtensions.FromCode(langHeader).ToCode();
-                    context.Request.Headers["Accept-Language"] = normalizedLang;
-                    context.Request.Headers["Language"] = normalizedLang;
-                }
-
-                await next();
-            });
-
-            if (!app.Environment.IsEnvironment("Test") && !app.Environment.IsProduction())
-            {
-                app.UseHttpsRedirection();
-            }
-            app.UseRouting();
-            app.UseCors("GatewayCorsPolicy");
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.UseRateLimiter();
-
-            var microserviceDocRoutes = new List<(string ServiceName, string DisplayName, string DocRoute, string ScalarRoute)>();
-            if (Directory.Exists(ocelotDir))
-            {
-                foreach (var file in Directory.GetFiles(ocelotDir, $"ocelot.*.{env.EnvironmentName}.json"))
-                {
-                    var fileName = Path.GetFileName(file);
-                    if (!fileName.StartsWith("ocelot.global.", StringComparison.OrdinalIgnoreCase)
-                        && !fileName.StartsWith("ocelot.merged.", StringComparison.OrdinalIgnoreCase))
+                    var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+                    builder.Services.AddCors(options =>
                     {
-                        var parts = fileName.Split('.');
-                        if (parts.Length >= 3)
+                        options.AddPolicy("GatewayCorsPolicy", policy =>
                         {
-                            var serviceName = parts[1]; 
-                            var displayName = char.ToUpper(serviceName[0]) + serviceName.Substring(1) + " Microservice API";
-                            microserviceDocRoutes.Add((serviceName, displayName, $"/api/docs/{serviceName}/openapi.json", $"/docs/{serviceName}"));
+                            if (allowedOrigins.Length > 0)
+                            {
+                                policy.WithOrigins(allowedOrigins)
+                                      .AllowAnyHeader()
+                                      .AllowAnyMethod()
+                                      .AllowCredentials();
+                            }
+                            else
+                            {
+                                policy.AllowAnyOrigin()
+                                      .AllowAnyHeader()
+                                      .AllowAnyMethod();
+                            }
+                        });
+                    });
+
+                    builder.Services.Configure<RateLimitingOptions>(builder.Configuration.GetSection(RateLimitingOptions.SectionName));
+                    var rateLimitSettings = builder.Configuration.GetSection(RateLimitingOptions.SectionName).Get<RateLimitingOptions>() ?? new RateLimitingOptions();
+
+                    builder.Services.AddRateLimiter(options =>
+                    {
+                        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+                        options.OnRejected = async (context, token) =>
+                        {
+                            var localizer = context.HttpContext.RequestServices.GetService<ILocalizationProvider>();
+                            var lang = context.HttpContext.Request.Headers["Accept-Language"].FirstOrDefault()
+                                ?? context.HttpContext.Request.Headers["Language"].FirstOrDefault()
+                                ?? context.HttpContext.Request.Headers["X-Language"].FirstOrDefault()
+                                ?? "en";
+                            lang = lang.Split(',')[0].Trim().Split(';')[0].Split('-')[0].Trim().ToLowerInvariant().StartsWith("ar") ? "ar" : "en";
+                            var message = localizer?.GetLocalizedString(LocalizationKeys.Auth.TooManyAttempts, lang);
+                            await context.HttpContext.Response.WriteAsJsonAsync(new
+                            {
+                                isSuccess = false,
+                                statusCode = 429,
+                                message = message,
+                                errors = new[] { message },
+                                data = (object?)null
+                            }, cancellationToken: token);
+                        };
+
+                        options.GlobalLimiter = System.Threading.RateLimiting.PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                        {
+                            var clientIp = httpContext.Connection.RemoteIpAddress?.ToString()
+                                           ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                                           ?? "anonymous";
+
+                            return System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(
+                                partitionKey: clientIp,
+                                factory: _ => new System.Threading.RateLimiting.FixedWindowRateLimiterOptions
+                                {
+                                    PermitLimit = rateLimitSettings.PermitLimit,
+                                    Window = TimeSpan.FromSeconds(rateLimitSettings.WindowSeconds),
+                                    QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst,
+                                    QueueLimit = rateLimitSettings.QueueLimit
+                                });
+                        });
+                    });
+
+                    builder.Services.AddGatewayOpenApiHttpClient();
+                    builder.Services.AddSingleton<Welco.API.Services.OpenApiAggregatorService>();
+                    builder.Services.AddHostedService<Welco.API.Services.OpenApiCacheWarmer>();
+                    builder.Services.Configure<OpenApiAggregatorOptions>(builder.Configuration.GetSection(OpenApiAggregatorOptions.SectionName));
+
+                    builder.Services.AddOcelot(builder.Configuration);
+                    builder.Services.AddConfiguredOpenApi();
+
+                    var app = builder.Build();
+
+                    app.UseForwardedHeaders(new ForwardedHeadersOptions
+                    {
+                        ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
+                                           Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
+                    });
+
+                    app.UseCustomExceptionHandler();
+                    app.UseJsonLocalization();
+
+                    app.Use(async (context, next) =>
+                    {
+                        context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+                        context.Response.Headers["X-Frame-Options"] = "DENY";
+                        context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+                        context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+                        context.Response.Headers.Remove("Server");
+                        context.Response.Headers.Remove("X-Powered-By");
+
+                        if (context.Request.IsHttps)
+                        {
+                            context.Response.Headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload";
+                        }
+
+                        var headers = context.Request.Headers;
+                        var langHeader = headers["Accept-Language"].FirstOrDefault()
+                                         ?? headers["Language"].FirstOrDefault()
+                                         ?? headers["language"].FirstOrDefault()
+                                         ?? headers["X-Language"].FirstOrDefault()
+                                         ?? headers["Culture"].FirstOrDefault()
+                                         ?? headers["Lang"].FirstOrDefault()
+                                         ?? context.Request.Query["culture"].FirstOrDefault()
+                                         ?? context.Request.Query["lang"].FirstOrDefault()
+                                         ?? context.Request.Query["language"].FirstOrDefault();
+
+                        if (!string.IsNullOrWhiteSpace(langHeader))
+                        {
+                            var normalizedLang = AppLanguageExtensions.FromCode(langHeader).ToCode();
+                            context.Request.Headers["Accept-Language"] = normalizedLang;
+                            context.Request.Headers["Language"] = normalizedLang;
+                        }
+
+                        await next();
+                    });
+
+                    if (!app.Environment.IsEnvironment("Test") && !app.Environment.IsProduction())
+                    {
+                        app.UseHttpsRedirection();
+                    }
+                    app.UseRouting();
+                    app.UseCors("GatewayCorsPolicy");
+                    app.UseAuthentication();
+                    app.UseAuthorization();
+                    app.UseRateLimiter();
+
+                    var microserviceDocRoutes = new List<(string ServiceName, string DisplayName, string DocRoute, string ScalarRoute)>();
+                    if (Directory.Exists(ocelotDir))
+                    {
+                        foreach (var file in Directory.GetFiles(ocelotDir, $"ocelot.*.{env.EnvironmentName}.json"))
+                        {
+                            var fileName = Path.GetFileName(file);
+                            if (!fileName.StartsWith("ocelot.global.", StringComparison.OrdinalIgnoreCase)
+                                && !fileName.StartsWith("ocelot.merged.", StringComparison.OrdinalIgnoreCase))
+                            {
+                                var parts = fileName.Split('.');
+                                if (parts.Length >= 3)
+                                {
+                                    var serviceName = parts[1];
+                                    var displayName = char.ToUpper(serviceName[0]) + serviceName.Substring(1) + " Microservice API";
+                                    microserviceDocRoutes.Add((serviceName, displayName, $"/api/docs/{serviceName}/openapi.json", $"/docs/{serviceName}"));
+                                }
+                            }
                         }
                     }
-                }
-            }
 
 #pragma warning disable ASP0014
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("/openapi/all.json", async (HttpContext httpContext, Welco.API.Services.OpenApiAggregatorService aggregator, CancellationToken ct) =>
-                {
-                    var gatewayBaseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
-                    var json = await aggregator.GetAggregatedOpenApiAsync(gatewayBaseUrl, ct);
-                    return Results.Content(json, "application/json");
-                });
-
-                endpoints.MapGet("/health/downstream", async (OpenApiAggregatorService aggregator, CancellationToken ct) =>
-                {
-                    var results = await aggregator.ProbeDownstreamConnectivityAsync(ct);
-                    return Results.Json(new { timestamp = DateTimeOffset.UtcNow, gatewayHost = Environment.MachineName, results });
-                });
-
-                endpoints.MapGet("/", () => Results.Redirect("/scalar/v1"));
-
-                endpoints.MapScalarApiReference(options =>
-                {
-                    options.WithTitle("Welco Microservices Platform API")
-                           .WithTheme(ScalarTheme.Moon)
-                           .WithOpenApiRoutePattern("/openapi/all.json");
-                });
-
-                foreach (var doc in microserviceDocRoutes)
-                {
-                    var docServiceName = doc.ServiceName;
-                    endpoints.MapGet(doc.DocRoute, async (HttpContext httpContext, Welco.API.Services.OpenApiAggregatorService aggregator, CancellationToken ct) =>
+                    app.UseEndpoints(endpoints =>
                     {
-                        var gatewayBaseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
-                        var json = docServiceName.Equals("integration", StringComparison.OrdinalIgnoreCase)
-                            ? await aggregator.GetIntegrationOpenApiAsync(gatewayBaseUrl, ct)
-                            : await aggregator.GetServiceOpenApiAsync(docServiceName, gatewayBaseUrl, ct);
-                        return Results.Content(json, "application/json");
-                    });
+                        endpoints.MapGet("/openapi/all.json", async (HttpContext httpContext, Welco.API.Services.OpenApiAggregatorService aggregator, CancellationToken ct) =>
+                        {
+                            var gatewayBaseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
+                            var json = await aggregator.GetAggregatedOpenApiAsync(gatewayBaseUrl, ct);
+                            return Results.Content(json, "application/json");
+                        });
 
-                    endpoints.MapScalarApiReference(doc.ScalarRoute, options =>
-                    {
-                        options.WithTitle(doc.DisplayName)
-                               .WithTheme(ScalarTheme.Moon)
-                               .WithOpenApiRoutePattern(doc.DocRoute);
-                    });
-                }
+                        endpoints.MapGet("/health/downstream", async (OpenApiAggregatorService aggregator, CancellationToken ct) =>
+                        {
+                            var results = await aggregator.ProbeDownstreamConnectivityAsync(ct);
+                            return Results.Json(new { timestamp = DateTimeOffset.UtcNow, gatewayHost = Environment.MachineName, results });
+                        });
 
-                endpoints.MapControllers();
-            });
+                        endpoints.MapGet("/", () => Results.Redirect("/scalar/v1"));
+
+                        endpoints.MapScalarApiReference(options =>
+                        {
+                            options.WithTitle("Welco Microservices Platform API")
+                                   .WithTheme(ScalarTheme.Moon)
+                                   .WithOpenApiRoutePattern("/openapi/all.json");
+                        });
+
+                        foreach (var doc in microserviceDocRoutes)
+                        {
+                            var docServiceName = doc.ServiceName;
+                            endpoints.MapGet(doc.DocRoute, async (HttpContext httpContext, Welco.API.Services.OpenApiAggregatorService aggregator, CancellationToken ct) =>
+                            {
+                                var gatewayBaseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
+                                var json = docServiceName.Equals("integration", StringComparison.OrdinalIgnoreCase)
+                                    ? await aggregator.GetIntegrationOpenApiAsync(gatewayBaseUrl, ct)
+                                    : await aggregator.GetServiceOpenApiAsync(docServiceName, gatewayBaseUrl, ct);
+                                return Results.Content(json, "application/json");
+                            });
+
+                            endpoints.MapScalarApiReference(doc.ScalarRoute, options =>
+                            {
+                                options.WithTitle(doc.DisplayName)
+                                       .WithTheme(ScalarTheme.Moon)
+                                       .WithOpenApiRoutePattern(doc.DocRoute);
+                            });
+                        }
+
+                        endpoints.MapControllers();
+                    });
 #pragma warning restore ASP0014
 
-            await app.UseOcelot();
-            await app.RunAsync();
+                    await app.UseOcelot();
+                    await app.RunAsync();
+                }
+
+            }
         }
     }
 }
