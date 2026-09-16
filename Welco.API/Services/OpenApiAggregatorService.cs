@@ -203,12 +203,16 @@ namespace Welco.API.Services
             }
 
             var endpoints = await GetDownstreamOpenApiEndpointsAsync(cancellationToken);
-            foreach (var (serviceName, url) in endpoints)
+            // Fetch in parallel (same pattern as GetAggregatedOpenApiAsync): sequential awaits
+            // multiply one slow cold-starting downstream across every other service's warm-up.
+            var warmUpTasks = endpoints.Select(endpoint =>
             {
+                var (serviceName, url) = endpoint;
                 var cacheFile = Path.Combine(cacheDir, $"openapi.{serviceName}.json");
                 _logger.LogInformation("Pre-warming OpenAPI schema for '{ServiceName}' from {Url}", serviceName, url);
-                await FetchOpenApiWithCacheAsync(serviceName, url, cacheFile, cancellationToken);
-            }
+                return FetchOpenApiWithCacheAsync(serviceName, url, cacheFile, cancellationToken);
+            }).ToList();
+            await Task.WhenAll(warmUpTasks);
         }
 
         public async Task<IReadOnlyList<(string ServiceName, string Url)>> GetDownstreamOpenApiEndpointsAsync(CancellationToken cancellationToken = default)
@@ -265,7 +269,7 @@ namespace Welco.API.Services
 
         private async Task<JsonObject?> FetchOpenApiWithCacheAsync(string serviceName, string url, string cacheFile, CancellationToken cancellationToken)
         {
-            var httpClient = _httpClientFactory.CreateClient("InsecureClient");
+            var httpClient = _httpClientFactory.CreateClient(GatewayHttpClientExtensions.InsecureClientName);
             var attempts = Math.Max(1, _options.RetryCount + 1);
 
             for (var attempt = 1; attempt <= attempts; attempt++)

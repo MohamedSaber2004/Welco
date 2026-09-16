@@ -7,6 +7,7 @@ using Scalar.AspNetCore;
 using Serilog;
 using System.Reflection;
 using Welco.API.Options;
+using Welco.API.Services;
 using Welco.Shared;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Middlewares;
@@ -213,14 +214,7 @@ namespace Welco.API
                 });
             });
 
-            builder.Services.AddHttpClient("InsecureClient", client =>
-                {
-                    client.Timeout = TimeSpan.FromSeconds(3);
-                })
-                .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-                {
-                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-                });
+            builder.Services.AddGatewayOpenApiHttpClient();
             builder.Services.AddSingleton<Welco.API.Services.OpenApiAggregatorService>();
             builder.Services.AddHostedService<Welco.API.Services.OpenApiCacheWarmer>();
             builder.Services.Configure<OpenApiAggregatorOptions>(builder.Configuration.GetSection(OpenApiAggregatorOptions.SectionName));
@@ -290,7 +284,8 @@ namespace Welco.API
                 foreach (var file in Directory.GetFiles(ocelotDir, $"ocelot.*.{env.EnvironmentName}.json"))
                 {
                     var fileName = Path.GetFileName(file);
-                    if (!fileName.StartsWith("ocelot.global."))
+                    if (!fileName.StartsWith("ocelot.global.", StringComparison.OrdinalIgnoreCase)
+                        && !fileName.StartsWith("ocelot.merged.", StringComparison.OrdinalIgnoreCase))
                     {
                         var parts = fileName.Split('.');
                         if (parts.Length >= 3)

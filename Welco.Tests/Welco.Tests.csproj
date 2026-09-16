@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Welco.Shared\Welco.Shared.csproj" />
     <ProjectReference Include="..\Auth.Services.API\Auth.Services.API.csproj" />
+    <ProjectReference Include="..\Welco.API\Welco.Gateway.API.csproj" />
   </ItemGroup>
 
 </Project>
