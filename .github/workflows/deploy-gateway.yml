@@ -10,6 +10,7 @@ on:
       - 'Welco.Shared/**'
       - '.github/workflows/deploy-gateway.yml'
       - '.github/workflows/ftp-deploy.py'
+      - 'check_verify.py'
   workflow_dispatch:
 
 jobs:
@@ -32,6 +33,9 @@ jobs:
           dotnet publish "Welco.API/Welco.Gateway.API.csproj" \
             -c Release \
             -o ./publish/gateway
+
+      - name: Verify Ocelot Configuration
+        run: python check_verify.py
 
       - name: Deploy to MonsterASP via FTP
         env:

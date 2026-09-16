@@ -10,11 +10,18 @@ from pathlib import Path
 
 def main():
     # Path to the merged Ocelot configuration
-    config_path = Path(__file__).parent / "Welco.API" / "Ocelot" / "ocelot.merged.Test.json"
+    # Support both running from repo root and from script directory
+    repo_root = Path(__file__).parent
+    config_path = repo_root / "Welco.API" / "Ocelot" / "ocelot.merged.Test.json"
     
     if not config_path.exists():
-        print(f"Error: Configuration file not found at {config_path}")
-        sys.exit(1)
+        # Fallback: try current working directory
+        alt_path = Path.cwd() / "Welco.API" / "Ocelot" / "ocelot.merged.Test.json"
+        if alt_path.exists():
+            config_path = alt_path
+        else:
+            print(f"Error: Configuration file not found at {config_path}")
+            sys.exit(1)
     
     try:
         with open(config_path, 'r') as f:
