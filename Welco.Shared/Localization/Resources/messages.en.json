@@ -367,14 +367,6 @@
     "Deleted": "Content deleted successfully.",
     "NotFound": "Content not found."
   },
-  "TradeShow": {
-    "Created": "Trade show created successfully.",
-    "ListFetched": "Trade shows retrieved successfully.",
-    "Fetched": "Trade show retrieved successfully.",
-    "NameRequired": "Trade show name is required.",
-    "LocationRequired": "Trade show location is required.",
-    "EndDateMustBeAfterStartDate": "End date must be on or after start date."
-  },
   "ProductInquiry": {
     "Created": "Product inquiry created successfully.",
     "ListFetched": "Product inquiries retrieved successfully.",
