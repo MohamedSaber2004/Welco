@@ -8,6 +8,7 @@ namespace Welco.API.Services
         {
             services.AddHttpClient(InsecureClientName, client =>
                 {
+                    client.Timeout = Timeout.InfiniteTimeSpan;
                 })
                 .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
                 {

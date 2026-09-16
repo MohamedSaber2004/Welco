@@ -64,7 +64,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                     FromCurrency = fromCurrency,
                     ToCurrency = toCurrency,
                     Rate = 1m,
-                    ConvertedAmount = Decimal.Round(amount, GetDecimalDigits(toCurrency)),
+                    ConvertedAmount = amount,
                     RateDate = DateOnly.FromDateTime(DateTime.UtcNow.Date),
                     Source = "identity"
                 };
@@ -101,18 +101,18 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 if (line.Quantity <= 0) throw new ArgumentException($"Invalid quantity for '{line.Key}'");
                 if (line.UnitAmount < 0) throw new ArgumentException($"Invalid amount for '{line.Key}'");
                 var details = await _provider.ConvertAsync(line.FromCurrency, toCurrency, line.UnitAmount, cancellationToken);
-                var nativeCeiled = CeilToDigits(line.UnitAmount, 0);
-                var ceiledUnit = CeilToDigits(nativeCeiled * details.Rate, 0);
-                var lineTotal = CeilToDigits(ceiledUnit * line.Quantity, 0);
+                var unitAmount = line.UnitAmount;
+                var convertedUnit = unitAmount * details.Rate;
+                var lineTotal = convertedUnit * line.Quantity;
                 lines.Add(new CartTotalLineResultDto
                 {
                     Key = line.Key ?? string.Empty,
                     FromCurrency = details.FromCurrency,
-                    UnitAmount = line.UnitAmount,
-                    CeiledUnitAmount = nativeCeiled,
+                    UnitAmount = unitAmount,
+                    CeiledUnitAmount = unitAmount,
                     Quantity = line.Quantity,
                     Rate = details.Rate,
-                    ConvertedUnitAmount = ceiledUnit,
+                    ConvertedUnitAmount = convertedUnit,
                     LineTotal = lineTotal
                 });
                 rateDate = details.RateDate;
@@ -151,12 +151,6 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
         }
 
         private static string NormalizeCode(string code) => string.IsNullOrWhiteSpace(code) ? "USD" : code.Trim().ToUpperInvariant();
-        private static decimal CeilToDigits(decimal value, int digits)
-        {
-            var factor = 1m;
-            for (var i = 0; i < digits; i++) factor *= 10m;
-            return Math.Ceiling(value * factor) / factor;
-        }
         private static int GetDecimalDigits(string code)
         {
             var common = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)

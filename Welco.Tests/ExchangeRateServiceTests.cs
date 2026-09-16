@@ -141,7 +141,7 @@ public class ExchangeRateServiceTests
         await Assert.ThrowsAsync<InvalidOperationException>(() => _svc.ConvertWithDetailsAsync(10m, "USD", "EGP", CancellationToken.None));
     }
 
-    [Fact] public async Task ConvertCartTotal_WholeUnitCeiling()
+    [Fact] public async Task ConvertCartTotal_RealRatesNoCeiling()
     {
         var req = new ConvertCartTotalRequest
         {
@@ -156,18 +156,21 @@ public class ExchangeRateServiceTests
         var res = await _svc.ConvertCartTotalAsync(req, CancellationToken.None);
         Assert.Equal("EGP", res.ToCurrency);
         Assert.Equal(3, res.Lines.Count);
-        Assert.Equal(311m, res.Lines[0].CeiledUnitAmount);
-        Assert.Equal(15845m, res.Lines[0].ConvertedUnitAmount);
-        Assert.Equal(31690m, res.Lines[0].LineTotal);
-        Assert.Equal(11m, res.Lines[1].CeiledUnitAmount);
-        Assert.Equal(561m, res.Lines[1].ConvertedUnitAmount);
-        Assert.Equal(1683m, res.Lines[1].LineTotal);
-        Assert.Equal(10m, res.Lines[2].CeiledUnitAmount);
+        Assert.Equal(310.8m, res.Lines[0].UnitAmount);
+        Assert.Equal(50.9467m, res.Lines[0].Rate);
+        Assert.Equal(310.8m * 50.9467m, res.Lines[0].ConvertedUnitAmount);
+        Assert.Equal(310.8m * 50.9467m * 2, res.Lines[0].LineTotal);
+        Assert.Equal(10.2m, res.Lines[1].UnitAmount);
+        Assert.Equal(50.9467m, res.Lines[1].Rate);
+        Assert.Equal(10.2m * 50.9467m, res.Lines[1].ConvertedUnitAmount);
+        Assert.Equal(10.2m * 50.9467m * 3, res.Lines[1].LineTotal);
+        Assert.Equal(10m, res.Lines[2].UnitAmount);
+        Assert.Equal(1m, res.Lines[2].Rate);
         Assert.Equal(10m, res.Lines[2].ConvertedUnitAmount);
         Assert.Equal(10m, res.Lines[2].LineTotal);
-        Assert.Equal(31690m + 1683m + 10m, res.Subtotal);
-        Assert.Equal(31690m + 1683m + 10m, res.Total);
-        Assert.True(res.Total >= res.Subtotal);
+        var expectedTotal = (310.8m * 50.9467m * 2) + (10.2m * 50.9467m * 3) + 10m;
+        Assert.Equal(expectedTotal, res.Subtotal);
+        Assert.Equal(expectedTotal, res.Total);
     }
 
     [Fact]
