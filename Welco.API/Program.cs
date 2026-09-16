@@ -92,16 +92,50 @@ namespace Welco.API
                             Log.Warning(ex, "Failed to merge Ocelot file {File}", file);
                         }
                     }
-                    if (allRoutes.Count > 0)
+if (allRoutes.Count > 0)
+            {
+                var mergedPath = Path.Combine(ocelotDir, $"ocelot.merged.{env.EnvironmentName}.json");
+                
+                // Merge GlobalConfiguration from global JSON files into the merged file
+                // (so Ocelot keeps BaseUrl and other global settings when it loads the merged file)
+                var mergedPayload = new System.Text.Json.Nodes.JsonObject();
+                var globalConfig = new System.Text.Json.Nodes.JsonObject();
+                
+                var globalJsonFiles = new[] { "ocelot.global.json", $"ocelot.global.{env.EnvironmentName}.json" };
+                foreach (var fileName in globalJsonFiles)
+                {
+                    var globalPath = Path.Combine(ocelotDir, fileName);
+                    if (File.Exists(globalPath))
                     {
-                        var mergedPath = Path.Combine(ocelotDir, $"ocelot.merged.{env.EnvironmentName}.json");
-                        var mergedPayload = new System.Text.Json.Nodes.JsonObject { ["Routes"] = new System.Text.Json.Nodes.JsonArray(allRoutes.ToArray()) };
-                        var mergedJson = mergedPayload.ToJsonString(new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
-                        try { File.WriteAllText(mergedPath, mergedJson); } catch (Exception ex) { Log.Warning(ex, "Failed to write merged Ocelot file"); }
-                        builder.Configuration.AddJsonFile(mergedPath, optional: false, reloadOnChange: true);
-                        Log.Information("Merged {Count} Ocelot routes from {Files} into {Merged}", allRoutes.Count, string.Join(", ", routeFiles.Select(Path.GetFileName)), Path.GetFileName(mergedPath));
+                        try
+                        {
+                            var globalNode = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(globalPath));
+                            var globalSection = globalNode?["GlobalConfiguration"] as System.Text.Json.Nodes.JsonObject;
+                            if (globalSection != null)
+                            {
+                                foreach (var property in globalSection)
+                                {
+                                    globalConfig[property.Key] = property.Value?.DeepClone();
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Warning(ex, "Failed to read global Ocelot config {File}", fileName);
+                        }
                     }
                 }
+                
+                if (globalConfig.Count > 0)
+                {
+                    mergedPayload["GlobalConfiguration"] = globalConfig;
+                }
+                mergedPayload["Routes"] = new System.Text.Json.Nodes.JsonArray(allRoutes.ToArray());
+                
+                var mergedJson = mergedPayload.ToJsonString(new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+                try { File.WriteAllText(mergedPath, mergedJson); } catch (Exception ex) { Log.Warning(ex, "Failed to write merged Ocelot file"); }
+                builder.Configuration.AddJsonFile(mergedPath, optional: false, reloadOnChange: true);
+Log.Information("Merged {Count} Ocelot routes from {Files} into {Merged}", allRoutes.Count, string.Join(", ", routeFiles.Select(Path.GetFileName)), Path.GetFileName(mergedPath));
             }
 
             builder.Services.AddControllers();
