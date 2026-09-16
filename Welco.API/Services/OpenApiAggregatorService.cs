@@ -401,6 +401,13 @@ namespace Welco.API.Services
                 {
                     _logger.LogWarning(ex, "Could not reach downstream service at {Url} (attempt {Attempt}/{Attempts})", url, attempt, attempts);
                 }
+
+                // Brief delay before retrying (skip after the last attempt).
+                if (attempt < attempts)
+                {
+                    try { await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken); }
+                    catch (OperationCanceledException) { break; }
+                }
             }
 
             if (File.Exists(cacheFile))

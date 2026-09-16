@@ -22,7 +22,7 @@ namespace Certification.Services.API.Controllers
         {
         }
 
-                [HttpGet]
+        [HttpGet]
         [Route(CertificationApiRoutes.Certifications.GetAll)]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -32,7 +32,7 @@ namespace Certification.Services.API.Controllers
             return ToActionResult(result);
         }
 
-                [HttpGet]
+        [HttpGet]
         [Route(CertificationApiRoutes.Certifications.GetById)]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -43,7 +43,7 @@ namespace Certification.Services.API.Controllers
             return ToActionResult(result);
         }
 
-                [HttpGet]
+        [HttpGet]
         [Route(CertificationApiRoutes.Certifications.Show)]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -54,7 +54,7 @@ namespace Certification.Services.API.Controllers
             return ToActionResult(result);
         }
 
-                [HttpPost]
+        [HttpPost]
         [Route(CertificationApiRoutes.Certifications.Create)]
         [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -66,7 +66,7 @@ namespace Certification.Services.API.Controllers
             return ToActionResult(result);
         }
 
-                [HttpPut]
+        [HttpPut]
         [Route(CertificationApiRoutes.Certifications.Update)]
         [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -80,7 +80,7 @@ namespace Certification.Services.API.Controllers
             return ToActionResult(result);
         }
 
-                [HttpDelete]
+        [HttpDelete]
         [Route(CertificationApiRoutes.Certifications.Delete)]
         [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
         [ProducesResponseType(StatusCodes.Status200OK)]
