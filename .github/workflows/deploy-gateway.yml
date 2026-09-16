@@ -33,6 +33,15 @@ jobs:
           dotnet publish "Welco.API/Welco.Gateway.API.csproj" \
             -c Release \
             -o ./publish/gateway
+          mkdir -p ./publish/gateway/Logs
+          if [ ! -d "./publish/gateway/Ocelot" ]; then
+            echo "Copying Ocelot directory to publish..."
+            cp -r Welco.API/Ocelot ./publish/gateway/
+          fi
+          if [ ! -f "./publish/gateway/web.config" ]; then
+            echo "Copying web.config to publish..."
+            cp Welco.API/web.config ./publish/gateway/
+          fi
 
       - name: Verify Ocelot Configuration
         run: python check_verify.py

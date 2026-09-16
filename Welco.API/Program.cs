@@ -69,6 +69,8 @@ namespace Welco.API
                              && !Path.GetFileName(f).StartsWith("ocelot.merged.", StringComparison.OrdinalIgnoreCase))
                     .OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
                     .ToArray();
+                var mergedPath = Path.Combine(ocelotDir, $"ocelot.merged.{env.EnvironmentName}.json");
+
                 if (routeFiles.Length > 0)
                 {
                     var allRoutes = new List<System.Text.Json.Nodes.JsonNode?>();
@@ -94,8 +96,6 @@ namespace Welco.API
                     }
                     if (allRoutes.Count > 0)
                     {
-                        var mergedPath = Path.Combine(ocelotDir, $"ocelot.merged.{env.EnvironmentName}.json");
-
                         // Merge GlobalConfiguration from global JSON files into the merged file
                         // (so Ocelot keeps BaseUrl and other global settings when it loads the merged file)
                         var mergedPayload = new System.Text.Json.Nodes.JsonObject();
@@ -137,10 +137,21 @@ namespace Welco.API
                         builder.Configuration.AddJsonFile(mergedPath, optional: false, reloadOnChange: true);
                         Log.Information("Merged {Count} Ocelot routes from {Files} into {Merged}", allRoutes.Count, string.Join(", ", routeFiles.Select(Path.GetFileName)), Path.GetFileName(mergedPath));
                     }
+                }
+                else if (File.Exists(mergedPath))
+                {
+                    builder.Configuration.AddJsonFile(mergedPath, optional: false, reloadOnChange: true);
+                    Log.Information("Loaded existing merged Ocelot file {Merged}", Path.GetFileName(mergedPath));
+                }
+            }
+            else
+            {
+                Log.Warning("Ocelot directory not found at {Path}", ocelotDir);
+            }
 
-                    builder.Services.AddControllers();
-                    builder.Services.AddJsonLocalization();
-                    builder.Services.AddWelcoSharedDependencies();
+            builder.Services.AddControllers();
+            builder.Services.AddJsonLocalization();
+            builder.Services.AddWelcoSharedDependencies();
 
                     builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
                     var jwtSettings = new JwtSettings();
@@ -384,9 +395,6 @@ namespace Welco.API
 
                     await app.UseOcelot();
                     await app.RunAsync();
-                }
-
-            }
         }
     }
 }

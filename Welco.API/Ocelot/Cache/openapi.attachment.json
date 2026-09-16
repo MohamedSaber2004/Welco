@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "https://localhost:7180/"
+      "url": "https://welco-attachment.runasp.net/"
     }
   ],
   "paths": {

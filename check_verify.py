@@ -12,16 +12,20 @@ def main():
     # Path to the merged Ocelot configuration
     # Support both running from repo root and from script directory
     repo_root = Path(__file__).parent
-    config_path = repo_root / "Welco.API" / "Ocelot" / "ocelot.merged.Test.json"
-    
-    if not config_path.exists():
-        # Fallback: try current working directory
-        alt_path = Path.cwd() / "Welco.API" / "Ocelot" / "ocelot.merged.Test.json"
-        if alt_path.exists():
-            config_path = alt_path
-        else:
-            print(f"Error: Configuration file not found at {config_path}")
-            sys.exit(1)
+    publish_path = repo_root / "publish" / "gateway" / "Ocelot" / "ocelot.merged.Test.json"
+    if publish_path.exists():
+        config_path = publish_path
+        print(f"Verifying published config at: {config_path}")
+    else:
+        config_path = repo_root / "Welco.API" / "Ocelot" / "ocelot.merged.Test.json"
+        if not config_path.exists():
+            alt_path = Path.cwd() / "Welco.API" / "Ocelot" / "ocelot.merged.Test.json"
+            if alt_path.exists():
+                config_path = alt_path
+            else:
+                print(f"Error: Configuration file not found at {config_path}")
+                sys.exit(1)
+        print(f"Verifying source config at: {config_path}")
     
     try:
         with open(config_path, 'r', encoding='utf-8-sig') as f:

@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "https://localhost:7101/"
+      "url": "https://welco-certification.runasp.net/"
     }
   ],
   "paths": {

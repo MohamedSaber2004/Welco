@@ -42,6 +42,27 @@ def deploy():
     uploaded_count = 0
 
     try:
+        # List existing remote files for diagnostics
+        try:
+            ensure_dir(target_base_dir)
+            listing = []
+            ftp.retrlines('LIST', listing.append)
+            print(f"Current remote files in '{target_base_dir}':")
+            for item in listing[:25]:
+                print(f"  {item}")
+        except Exception as e:
+            print(f"Diagnostics: Could not list remote directory: {e}")
+
+        # Remove default MonsterASP placeholder files that prevent IIS from routing to ASP.NET Core
+        placeholder_names = ["default.aspx", "default.htm", "default.html", "index.html", "index.htm", "hostingstart.html"]
+        for pf in placeholder_names:
+            try:
+                ensure_dir(target_base_dir)
+                ftp.delete(pf)
+                print(f"  ✓ Removed MonsterASP placeholder file: {pf}")
+            except Exception:
+                pass
+
         # 1. Upload app_offline.htm to shut down IIS worker process and release locked .dll files
         print(f"Uploading app_offline.htm to {target_base_dir} to release IIS file locks...")
         with open(offline_file, "w", encoding="utf-8") as f:
