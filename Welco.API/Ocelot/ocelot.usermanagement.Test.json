@@ -13,7 +13,12 @@
                        "UpstreamHttpMethod":  [
                                                   "GET"
                                               ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/api/v1/user-management/countries/{everything}",
@@ -28,7 +33,12 @@
                        "UpstreamHttpMethod":  [
                                                   "GET"
                                               ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/api/v1/user-management/cities",
@@ -43,7 +53,12 @@
                        "UpstreamHttpMethod":  [
                                                   "GET"
                                               ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/api/v1/user-management/cities/{everything}",
@@ -58,7 +73,12 @@
                        "UpstreamHttpMethod":  [
                                                   "GET"
                                               ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/api/v1/user-management/zones",
@@ -73,7 +93,12 @@
                        "UpstreamHttpMethod":  [
                                                   "GET"
                                               ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/api/v1/user-management/zones/{everything}",
@@ -88,7 +113,12 @@
                        "UpstreamHttpMethod":  [
                                                   "GET"
                                               ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/api/v1/user-management/companies",
@@ -103,7 +133,12 @@
                        "UpstreamHttpMethod":  [
                                                   "GET"
                                               ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/api/v1/user-management/distributor-applications",
@@ -124,7 +159,12 @@
                                                      "AllowedScopes":  [
 
                                                                        ]
-                                                 }
+                                                 },
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/api/v1/user-management/{everything}",
@@ -148,7 +188,12 @@
 
                                                                        ]
                                                  },
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/openapi/v1.json",
@@ -163,7 +208,12 @@
                        "UpstreamHttpMethod":  [
                                                   "GET"
                                               ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/scalar/v1",
@@ -178,7 +228,12 @@
                        "UpstreamHttpMethod":  [
                                                   "GET"
                                               ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    }
                ]
 }

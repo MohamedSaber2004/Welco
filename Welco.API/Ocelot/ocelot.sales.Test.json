@@ -22,7 +22,12 @@
 
                                                                        ]
                                                  },
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/api/v1/quotes/{everything}",
@@ -46,7 +51,12 @@
 
                                                                        ]
                                                  },
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/api/v1/product-inquiries/{everything}",
@@ -61,7 +71,12 @@
                        "UpstreamHttpMethod":  [
                                                   "POST"
                                               ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/api/v1/product-inquiries/{everything}",
@@ -83,7 +98,12 @@
                                                      "AllowedScopes":  [
 
                                                                        ]
-                                                 }
+                                                 },
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/openapi/v1.json",
@@ -98,7 +118,12 @@
                        "UpstreamHttpMethod":  [
                                                   "GET"
                                               ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    },
                    {
                        "DownstreamPathTemplate":  "/scalar/v1",
@@ -113,7 +138,12 @@
                        "UpstreamHttpMethod":  [
                                                   "GET"
                                               ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true
+                       "DangerousAcceptAnyServerCertificateValidator":  true,
+                       "QoSOptions":  {
+                                          "TimeoutValue":  30000,
+                                          "ExceptionsAllowedBeforeBreaking":  3,
+                                          "DurationOfBreak":  30000
+                                      }
                    }
                ]
 }
