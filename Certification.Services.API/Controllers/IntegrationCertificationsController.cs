@@ -11,7 +11,7 @@ using Welco.Shared.Results;
 
 namespace Certification.Services.API.Controllers
 {
-        [ServiceAuth]
+    [ServiceAuth]
     [ApiController]
     [IntegrationRouteName("Certifications")]
     [Route("api/integration/certifications")]
@@ -24,7 +24,7 @@ namespace Certification.Services.API.Controllers
             _unitOfWork = unitOfWork;
         }
 
-                [HttpGet("")]
+        [HttpGet("")]
         public async Task<IActionResult> GetAll(CancellationToken ct)
         {
             var repo = _unitOfWork.GetRepository<Welco.Shared.Domain.Models.Certification, Guid>();
@@ -48,7 +48,7 @@ namespace Certification.Services.API.Controllers
             return ToActionResult(Result<List<ExternalCertificationDto>>.Success(certs));
         }
 
-                [HttpGet("{id:guid}")]
+        [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct)
         {
             var repo = _unitOfWork.GetRepository<Welco.Shared.Domain.Models.Certification, Guid>();

@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Sockets;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Options;
@@ -213,6 +215,93 @@ namespace Welco.API.Services
                 return FetchOpenApiWithCacheAsync(serviceName, url, cacheFile, cancellationToken);
             }).ToList();
             await Task.WhenAll(warmUpTasks);
+        }
+
+        public sealed record DownstreamProbeResult(
+            string ServiceName,
+            string Url,
+            string? IpAddress,
+            bool TcpOk,
+            double LatencyMs,
+            int? HttpStatus,
+            string? Error);
+
+        /// <summary>
+        /// Server-side connectivity probe: tests every downstream from THIS gateway box
+        /// (DNS + TCP connect + HTTP GET), in parallel. Surfaced via GET /health/downstream
+        /// so server-to-server reachability can be checked without console access to the host.
+        /// </summary>
+        public async Task<IReadOnlyList<DownstreamProbeResult>> ProbeDownstreamConnectivityAsync(CancellationToken cancellationToken = default)
+        {
+            var endpoints = await GetDownstreamOpenApiEndpointsAsync(cancellationToken);
+            var tasks = endpoints.Select(e => ProbeOneAsync(e.ServiceName, e.Url, cancellationToken)).ToList();
+            return await Task.WhenAll(tasks);
+        }
+
+        public static async Task<(bool Ok, double LatencyMs, string? Error)> ProbeTcpAsync(
+            string host, int port, int timeoutMs = 5000, CancellationToken cancellationToken = default)
+        {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            try
+            {
+                using var tcp = new TcpClient();
+                using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                cts.CancelAfter(timeoutMs);
+                await tcp.ConnectAsync(host, port, cts.Token);
+                sw.Stop();
+                return (true, sw.Elapsed.TotalMilliseconds, null);
+            }
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+            {
+                sw.Stop();
+                return (false, sw.Elapsed.TotalMilliseconds, $"TCP connect to {host}:{port} timed out after {timeoutMs}ms");
+            }
+            catch (Exception ex)
+            {
+                sw.Stop();
+                return (false, sw.Elapsed.TotalMilliseconds, $"{ex.GetType().Name}: {ex.Message}");
+            }
+        }
+
+        private async Task<DownstreamProbeResult> ProbeOneAsync(string serviceName, string url, CancellationToken cancellationToken)
+        {
+            string? ip = null;
+            try
+            {
+                var uri = new Uri(url);
+                var addresses = await Dns.GetHostAddressesAsync(uri.Host, cancellationToken);
+                ip = addresses.FirstOrDefault()?.ToString();
+
+                var (tcpOk, latencyMs, tcpError) = await ProbeTcpAsync(uri.Host, uri.Port, 5000, cancellationToken);
+
+                int? httpStatus = null;
+                var error = tcpError;
+                if (tcpOk)
+                {
+                    try
+                    {
+                        var httpClient = _httpClientFactory.CreateClient(GatewayHttpClientExtensions.InsecureClientName);
+                        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                        cts.CancelAfter(TimeSpan.FromSeconds(15));
+                        using var response = await httpClient.GetAsync(url, cts.Token);
+                        httpStatus = (int)response.StatusCode;
+                    }
+                    catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+                    {
+                        error = "HTTP GET timed out after 15s (TCP was OK; downstream app may be cold)";
+                    }
+                    catch (Exception ex)
+                    {
+                        error = $"HTTP GET failed: {ex.GetType().Name}: {ex.Message}";
+                    }
+                }
+
+                return new DownstreamProbeResult(serviceName, url, ip, tcpOk, Math.Round(latencyMs, 1), httpStatus, error);
+            }
+            catch (Exception ex)
+            {
+                return new DownstreamProbeResult(serviceName, url, ip, false, 0, null, $"{ex.GetType().Name}: {ex.Message}");
+            }
         }
 
         public async Task<IReadOnlyList<(string ServiceName, string Url)>> GetDownstreamOpenApiEndpointsAsync(CancellationToken cancellationToken = default)

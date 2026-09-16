@@ -308,6 +308,12 @@ namespace Welco.API
                     return Results.Content(json, "application/json");
                 });
 
+                endpoints.MapGet("/health/downstream", async (OpenApiAggregatorService aggregator, CancellationToken ct) =>
+                {
+                    var results = await aggregator.ProbeDownstreamConnectivityAsync(ct);
+                    return Results.Json(new { timestamp = DateTimeOffset.UtcNow, gatewayHost = Environment.MachineName, results });
+                });
+
                 endpoints.MapGet("/", () => Results.Redirect("/scalar/v1"));
 
                 endpoints.MapScalarApiReference(options =>

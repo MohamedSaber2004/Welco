@@ -1,150 +1,65 @@
-[16:09:58 INF] Welco API Gateway is starting up at 09/16/2026 16:09:58
-[16:09:58 INF] Ocelot file ocelot.attachment.Test.json contributed 4 routes
-[16:09:58 INF] Ocelot file ocelot.auth.Test.json contributed 4 routes
-[16:09:58 INF] Ocelot file ocelot.certification.Test.json contributed 5 routes
-[16:09:58 INF] Ocelot file ocelot.commerce.Test.json contributed 6 routes
-[16:09:58 INF] Ocelot file ocelot.content.Test.json contributed 14 routes
-[16:09:58 INF] Ocelot file ocelot.integration.Test.json contributed 15 routes
-[16:09:58 INF] Ocelot file ocelot.product.Test.json contributed 19 routes
-[16:09:58 INF] Ocelot file ocelot.sales.Test.json contributed 6 routes
-[16:09:58 INF] Ocelot file ocelot.usermanagement.Test.json contributed 11 routes
-[16:09:58 INF] Merged 84 Ocelot routes from ocelot.attachment.Test.json, ocelot.auth.Test.json, ocelot.certification.Test.json, ocelot.commerce.Test.json, ocelot.content.Test.json, ocelot.integration.Test.json, ocelot.product.Test.json, ocelot.sales.Test.json, ocelot.usermanagement.Test.json into ocelot.merged.Test.json
-[16:09:58 INF] Successfully loaded 390 keys from embedded resource for language: en
-[16:09:58 INF] Successfully loaded 390 keys from embedded resource for language: ar
-[16:09:58 INF] Successfully loaded 390 keys from file D:\Sites\site87745\wwwroot\Localization\Resources\messages.en.json
-[16:09:58 INF] Successfully loaded 390 keys from file D:\Sites\site87745\wwwroot\Localization\Resources\messages.ar.json
-[16:09:59 WRN] Using an in-memory repository. Keys will not be persisted to storage.
-[16:09:59 WRN] Neither user profile nor HKLM registry available. Using an ephemeral key repository. Protected data will be unavailable when application exits.
-[16:09:59 WRN] No XML encryptor configured. Key {25f1a779-cb88-4b9f-b72e-8a94a5cc7882} may be persisted to storage in unencrypted form.
-[16:10:00 INF] Start processing HTTP request GET https://welco-attachment.runasp.net/openapi/v1.json
-[16:10:00 INF] Sending HTTP request GET https://welco-attachment.runasp.net/openapi/v1.json
-[16:10:00 INF] Start processing HTTP request GET https://welco-auth.runasp.net/openapi/v1.json
-[16:10:00 INF] Sending HTTP request GET https://welco-auth.runasp.net/openapi/v1.json
-[16:10:00 INF] Start processing HTTP request GET https://welco-certification.runasp.net/openapi/v1.json
-[16:10:00 INF] Sending HTTP request GET https://welco-certification.runasp.net/openapi/v1.json
-[16:10:00 INF] Start processing HTTP request GET https://welco-commerce.runasp.net/openapi/v1.json
-[16:10:00 INF] Sending HTTP request GET https://welco-commerce.runasp.net/openapi/v1.json
-[16:10:00 INF] Start processing HTTP request GET https://welco-content.runasp.net/openapi/v1.json
-[16:10:00 INF] Sending HTTP request GET https://welco-content.runasp.net/openapi/v1.json
-[16:10:00 INF] Start processing HTTP request GET https://welco-product.runasp.net/openapi/v1.json
-[16:10:00 INF] Sending HTTP request GET https://welco-product.runasp.net/openapi/v1.json
-[16:10:00 INF] Start processing HTTP request GET https://welco-sales.runasp.net/openapi/v1.json
-[16:10:00 INF] Sending HTTP request GET https://welco-sales.runasp.net/openapi/v1.json
-[16:10:00 INF] Start processing HTTP request GET https://welco-user.runasp.net/openapi/v1.json
-[16:10:00 INF] Sending HTTP request GET https://welco-user.runasp.net/openapi/v1.json
-[16:10:03 WRN] Timed out fetching OpenAPI schema from https://welco-certification.runasp.net:443/openapi/v1.json (attempt 1/2; downstream service may not be running).
-[16:10:03 WRN] Timed out fetching OpenAPI schema from https://welco-commerce.runasp.net:443/openapi/v1.json (attempt 1/2; downstream service may not be running).
-[16:10:03 WRN] Timed out fetching OpenAPI schema from https://welco-attachment.runasp.net:443/openapi/v1.json (attempt 1/2; downstream service may not be running).
-[16:10:03 WRN] Timed out fetching OpenAPI schema from https://welco-content.runasp.net:443/openapi/v1.json (attempt 1/2; downstream service may not be running).
-[16:10:03 WRN] Timed out fetching OpenAPI schema from https://welco-product.runasp.net:443/openapi/v1.json (attempt 1/2; downstream service may not be running).
-[16:10:03 WRN] Timed out fetching OpenAPI schema from https://welco-sales.runasp.net:443/openapi/v1.json (attempt 1/2; downstream service may not be running).
-[16:10:03 INF] Start processing HTTP request GET https://welco-certification.runasp.net/openapi/v1.json
-[16:10:03 INF] Start processing HTTP request GET https://welco-attachment.runasp.net/openapi/v1.json
-[16:10:03 INF] Start processing HTTP request GET https://welco-commerce.runasp.net/openapi/v1.json
-[16:10:03 INF] Start processing HTTP request GET https://welco-product.runasp.net/openapi/v1.json
-[16:10:03 INF] Start processing HTTP request GET https://welco-content.runasp.net/openapi/v1.json
-[16:10:03 INF] Start processing HTTP request GET https://welco-sales.runasp.net/openapi/v1.json
-[16:10:03 INF] Sending HTTP request GET https://welco-certification.runasp.net/openapi/v1.json
-[16:10:03 INF] Sending HTTP request GET https://welco-attachment.runasp.net/openapi/v1.json
-[16:10:03 INF] Sending HTTP request GET https://welco-commerce.runasp.net/openapi/v1.json
-[16:10:03 INF] Sending HTTP request GET https://welco-product.runasp.net/openapi/v1.json
-[16:10:03 INF] Sending HTTP request GET https://welco-sales.runasp.net/openapi/v1.json
-[16:10:03 INF] Sending HTTP request GET https://welco-content.runasp.net/openapi/v1.json
-[16:10:03 WRN] Timed out fetching OpenAPI schema from https://welco-user.runasp.net:443/openapi/v1.json (attempt 1/2; downstream service may not be running).
-[16:10:03 INF] Start processing HTTP request GET https://welco-user.runasp.net/openapi/v1.json
-[16:10:03 INF] Sending HTTP request GET https://welco-user.runasp.net/openapi/v1.json
-[16:10:03 WRN] Timed out fetching OpenAPI schema from https://welco-auth.runasp.net:443/openapi/v1.json (attempt 1/2; downstream service may not be running).
-[16:10:03 INF] Start processing HTTP request GET https://welco-auth.runasp.net/openapi/v1.json
-[16:10:03 INF] Sending HTTP request GET https://welco-auth.runasp.net/openapi/v1.json
-[16:10:04 INF] Pre-warming OpenAPI schema for 'attachment' from https://welco-attachment.runasp.net:443/openapi/v1.json
-[16:10:04 INF] Start processing HTTP request GET https://welco-attachment.runasp.net/openapi/v1.json
-[16:10:04 INF] Sending HTTP request GET https://welco-attachment.runasp.net/openapi/v1.json
-[16:10:05 INF] Received HTTP response headers after 1532.9478ms - 200
-[16:10:05 INF] End processing HTTP request after 1540.4346ms - 200
-[16:10:05 INF] Received HTTP response headers after 1563.6698ms - 200
-[16:10:05 INF] End processing HTTP request after 1564.1962ms - 200
-[16:10:06 WRN] Timed out fetching OpenAPI schema from https://welco-product.runasp.net:443/openapi/v1.json (attempt 2/2; downstream service may not be running).
-[16:10:06 WRN] Timed out fetching OpenAPI schema from https://welco-sales.runasp.net:443/openapi/v1.json (attempt 2/2; downstream service may not be running).
-[16:10:06 WRN] Timed out fetching OpenAPI schema from https://welco-commerce.runasp.net:443/openapi/v1.json (attempt 2/2; downstream service may not be running).
-[16:10:06 WRN] Timed out fetching OpenAPI schema from https://welco-certification.runasp.net:443/openapi/v1.json (attempt 2/2; downstream service may not be running).
-[16:10:06 WRN] Timed out fetching OpenAPI schema from https://welco-attachment.runasp.net:443/openapi/v1.json (attempt 2/2; downstream service may not be running).
-[16:10:06 WRN] Timed out fetching OpenAPI schema from https://welco-content.runasp.net:443/openapi/v1.json (attempt 2/2; downstream service may not be running).
-[16:10:06 INF] Using cached OpenAPI specification for 'sales'.
-[16:10:06 INF] Using cached OpenAPI specification for 'attachment'.
-[16:10:06 INF] Using cached OpenAPI specification for 'certification'.
-[16:10:06 INF] Using cached OpenAPI specification for 'commerce'.
-[16:10:06 INF] Using cached OpenAPI specification for 'content'.
-[16:10:06 INF] Using cached OpenAPI specification for 'product'.
-[16:10:07 WRN] Timed out fetching OpenAPI schema from https://welco-attachment.runasp.net:443/openapi/v1.json (attempt 1/2; downstream service may not be running).
-[16:10:07 INF] Start processing HTTP request GET https://welco-attachment.runasp.net/openapi/v1.json
-[16:10:07 INF] Sending HTTP request GET https://welco-attachment.runasp.net/openapi/v1.json
-[16:10:10 WRN] Timed out fetching OpenAPI schema from https://welco-attachment.runasp.net:443/openapi/v1.json (attempt 2/2; downstream service may not be running).
-[16:10:10 INF] Using cached OpenAPI specification for 'attachment'.
-[16:10:10 INF] Pre-warming OpenAPI schema for 'auth' from https://welco-auth.runasp.net:443/openapi/v1.json
-[16:10:10 INF] Start processing HTTP request GET https://welco-auth.runasp.net/openapi/v1.json
-[16:10:10 INF] Sending HTTP request GET https://welco-auth.runasp.net/openapi/v1.json
-[16:10:10 INF] Received HTTP response headers after 35.2815ms - 200
-[16:10:10 INF] End processing HTTP request after 35.5715ms - 200
-[16:10:10 INF] Pre-warming OpenAPI schema for 'certification' from https://welco-certification.runasp.net:443/openapi/v1.json
-[16:10:10 INF] Start processing HTTP request GET https://welco-certification.runasp.net/openapi/v1.json
-[16:10:10 INF] Sending HTTP request GET https://welco-certification.runasp.net/openapi/v1.json
-[16:10:13 WRN] Timed out fetching OpenAPI schema from https://welco-certification.runasp.net:443/openapi/v1.json (attempt 1/2; downstream service may not be running).
-[16:10:13 INF] Start processing HTTP request GET https://welco-certification.runasp.net/openapi/v1.json
-[16:10:13 INF] Sending HTTP request GET https://welco-certification.runasp.net/openapi/v1.json
-[16:10:16 WRN] Timed out fetching OpenAPI schema from https://welco-certification.runasp.net:443/openapi/v1.json (attempt 2/2; downstream service may not be running).
-[16:10:16 INF] Using cached OpenAPI specification for 'certification'.
-[16:10:16 INF] Pre-warming OpenAPI schema for 'commerce' from https://welco-commerce.runasp.net:443/openapi/v1.json
-[16:10:16 INF] Start processing HTTP request GET https://welco-commerce.runasp.net/openapi/v1.json
-[16:10:16 INF] Sending HTTP request GET https://welco-commerce.runasp.net/openapi/v1.json
-[16:10:17 INF] RequestId: 40000260-1004-d400-b63f-84710c7967bb, PreviousRequestId: -
-Rate limiting is disabled for route '/api/v1/products' via the EnableRateLimiting option.
-[16:10:17 INF] RequestId: 40000260-1004-d400-b63f-84710c7967bb, PreviousRequestId: -
-No authentication is required for the path '/api/v1/products' in the route /api/v1/products.
-[16:10:17 WRN] RequestId: 40000260-1004-d400-b63f-84710c7967bb, PreviousRequestId: -
-You have ignored all SSL warnings by using DangerousAcceptAnyServerCertificateValidator for this DownstreamRoute -> /api/v1/products
-[16:10:19 WRN] Timed out fetching OpenAPI schema from https://welco-commerce.runasp.net:443/openapi/v1.json (attempt 1/2; downstream service may not be running).
-[16:10:19 INF] Start processing HTTP request GET https://welco-commerce.runasp.net/openapi/v1.json
-[16:10:19 INF] Sending HTTP request GET https://welco-commerce.runasp.net/openapi/v1.json
-[16:10:22 WRN] Timed out fetching OpenAPI schema from https://welco-commerce.runasp.net:443/openapi/v1.json (attempt 2/2; downstream service may not be running).
-[16:10:22 INF] Using cached OpenAPI specification for 'commerce'.
-[16:10:22 INF] Pre-warming OpenAPI schema for 'content' from https://welco-content.runasp.net:443/openapi/v1.json
-[16:10:22 INF] Start processing HTTP request GET https://welco-content.runasp.net/openapi/v1.json
-[16:10:22 INF] Sending HTTP request GET https://welco-content.runasp.net/openapi/v1.json
-[16:10:25 WRN] Timed out fetching OpenAPI schema from https://welco-content.runasp.net:443/openapi/v1.json (attempt 1/2; downstream service may not be running).
-[16:10:25 INF] Start processing HTTP request GET https://welco-content.runasp.net/openapi/v1.json
-[16:10:25 INF] Sending HTTP request GET https://welco-content.runasp.net/openapi/v1.json
-[16:10:28 WRN] Timed out fetching OpenAPI schema from https://welco-content.runasp.net:443/openapi/v1.json (attempt 2/2; downstream service may not be running).
-[16:10:28 INF] Using cached OpenAPI specification for 'content'.
-[16:10:28 INF] Pre-warming OpenAPI schema for 'product' from https://welco-product.runasp.net:443/openapi/v1.json
-[16:10:28 INF] Start processing HTTP request GET https://welco-product.runasp.net/openapi/v1.json
-[16:10:28 INF] Sending HTTP request GET https://welco-product.runasp.net/openapi/v1.json
-[16:10:31 WRN] Timed out fetching OpenAPI schema from https://welco-product.runasp.net:443/openapi/v1.json (attempt 1/2; downstream service may not be running).
-[16:10:31 INF] Start processing HTTP request GET https://welco-product.runasp.net/openapi/v1.json
-[16:10:31 INF] Sending HTTP request GET https://welco-product.runasp.net/openapi/v1.json
-[16:10:34 WRN] Timed out fetching OpenAPI schema from https://welco-product.runasp.net:443/openapi/v1.json (attempt 2/2; downstream service may not be running).
-[16:10:34 INF] Using cached OpenAPI specification for 'product'.
-[16:10:34 INF] Pre-warming OpenAPI schema for 'sales' from https://welco-sales.runasp.net:443/openapi/v1.json
-[16:10:34 INF] Start processing HTTP request GET https://welco-sales.runasp.net/openapi/v1.json
-[16:10:34 INF] Sending HTTP request GET https://welco-sales.runasp.net/openapi/v1.json
-[16:10:37 WRN] Timed out fetching OpenAPI schema from https://welco-sales.runasp.net:443/openapi/v1.json (attempt 1/2; downstream service may not be running).
-[16:10:37 INF] Start processing HTTP request GET https://welco-sales.runasp.net/openapi/v1.json
-[16:10:37 INF] Sending HTTP request GET https://welco-sales.runasp.net/openapi/v1.json
-[16:10:38 INF] RequestId: 40000260-1004-d400-b63f-84710c7967bb, PreviousRequestId: -
-102 unknown status code of request URI: 
-[16:10:38 WRN] RequestId: 40000260-1004-d400-b63f-84710c7967bb, PreviousRequestId: -
-ResponderMiddleware found 1 error ->
-ConnectionToDownstreamServiceError: Error connecting to downstream service, exception: System.Net.Http.HttpRequestException: A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond. (welco-product.runasp.net:443)
- ---> System.Net.Sockets.SocketException (10060): A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.
-   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
-   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
-   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
-   --- End of inner exception stack trace ---
-   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
-   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
-   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
-   at System.Net.Http.HttpConnectionPool.InjectNewHttp11ConnectionAsync(QueueItem queueItem)
-   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
-   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
-   at System.Net.Http.DiagnosticsHandler.SendAsyncCore(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
-   at System.Net.Http.SocketsHttpHandler.<SendAsync>g__CreateHandlerAndSendAsync|115_0(HttpRequestMessage request, CancellationToken cancellationToken)
-   at Ocelot.Requester.TimeoutDeleg
+PS C:\Users\ALQasem> Test-NetConnection welco-gateway.runasp.net -Port 443
+
+                                                                                                                        ComputerName     : welco-gateway.runasp.net                                                                             RemoteAddress    : 5.9.179.193                                                                                          RemotePort       : 443                                                                                                  InterfaceAlias   : WiFi                                                                                                 SourceAddress    : 192.168.1.47                                                                                         TcpTestSucceeded : True
+
+
+
+PS C:\Users\ALQasem> Test-NetConnection welco-attachment.runasp.net -Port 443
+
+                                                                                                                        ComputerName     : welco-attachment.runasp.net                                                                          RemoteAddress    : 5.9.179.196                                                                                          RemotePort       : 443                                                                                                  InterfaceAlias   : WiFi                                                                                                 SourceAddress    : 192.168.1.47                                                                                         TcpTestSucceeded : True                                                                                                                                                                                                                                                                                                                                                                                                                                                                         PS C:\Users\ALQasem> Test-NetConnection welco-certification.runasp.net -Port 443                                                                                                                                                                
+ComputerName     : welco-certification.runasp.net
+RemoteAddress    : 5.9.179.196
+RemotePort       : 443
+InterfaceAlias   : WiFi
+SourceAddress    : 192.168.1.47                                                                                         TcpTestSucceeded : True                                                                                                                                                                                                                                                                                                                                                                                                                                                                         PS C:\Users\ALQasem> Test-NetConnection welco-sales.runasp.net -Port 443                                                                                                                                                                        
+ComputerName     : welco-sales.runasp.net
+RemoteAddress    : 5.9.179.196
+RemotePort       : 443
+InterfaceAlias   : WiFi
+SourceAddress    : 192.168.1.47                                                                                         TcpTestSucceeded : True                                                                                                                                                                                                                                                                                                                                                                                                                                                                         PS C:\Users\ALQasem> Test-NetConnection welco-content.runasp.net -Port 443                                                                                                                                                                      
+ComputerName     : welco-content.runasp.net
+RemoteAddress    : 5.9.179.196
+RemotePort       : 443
+InterfaceAlias   : WiFi
+SourceAddress    : 192.168.1.47
+TcpTestSucceeded : True
+
+
+
+PS C:\Users\ALQasem> Test-NetConnection welco-commerce.runasp.net -Port 443
+                                                                                                                                                                                                                                                ComputerName     : welco-commerce.runasp.net                                                                            RemoteAddress    : 5.9.179.196                                                                                          RemotePort       : 443                                                                                                  InterfaceAlias   : WiFi                                                                                                 SourceAddress    : 192.168.1.47
+TcpTestSucceeded : True
+
+
+
+PS C:\Users\ALQasem> Test-NetConnection welco-product.runasp.net -Port 443
+
+
+ComputerName     : welco-product.runasp.net
+RemoteAddress    : 5.9.179.196
+RemotePort       : 443                                                                                                  InterfaceAlias   : WiFi                                                                                                 SourceAddress    : 192.168.1.47                                                                                         TcpTestSucceeded : True                                                                                                                                                                                                                                                                                                                                                 
+PS C:\Users\ALQasem> Test-NetConnection welco-auth.runasp.net -Port 443
+
+
+ComputerName     : welco-auth.runasp.net
+RemoteAddress    : 5.9.179.193
+RemotePort       : 443
+InterfaceAlias   : WiFi
+SourceAddress    : 192.168.1.47
+TcpTestSucceeded : True
+
+
+
+PS C:\Users\ALQasem> Test-NetConnection welco-sales.runasp.net -Port 443
+
+
+ComputerName     : welco-sales.runasp.net
+RemoteAddress    : 5.9.179.196
+RemotePort       : 443
+InterfaceAlias   : WiFi
+SourceAddress    : 192.168.1.47
+TcpTestSucceeded : True
+
+
+
+PS C:\Users\ALQasem>
