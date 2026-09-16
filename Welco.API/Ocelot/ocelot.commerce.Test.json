@@ -1,157 +1,56 @@
-﻿{
-    "Routes":  [
-                   {
-                       "DownstreamPathTemplate":  "/api/v1/carts",
-                       "DownstreamScheme":  "https",
-                       "DownstreamHostAndPorts":  [
-                                                      {
-                                                          "Host":  "welco-commerce.runasp.net",
-                                                          "Port":  443
-                                                      }
-                                                  ],
-                       "UpstreamPathTemplate":  "/api/v1/carts",
-                       "UpstreamHttpMethod":  [
-                                                  "GET",
-                                                  "POST",
-                                                  "DELETE"
-                                              ],
-                       "AuthenticationOptions":  {
-                                                     "AuthenticationProviderKey":  "Bearer",
-                                                     "AllowedScopes":  [
-
-                                                                       ]
-                                                 },
-                       "DangerousAcceptAnyServerCertificateValidator":  true,
-                       "QoSOptions":  {
-                                          "TimeoutValue":  30000,
-                                          "ExceptionsAllowedBeforeBreaking":  3,
-                                          "DurationOfBreak":  30000
-                                      }
-                   },
-                   {
-                       "DownstreamPathTemplate":  "/api/v1/carts/{everything}",
-                       "DownstreamScheme":  "https",
-                       "DownstreamHostAndPorts":  [
-                                                      {
-                                                          "Host":  "welco-commerce.runasp.net",
-                                                          "Port":  443
-                                                      }
-                                                  ],
-                       "UpstreamPathTemplate":  "/api/v1/carts/{everything}",
-                       "UpstreamHttpMethod":  [
-                                                  "GET",
-                                                  "POST",
-                                                  "PUT",
-                                                  "DELETE"
-                                              ],
-                       "AuthenticationOptions":  {
-                                                     "AuthenticationProviderKey":  "Bearer",
-                                                     "AllowedScopes":  [
-
-                                                                       ]
-                                                 },
-                       "DangerousAcceptAnyServerCertificateValidator":  true,
-                       "QoSOptions":  {
-                                          "TimeoutValue":  30000,
-                                          "ExceptionsAllowedBeforeBreaking":  3,
-                                          "DurationOfBreak":  30000
-                                      }
-                   },
-                   {
-                       "DownstreamPathTemplate":  "/api/v1/orders",
-                       "DownstreamScheme":  "https",
-                       "DownstreamHostAndPorts":  [
-                                                      {
-                                                          "Host":  "welco-commerce.runasp.net",
-                                                          "Port":  443
-                                                      }
-                                                  ],
-                       "UpstreamPathTemplate":  "/api/v1/orders",
-                       "UpstreamHttpMethod":  [
-                                                  "GET",
-                                                  "POST"
-                                              ],
-                       "AuthenticationOptions":  {
-                                                     "AuthenticationProviderKey":  "Bearer",
-                                                     "AllowedScopes":  [
-
-                                                                       ]
-                                                 },
-                       "DangerousAcceptAnyServerCertificateValidator":  true,
-                       "QoSOptions":  {
-                                          "TimeoutValue":  30000,
-                                          "ExceptionsAllowedBeforeBreaking":  3,
-                                          "DurationOfBreak":  30000
-                                      }
-                   },
-                   {
-                       "DownstreamPathTemplate":  "/api/v1/orders/{everything}",
-                       "DownstreamScheme":  "https",
-                       "DownstreamHostAndPorts":  [
-                                                      {
-                                                          "Host":  "welco-commerce.runasp.net",
-                                                          "Port":  443
-                                                      }
-                                                  ],
-                       "UpstreamPathTemplate":  "/api/v1/orders/{everything}",
-                       "UpstreamHttpMethod":  [
-                                                  "GET",
-                                                  "POST",
-                                                  "PUT",
-                                                  "DELETE"
-                                              ],
-                       "AuthenticationOptions":  {
-                                                     "AuthenticationProviderKey":  "Bearer",
-                                                     "AllowedScopes":  [
-
-                                                                       ]
-                                                 },
-                       "DangerousAcceptAnyServerCertificateValidator":  true,
-                       "QoSOptions":  {
-                                          "TimeoutValue":  30000,
-                                          "ExceptionsAllowedBeforeBreaking":  3,
-                                          "DurationOfBreak":  30000
-                                      }
-                   },
-                   {
-                       "DownstreamPathTemplate":  "/openapi/v1.json",
-                       "DownstreamScheme":  "https",
-                       "DownstreamHostAndPorts":  [
-                                                      {
-                                                          "Host":  "welco-commerce.runasp.net",
-                                                          "Port":  443
-                                                      }
-                                                  ],
-                       "UpstreamPathTemplate":  "/api/docs/commerce/openapi.json",
-                       "UpstreamHttpMethod":  [
-                                                  "GET"
-                                              ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true,
-                       "QoSOptions":  {
-                                          "TimeoutValue":  30000,
-                                          "ExceptionsAllowedBeforeBreaking":  3,
-                                          "DurationOfBreak":  30000
-                                      }
-                   },
-                   {
-                       "DownstreamPathTemplate":  "/scalar/v1",
-                       "DownstreamScheme":  "https",
-                       "DownstreamHostAndPorts":  [
-                                                      {
-                                                          "Host":  "welco-commerce.runasp.net",
-                                                          "Port":  443
-                                                      }
-                                                  ],
-                       "UpstreamPathTemplate":  "/api/docs/commerce",
-                       "UpstreamHttpMethod":  [
-                                                  "GET"
-                                              ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true,
-                       "QoSOptions":  {
-                                          "TimeoutValue":  30000,
-                                          "ExceptionsAllowedBeforeBreaking":  3,
-                                          "DurationOfBreak":  30000
-                                      }
-                   }
-               ]
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/v1/carts",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-commerce.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/carts",
+      "UpstreamHttpMethod": [ "GET", "POST", "DELETE" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer", "AllowedScopes": [] },
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/carts/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-commerce.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/carts/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer", "AllowedScopes": [] },
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/orders",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-commerce.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/orders",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer", "AllowedScopes": [] },
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/orders/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-commerce.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/v1/orders/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer", "AllowedScopes": [] },
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/openapi/v1.json",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-commerce.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/docs/commerce/openapi.json",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "DownstreamPathTemplate": "/scalar/v1",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [{ "Host": "welco-commerce.runasp.net", "Port": 443 }],
+      "UpstreamPathTemplate": "/api/docs/commerce",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DangerousAcceptAnyServerCertificateValidator": true
+    }
+  ]
 }
