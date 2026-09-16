@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using Ocelot.Provider.Polly;
 using Scalar.AspNetCore;
 using Serilog;
 using System.Reflection;
@@ -255,7 +254,7 @@ namespace Welco.API
                     builder.Services.Configure<OpenApiAggregatorOptions>(builder.Configuration.GetSection(OpenApiAggregatorOptions.SectionName));
 
                     builder.Services.AddOcelot(builder.Configuration)
-                        .AddPolly();
+                        .AddQualityOfService();
                     builder.Services.AddConfiguredOpenApi();
 
                     var app = builder.Build();
