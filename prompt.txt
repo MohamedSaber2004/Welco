@@ -1,4 +1,1 @@
-https://api.fastforex.io/fetch-one?from=USD&to=EGP&api_key=e5fdcf09dd-3a41a7f9b4-tlcvn4 that is the url of exchange currencies api rates update to dated daily
-
-
-{"base":"USD","result":{"EGP":51.8158},"updated":"2026-09-15T14:17:21Z","ms":4}
+the requests from gateway to any api is return badgaateway in test environment with url https://welco-gateway.runasp.net

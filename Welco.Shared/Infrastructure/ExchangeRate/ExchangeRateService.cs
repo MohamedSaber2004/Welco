@@ -6,10 +6,6 @@ using Welco.Shared.Common.Options;
 
 namespace Welco.Shared.Infrastructure.ExchangeRate
 {
-    /// <summary>
-    /// No caching: every call hits FastForex fetch-one directly
-    /// (GET fetch-one?from={FROM}&amp;to={TO}&amp;api_key={KEY}).
-    /// </summary>
     public class ExchangeRateService : IExchangeRateService
     {
         private readonly IExchangeRateProvider _provider;
@@ -138,7 +134,6 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
         public async Task<IReadOnlyCollection<ExchangeRateDto>> GetLatestRatesAsync(string baseCurrency, CancellationToken cancellationToken)
         {
             baseCurrency = NormalizeCode(baseCurrency);
-            // No cache: fetch live from FastForex fetch-one on every call.
             var targetCodes = new[] { "USD", "EUR", "GBP", "EGP", "SAR", "AED", "DZD" };
             var response = await _provider.GetLatestRatesAsync(baseCurrency, targetCodes, cancellationToken);
             return response.Rates

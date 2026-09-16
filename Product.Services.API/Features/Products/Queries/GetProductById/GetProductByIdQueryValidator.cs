@@ -1,4 +1,5 @@
 using FluentValidation;
+using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Localization;
 
 namespace Product.Services.API.Features.Products.Queries.GetProductById

@@ -30,7 +30,7 @@ namespace Welco.API.Services
             var cacheDir = Path.Combine(ocelotDir, "Cache");
             if (!Directory.Exists(cacheDir))
             {
-                try { Directory.CreateDirectory(cacheDir); } catch {  }
+                try { Directory.CreateDirectory(cacheDir); } catch { }
             }
 
             var downstreamEndpoints = await GetDownstreamOpenApiEndpointsAsync(cancellationToken);
@@ -88,7 +88,7 @@ namespace Welco.API.Services
             {
                 if (serviceObj == null) continue;
 
-if (serviceObj.TryGetPropertyValue("paths", out var pathsNode) && pathsNode is JsonObject pathsObj)
+                if (serviceObj.TryGetPropertyValue("paths", out var pathsNode) && pathsNode is JsonObject pathsObj)
                 {
                     foreach (var (pathKey, pathValue) in pathsObj)
                     {
@@ -100,7 +100,7 @@ if (serviceObj.TryGetPropertyValue("paths", out var pathsNode) && pathsNode is J
                     }
                 }
 
-if (serviceObj.TryGetPropertyValue("components", out var componentsNode) && componentsNode is JsonObject componentsObj)
+                if (serviceObj.TryGetPropertyValue("components", out var componentsNode) && componentsNode is JsonObject componentsObj)
                 {
                     if (componentsObj.TryGetPropertyValue("schemas", out var schemasNode) && schemasNode is JsonObject schemasObj)
                     {
@@ -114,7 +114,7 @@ if (serviceObj.TryGetPropertyValue("components", out var componentsNode) && comp
                     }
                 }
 
-if (serviceObj.TryGetPropertyValue("tags", out var tagsNode) && tagsNode is JsonArray tagsArray)
+                if (serviceObj.TryGetPropertyValue("tags", out var tagsNode) && tagsNode is JsonArray tagsArray)
                 {
                     foreach (var tag in tagsArray)
                     {
@@ -199,7 +199,7 @@ if (serviceObj.TryGetPropertyValue("tags", out var tagsNode) && tagsNode is Json
             var cacheDir = Path.Combine(ocelotDir, "Cache");
             if (!Directory.Exists(cacheDir))
             {
-                try { Directory.CreateDirectory(cacheDir); } catch {  }
+                try { Directory.CreateDirectory(cacheDir); } catch { }
             }
 
             var endpoints = await GetDownstreamOpenApiEndpointsAsync(cancellationToken);
@@ -286,7 +286,7 @@ if (serviceObj.TryGetPropertyValue("tags", out var tagsNode) && tagsNode is Json
                         }
                         catch
                         {
-                            
+
                         }
 
                         var serviceNode = JsonNode.Parse(content);
@@ -310,7 +310,7 @@ if (serviceObj.TryGetPropertyValue("tags", out var tagsNode) && tagsNode is Json
                 }
             }
 
-if (File.Exists(cacheFile))
+            if (File.Exists(cacheFile))
             {
                 try
                 {
@@ -358,7 +358,7 @@ if (File.Exists(cacheFile))
             }
             catch
             {
-                
+
             }
 
             return openApiJson;

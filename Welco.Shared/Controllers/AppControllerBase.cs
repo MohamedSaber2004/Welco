@@ -14,7 +14,7 @@ namespace Welco.Shared.Controllers
     {
         protected readonly IMediator _mediator;
 
-protected AppControllerBase(IMediator mediator)
+        protected AppControllerBase(IMediator mediator)
         {
             _mediator = mediator;
         }
@@ -53,8 +53,8 @@ protected AppControllerBase(IMediator mediator)
                     return AppLanguageExtensions.FromCode(hCulture).ToCode();
                 }
 
-                var qCulture = req.Query["culture"].FirstOrDefault() 
-                               ?? req.Query["ui-culture"].FirstOrDefault() 
+                var qCulture = req.Query["culture"].FirstOrDefault()
+                               ?? req.Query["ui-culture"].FirstOrDefault()
                                ?? req.Query["lang"].FirstOrDefault()
                                ?? req.Query["language"].FirstOrDefault();
 

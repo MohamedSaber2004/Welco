@@ -1,4 +1,5 @@
 using FluentValidation;
+using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Localization;
 
 namespace Content.Services.API.Features.LandingPages.Commands.CreateLandingPage

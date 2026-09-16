@@ -20,7 +20,13 @@ namespace UserManamgent.Service.API.Controllers
         {
         }
 
-                [HttpGet]
+        /// <summary>
+        /// Get All Addresses By User Id
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpGet]
         [Route(UserManagementApiRoutes.Addresses.GetAllByUser)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllByUser([FromRoute] Guid userId, CancellationToken cancellationToken)
@@ -29,7 +35,13 @@ namespace UserManamgent.Service.API.Controllers
             return ToActionResult(result);
         }
 
-                [HttpGet]
+        /// <summary>
+        /// Get Address By Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpGet]
         [Route(UserManagementApiRoutes.Addresses.GetById)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -39,7 +51,13 @@ namespace UserManamgent.Service.API.Controllers
             return ToActionResult(result);
         }
 
-                [HttpPost]
+        /// <summary>
+        /// Create Address
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpPost]
         [Route(UserManagementApiRoutes.Addresses.Create)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -50,7 +68,14 @@ namespace UserManamgent.Service.API.Controllers
             return ToActionResult(result);
         }
 
-                [HttpPut]
+        /// <summary>
+        /// Edit Address
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="command"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpPut]
         [Route(UserManagementApiRoutes.Addresses.Update)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -62,7 +87,13 @@ namespace UserManamgent.Service.API.Controllers
             return ToActionResult(result);
         }
 
-                [HttpDelete]
+        /// <summary>
+        /// Delete Address
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpDelete]
         [Route(UserManagementApiRoutes.Addresses.Delete)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

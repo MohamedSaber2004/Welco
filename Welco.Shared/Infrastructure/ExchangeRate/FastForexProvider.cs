@@ -25,8 +25,6 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             _logger = logger;
             if (_httpClient.Timeout == System.Threading.Timeout.InfiniteTimeSpan)
                 _httpClient.Timeout = TimeSpan.FromSeconds(_settings.TimeoutSeconds > 0 ? _settings.TimeoutSeconds : 10);
-            // NOTE: FastForex uses ?api_key= query param, NOT a Bearer header.
-            // Do not set Authorization here.
         }
 
         private string ApiKey
@@ -53,10 +51,6 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             return codes;
         }
 
-        /// <summary>
-        /// Single fetch-one call: GET fetch-one?from={from}&amp;to={to}&amp;api_key={key}.
-        /// Returns (rate, rateDate) dated from the "updated" field (daily).
-        /// </summary>
         private async Task<(decimal Rate, DateOnly RateDate)> FetchOneAsync(string from, string to, CancellationToken ct)
         {
             from = from.Trim().ToUpperInvariant();
@@ -93,8 +87,6 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 dict[r.Target] = r.Rate;
                 if (r.Date > rateDate) rateDate = r.Date;
             }
-            // Daily dating: all fetch-one "updated" values fall on the same UTC day.
-            // Use the latest day seen so the whole table shares one RateDate.
             if (results.Length > 0) rateDate = results.Max(r => r.Date);
 
             return new ExchangeRateResponse
