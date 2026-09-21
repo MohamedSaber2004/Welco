@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "https://welco-commerce.runasp.net/"
+      "url": "https://localhost:7045/"
     }
   ],
   "paths": {
@@ -360,84 +360,6 @@
         }
       }
     },
-    "/api/integration/inventory/check": {
-      "post": {
-        "tags": [
-          "IntegrationInventory"
-        ],
-        "parameters": [
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CheckInventoryQuery"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CheckInventoryQuery"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CheckInventoryQuery"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/integration/inventory/reserve": {
-      "post": {
-        "tags": [
-          "IntegrationInventory"
-        ],
-        "parameters": [
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReserveInventoryCommand"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReserveInventoryCommand"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ReserveInventoryCommand"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/v1/orders": {
       "get": {
         "tags": [
@@ -676,17 +598,6 @@
           }
         }
       },
-      "CheckInventoryQuery": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/InventoryCheckItem"
-            }
-          }
-        }
-      },
       "CreateCartCommand": {
         "type": "object",
         "properties": {
@@ -782,34 +693,6 @@
           }
         }
       },
-      "InventoryCheckItem": {
-        "type": "object",
-        "properties": {
-          "welcoProductId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "requestedQuantity": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          }
-        }
-      },
-      "ReserveInventoryCommand": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/InventoryCheckItem"
-            }
-          }
-        }
-      },
       "UpdateCartItemCommand": {
         "type": "object",
         "properties": {
@@ -851,9 +734,6 @@
     },
     {
       "name": "Carts"
-    },
-    {
-      "name": "IntegrationInventory"
     },
     {
       "name": "Orders"

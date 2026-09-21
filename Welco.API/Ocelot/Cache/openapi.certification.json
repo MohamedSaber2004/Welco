@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "https://welco-certification.runasp.net/"
+      "url": "https://localhost:7101/"
     }
   ],
   "paths": {
@@ -410,53 +410,6 @@
           }
         }
       }
-    },
-    "/api/integration/certifications": {
-      "get": {
-        "tags": [
-          "IntegrationCertifications"
-        ],
-        "parameters": [
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/integration/certifications/{id}": {
-      "get": {
-        "tags": [
-          "IntegrationCertifications"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
     }
   },
   "components": {
@@ -597,9 +550,6 @@
     },
     {
       "name": "Certifications"
-    },
-    {
-      "name": "IntegrationCertifications"
     }
   ]
 }
