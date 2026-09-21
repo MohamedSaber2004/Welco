@@ -23,12 +23,13 @@ namespace Product.Services.API.ProductRoutes
         {
             public const string Base = ProductApiRoutes.Base;
             public const string GetAll = "";
-            public const string GetById = "{id}";
+            public const string GetById = "{id:guid}";
+            public const string GetMine = "mine";
             public const string Create = "";
-            public const string Update = "{id}";
-            public const string Delete = "{id}";
-            public const string GetVideos = "{id}/videos";
-            public const string UpdateVideos = "{id}/videos";
+            public const string Update = "{id:guid}";
+            public const string Delete = "{id:guid}";
+            public const string GetVideos = "{id:guid}/videos";
+            public const string UpdateVideos = "{id:guid}/videos";
         }
 
         public static class Currencies

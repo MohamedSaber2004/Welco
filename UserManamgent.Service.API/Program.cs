@@ -57,7 +57,6 @@ namespace UserManamgent.Service.API
 
             builder.Services.AddControllers(options =>
             {
-                options.Conventions.Add(new IntegrationRouteConvention(builder.Configuration));
             });
             builder.Services.AddJsonLocalization();
             builder.Services.AddWelcoSharedDependencies(builder.Configuration);
@@ -130,3 +129,4 @@ using (var scope = app.Services.CreateScope())
         }
     }
 }
+

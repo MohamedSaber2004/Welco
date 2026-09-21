@@ -177,24 +177,6 @@ namespace Welco.API.Services
             return "{}";
         }
 
-        public async Task<string> GetIntegrationOpenApiAsync(string gatewayBaseUrl, CancellationToken cancellationToken = default)
-        {
-            var allJson = await GetAggregatedOpenApiAsync(gatewayBaseUrl, cancellationToken);
-            var node = JsonNode.Parse(allJson);
-            if (node is not JsonObject obj) return allJson;
-            if (obj["info"] is JsonObject info)
-            {
-                info["title"] = "Welco Integration API";
-                info["description"] = "External integration endpoints (ServiceAuth service-secret). Internal /api/v1/* excluded.";
-            }
-            if (obj["paths"] is JsonObject paths)
-            {
-                var toRemove = paths.Where(kv => !kv.Key.StartsWith("/api/integration/", StringComparison.OrdinalIgnoreCase)).Select(kv => kv.Key).ToList();
-                foreach (var k in toRemove) paths.Remove(k);
-            }
-            return obj.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
-        }
-
         public async Task WarmUpAsync(CancellationToken cancellationToken = default)
         {
             var ocelotDir = Path.Combine(_env.ContentRootPath, "Ocelot");

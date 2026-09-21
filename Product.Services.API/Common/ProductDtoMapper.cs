@@ -26,6 +26,8 @@ namespace Product.Services.API.Common
             CategoryId = p.CategoryId,
             CategoryNameEn = p.Category != null ? p.Category.NameEn : null,
             CategoryNameAr = p.Category != null ? p.Category.NameAr : null,
+            CompanyId = p.CompanyId,
+            CompanyName = p.Company != null ? p.Company.Name : null,
             IsActive = p.IsActive,
             CreatedAt = p.CreatedAt,
             UpdatedAt = p.UpdatedAt

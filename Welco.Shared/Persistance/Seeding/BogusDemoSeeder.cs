@@ -256,7 +256,7 @@ List<Category> leaves;
                             $"demo/products/{slug}.jpg",
                             material, length,
                             usd?.Id,
-                            leaf.Id, Marker);
+                            leaf.Id, null, Marker);
                         products.Add(product);
                         specs.Add(new ProductSpecification { Id = Guid.NewGuid(), ProductId = product.Id, AttrName = "Material", AttrValue = material });
                         specs.Add(new ProductSpecification { Id = Guid.NewGuid(), ProductId = product.Id, AttrName = "Sterilization", AttrValue = "Autoclave 134°C" });

@@ -1,4 +1,5 @@
 using MediatR;
+using Product.Services.API.Features.Shared;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Localization;
@@ -26,6 +27,15 @@ namespace Product.Services.API.Features.Products.Commands.DeleteProduct
             var product = await productRepo.GetByIdAsync(request.Id, cancellationToken);
 
             if (product == null || product.IsDeleted)
+            {
+                return Result<string>.NotFound(LocalizationKeys.Product.NotFound);
+            }
+
+            // Mediator model: providers may only delete their own company's
+            // products (see UpdateProductCommandHandler).
+            var scope = await ProviderScope.GetAsync(_unitOfWork, _currentUserService, cancellationToken);
+            if (scope.IsOrganizationUser &&
+                (!scope.CompanyId.HasValue || product.CompanyId != scope.CompanyId.Value))
             {
                 return Result<string>.NotFound(LocalizationKeys.Product.NotFound);
             }

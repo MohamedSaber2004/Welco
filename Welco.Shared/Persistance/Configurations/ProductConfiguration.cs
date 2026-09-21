@@ -58,8 +58,16 @@ namespace Welco.Shared.Persistance.Configurations
                 .HasForeignKey(x => x.CurrencyId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Property(x => x.CompanyId);
+
+            builder.HasOne(x => x.Company)
+                .WithMany(x => x.Products)
+                .HasForeignKey(x => x.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.HasIndex(x => x.CategoryId);
             builder.HasIndex(x => x.CurrencyId);
+            builder.HasIndex(x => x.CompanyId);
 
             builder.Property(x => x.CreatedBy)
                 .IsRequired();

@@ -84,33 +84,18 @@ namespace Welco.Shared.Common.Attributes
                 string secret;
                 if (!string.IsNullOrWhiteSpace(clientId))
                 {
-                    var match = settings.Clients?
-                        .FirstOrDefault(kvp => string.Equals(kvp.Key, clientId, StringComparison.OrdinalIgnoreCase));
-
-                    if (match?.Value is null || string.IsNullOrWhiteSpace(match.Value.Value.Secret))
-                    {
-                        logger.LogWarning("[ServiceAuth] Unknown integration client ClientId={ClientId}.", clientId);
-                        return false;
-                    }
-
-                    secret = match.Value.Value.Secret;
-                    if (secret.Length < 32)
-                    {
-                        logger.LogWarning("[ServiceAuth] Misconfigured secret for integration client ClientId={ClientId} (min 32 chars).", clientId);
-                        return false;
-                    }
+                    logger.LogWarning("[ServiceAuth] Client-specific authentication is no longer supported.");
+                    return false;
                 }
-                else
+
+                logger.LogWarning("[ServiceAuth] Legacy service token without client_id.");
+                if (string.IsNullOrWhiteSpace(settings.ServiceSecret) || settings.ServiceSecret.Length < 32)
                 {
-                    logger.LogWarning("[ServiceAuth] Legacy service token without client_id.");
-                    if (string.IsNullOrWhiteSpace(settings.ServiceSecret) || settings.ServiceSecret.Length < 32)
-                    {
-                        logger.LogError("[ServiceAuth] WelcoServiceSettings.ServiceSecret is not configured (min 32 chars).");
-                        return false;
-                    }
-
-                    secret = settings.ServiceSecret;
+                    logger.LogError("[ServiceAuth] WelcoServiceSettings.ServiceSecret is not configured (min 32 chars).");
+                    return false;
                 }
+
+                secret = settings.ServiceSecret;
 
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
 

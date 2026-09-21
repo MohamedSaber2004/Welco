@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Product.Services.API.Common;
+using Product.Services.API.Features.Shared;
 using Welco.Shared.Common.DTOs.Products;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
@@ -31,6 +32,14 @@ namespace Product.Services.API.Features.Products.Commands.UpdateProduct
             var product = await productRepo.GetByIdAsync(request.Id, cancellationToken);
 
             if (product == null || product.IsDeleted)
+                return Result<ProductDto>.NotFound(LocalizationKeys.Product.NotFound);
+
+            // Mediator model: providers may only touch their own company's
+            // products. Legacy/global items (CompanyId = null) stay
+            // Admin/WelcoStaff-only. Return NotFound to avoid leaking existence.
+            var scope = await ProviderScope.GetAsync(_unitOfWork, _currentUserService, cancellationToken);
+            if (scope.IsOrganizationUser &&
+                (!scope.CompanyId.HasValue || product.CompanyId != scope.CompanyId.Value))
                 return Result<ProductDto>.NotFound(LocalizationKeys.Product.NotFound);
 
             if (!string.Equals(product.Sku, request.Sku.Trim(), StringComparison.OrdinalIgnoreCase))

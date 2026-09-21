@@ -35,7 +35,6 @@ namespace Welco.Shared
                 services.Configure<EmailSettings>(configuration.GetSection(EmailSettings.SectionName));
                 services.Configure<ExchangeRateSettings>(configuration.GetSection(ExchangeRateSettings.SectionName));
                 services.Configure<WelcoServiceSettings>(configuration.GetSection(WelcoServiceSettings.SectionName));
-                services.Configure<IntegrationRoutesOptions>(configuration.GetSection(IntegrationRoutesOptions.SectionName));
             }
             else
             {
@@ -60,18 +59,12 @@ namespace Welco.Shared
                     {
                         config.GetSection(WelcoServiceSettings.SectionName).Bind(options);
                     });
-                services.AddOptions<IntegrationRoutesOptions>()
-                    .Configure<IConfiguration>((options, config) =>
-                    {
-                        config.GetSection(IntegrationRoutesOptions.SectionName).Bind(options);
-                    });
             }
 
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<JwtSettings>>().Value);
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<EmailSettings>>().Value);
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value);
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<WelcoServiceSettings>>().Value);
-            services.AddSingleton(sp => sp.GetRequiredService<IOptions<IntegrationRoutesOptions>>().Value);
 
             services.AddDbContext<WelcoDbContext>((serviceProvider, options) =>
             {
@@ -156,3 +149,5 @@ namespace Welco.Shared
         }
     }
 }
+
+

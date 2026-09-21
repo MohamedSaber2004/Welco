@@ -58,7 +58,6 @@ namespace Content.Services.API
 
             builder.Services.AddControllers(options =>
             {
-                options.Conventions.Add(new IntegrationRouteConvention(builder.Configuration));
             });
             builder.Services.AddJsonLocalization();
             builder.Services.AddWelcoSharedDependencies(builder.Configuration);
@@ -135,3 +134,4 @@ if (!app.Environment.IsEnvironment("Test"))
         }
     }
 }
+

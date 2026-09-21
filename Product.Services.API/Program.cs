@@ -59,7 +59,6 @@ var env = builder.Environment;
 
             builder.Services.AddControllers(options =>
             {
-                options.Conventions.Add(new Welco.Shared.Common.Extensions.IntegrationRouteConvention(builder.Configuration));
             });
             builder.Services.AddJsonLocalization();
             builder.Services.AddWelcoSharedDependencies(builder.Configuration);
@@ -157,3 +156,4 @@ if (BogusDemoSeeder.ShouldSeedDemoData(app.Environment, app.Configuration, out v
         }
     }
 }
+

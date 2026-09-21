@@ -375,9 +375,7 @@ namespace Welco.API
                             endpoints.MapGet(doc.DocRoute, async (HttpContext httpContext, Welco.API.Services.OpenApiAggregatorService aggregator, CancellationToken ct) =>
                             {
                                 var gatewayBaseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
-                                var json = docServiceName.Equals("integration", StringComparison.OrdinalIgnoreCase)
-                                    ? await aggregator.GetIntegrationOpenApiAsync(gatewayBaseUrl, ct)
-                                    : await aggregator.GetServiceOpenApiAsync(docServiceName, gatewayBaseUrl, ct);
+                                var json = await aggregator.GetServiceOpenApiAsync(docServiceName, gatewayBaseUrl, ct);
                                 return Results.Content(json, "application/json");
                             });
 

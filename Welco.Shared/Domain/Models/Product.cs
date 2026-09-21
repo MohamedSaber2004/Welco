@@ -17,9 +17,15 @@ namespace Welco.Shared.Domain.Models
         public decimal? LengthCm { get; set; }
         public Guid? CurrencyId { get; set; }
         public Guid CategoryId { get; set; }
+        /// <summary>
+        /// Owning provider company (mediator model). Null = legacy/global
+        /// catalog item, manageable only by Admin/WelcoStaff.
+        /// </summary>
+        public Guid? CompanyId { get; set; }
 
         public virtual Currency? Currency { get; set; }
         public virtual Category? Category { get; set; }
+        public virtual Company? Company { get; set; }
 
         public static Product Create(
             string nameEn,
@@ -35,6 +41,7 @@ namespace Welco.Shared.Domain.Models
             decimal? lengthCm,
             Guid? currencyId,
             Guid categoryId,
+            Guid? companyId,
             string createdBy)
         {
             var product = new Product
@@ -52,7 +59,8 @@ namespace Welco.Shared.Domain.Models
                 Material = material,
                 LengthCm = lengthCm,
                 CurrencyId = currencyId,
-                CategoryId = categoryId
+                CategoryId = categoryId,
+                CompanyId = companyId
             };
             product.MarkAsCreated(createdBy);
             return product;

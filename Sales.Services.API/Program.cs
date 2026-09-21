@@ -54,7 +54,6 @@ namespace Sales.Services.API
 
             builder.Services.AddControllers(options =>
             {
-                options.Conventions.Add(new Welco.Shared.Common.Extensions.IntegrationRouteConvention(builder.Configuration));
             });
             builder.Services.AddJsonLocalization();
             builder.Services.AddWelcoSharedDependencies(builder.Configuration);
@@ -114,3 +113,4 @@ namespace Sales.Services.API
         }
     }
 }
+

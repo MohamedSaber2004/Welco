@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Product.Services.API.Features.Shared;
 using Welco.Shared.Common.DTOs.Products;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
@@ -24,8 +25,15 @@ namespace Product.Services.API.Features.Products.Commands.UpdateProductVideos
         public async Task<Result<IReadOnlyList<ProductMediaDto>>> Handle(UpdateProductVideosCommand request, CancellationToken cancellationToken)
         {
             var productRepo = _unitOfWork.GetRepository<ProductEntity, Guid>();
-            var exists = await productRepo.ExistsAsync(p => !p.IsDeleted && p.Id == request.ProductId, cancellationToken);
-            if (!exists)
+            var product = await productRepo.GetByIdAsync(request.ProductId, cancellationToken);
+            if (product == null || product.IsDeleted)
+                return Result<IReadOnlyList<ProductMediaDto>>.NotFound(LocalizationKeys.Product.NotFound);
+
+            // Mediator model: providers may only manage videos of their own
+            // company's products.
+            var scope = await ProviderScope.GetAsync(_unitOfWork, _currentUserService, cancellationToken);
+            if (scope.IsOrganizationUser &&
+                (!scope.CompanyId.HasValue || product.CompanyId != scope.CompanyId.Value))
                 return Result<IReadOnlyList<ProductMediaDto>>.NotFound(LocalizationKeys.Product.NotFound);
 
             var currentUserId = _currentUserService.UserId != Guid.Empty

@@ -46,7 +46,7 @@ namespace Product.Services.API.Controllers
 
 [HttpPost]
         [Route(ProductApiRoutes.Categories.Create)]
-        [RoleAuthorize(UserType.Admin, UserType.WelcoStaff)]
+        [RoleAuthorize(UserType.Admin, UserType.WelcoStaff, UserType.OrganizationUser)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateCategoryCommand command, CancellationToken cancellationToken)

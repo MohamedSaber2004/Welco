@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Product.Services.API.Common;
+using Product.Services.API.Features.Shared;
 using Welco.Shared.Common.DTOs.Products;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
@@ -54,6 +55,18 @@ namespace Product.Services.API.Features.Products.Commands.CreateProduct
 
             var currentUserId = _currentUserService.UserId != Guid.Empty ? _currentUserService.UserId.ToString() : "System";
 
+            // Mediator model: OrganizationUser products are owned by their
+            // company (resolved server-side from claims, never from input).
+            // Admin/Staff create legacy/global items (CompanyId = null).
+            var scope = await ProviderScope.GetAsync(_unitOfWork, _currentUserService, cancellationToken);
+            Guid? companyId = null;
+            if (scope.IsOrganizationUser)
+            {
+                if (!scope.CompanyId.HasValue)
+                    return Result<ProductDto>.Forbidden();
+                companyId = scope.CompanyId.Value;
+            }
+
             var product = ProductEntity.Create(
                 request.NameEn.Trim(),
                 request.NameAr.Trim(),
@@ -68,6 +81,7 @@ namespace Product.Services.API.Features.Products.Commands.CreateProduct
                 request.LengthCm,
                 request.CurrencyId,
                 request.CategoryId,
+                companyId,
                 currentUserId);
 
             await productRepo.AddAsync(product, cancellationToken);
