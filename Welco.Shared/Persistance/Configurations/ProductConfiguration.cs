@@ -23,7 +23,10 @@ namespace Welco.Shared.Persistance.Configurations
             builder.Property(x => x.Sku)
                 .IsRequired()
                 .HasMaxLength(50);
-            builder.HasIndex(x => x.Sku).IsUnique();
+            // Mediator model: the same SKU can be supplied by many companies.
+            // Uniqueness is per owning company (legacy/global rows with
+            // CompanyId = null share one scope).
+            builder.HasIndex(x => new { x.CompanyId, x.Sku }).IsUnique();
 
             builder.Property(x => x.Slug)
                 .IsRequired()

@@ -30,8 +30,20 @@ namespace Product.Services.API.Features.Products.Commands.CreateProduct
         {
             var productRepo = _unitOfWork.GetRepository<ProductEntity, Guid>();
 
+            // Mediator model: OrganizationUser products are owned by their
+            // company (resolved server-side from claims, never from input).
+            // Admin/Staff create legacy/global items (CompanyId = null).
+            var scope = await ProviderScope.GetAsync(_unitOfWork, _currentUserService, cancellationToken);
+            Guid? companyId = null;
+            if (scope.IsOrganizationUser)
+            {
+                if (!scope.CompanyId.HasValue)
+                    return Result<ProductDto>.Forbidden();
+                companyId = scope.CompanyId.Value;
+            }
+
             var sku = request.Sku.Trim();
-            var skuExists = await productRepo.ExistsAsync(p => !p.IsDeleted && p.Sku.ToLower() == sku.ToLower(), cancellationToken);
+            var skuExists = await productRepo.ExistsAsync(p => !p.IsDeleted && p.CompanyId == companyId && p.Sku.ToLower() == sku.ToLower(), cancellationToken);
             if (skuExists)
                 return Result<ProductDto>.Conflict(LocalizationKeys.Product.SkuAlreadyExists);
 
@@ -54,18 +66,6 @@ namespace Product.Services.API.Features.Products.Commands.CreateProduct
             }
 
             var currentUserId = _currentUserService.UserId != Guid.Empty ? _currentUserService.UserId.ToString() : "System";
-
-            // Mediator model: OrganizationUser products are owned by their
-            // company (resolved server-side from claims, never from input).
-            // Admin/Staff create legacy/global items (CompanyId = null).
-            var scope = await ProviderScope.GetAsync(_unitOfWork, _currentUserService, cancellationToken);
-            Guid? companyId = null;
-            if (scope.IsOrganizationUser)
-            {
-                if (!scope.CompanyId.HasValue)
-                    return Result<ProductDto>.Forbidden();
-                companyId = scope.CompanyId.Value;
-            }
 
             var product = ProductEntity.Create(
                 request.NameEn.Trim(),

@@ -73,8 +73,8 @@ namespace Welco.Shared.Persistance.Seeding
             ("CityCare Hospitals Group", "citycare.svg", CompanyType.Hospital),
             ("Nova Health Clinic", "nova-health.svg", CompanyType.Clinic),
             ("PrimeCare Medical", "primecare.svg", CompanyType.Clinic),
-            ("Sahara Med Import", "sahara-med.svg", CompanyType.Distributor),
-            ("Delta Surgical Co.", "delta-surgical.svg", CompanyType.Distributor),
+            ("Sahara Med Import", "sahara-med.svg", CompanyType.Supplier),
+            ("Delta Surgical Co.", "delta-surgical.svg", CompanyType.Supplier),
             ("LifeLine Hospitals", "lifeline.svg", CompanyType.Hospital),
             ("OrthoPlus Distributors", "orthoplus.svg", CompanyType.Distributor),
             ("CarePoint Clinics", "carepoint.svg", CompanyType.Clinic),
@@ -359,7 +359,56 @@ List<Category> leaves;
                 logger.LogInformation("Bogus seeded {Count} companies (+addresses).", companies.Count);
                 }
 
-var password = DemoPassword(config);
+                // Mediator model linkage: distribute catalog items that have no
+                // owner across approved provider companies (round-robin), so
+                // provider storefronts, category providers, and the shared-SKU
+                // (multi-supplier) scenarios are testable from seed data.
+                var providerPool = companies
+                    .Where(c => c.Status == CompanyStatus.Approved && c.IsProvider)
+                    .ToList();
+                if (providerPool.Count == 0)
+                    providerPool = companies.Where(c => c.Status == CompanyStatus.Approved).ToList();
+                var unlinkedProducts = products.Where(p => !p.IsDeleted && p.CompanyId == null).ToList();
+                for (var pi = 0; pi < unlinkedProducts.Count; pi++)
+                {
+                    if (providerPool.Count == 0) break;
+                    unlinkedProducts[pi].CompanyId = providerPool[pi % providerPool.Count].Id;
+                }
+                if (unlinkedProducts.Count > 0 && providerPool.Count > 0)
+                {
+                    await db.SaveChangesAsync(ct);
+                    logger.LogInformation("Bogus linked {Count} products to {Providers} provider companies.", unlinkedProducts.Count, providerPool.Count);
+                }
+
+                // Shared-SKU demo: the same instrument supplied by two providers
+                // at different prices (drives the product "Offered by" scenario).
+                if (providerPool.Count >= 2 && leaves.Count > 0)
+                {
+                    const string sharedSku = "WL-SHARED-001";
+                    var sharedExists = await db.Products.AnyAsync(p => !p.IsDeleted && p.Sku == sharedSku, ct);
+                    if (!sharedExists)
+                    {
+                        var demoCat = leaves[0];
+                        var compA = providerPool[0];
+                        var compB = providerPool[1];
+                        db.Products.Add(Product.Create(
+                            "Metzenbaum Dissecting Scissors", "مقص تشريح ميتزنباوم",
+                            sharedSku, "metzenbaum-dissecting-scissors-a",
+                            "Demo shared listing from provider A.", 310.80m, 24,
+                            null, null, "German Stainless Steel", 18m, null,
+                            demoCat.Id, compA.Id, Marker));
+                        db.Products.Add(Product.Create(
+                            "Metzenbaum Dissecting Scissors", "مقص تشريح ميتزنباوم",
+                            sharedSku, "metzenbaum-dissecting-scissors-b",
+                            "Demo shared listing from provider B.", 289.50m, 12,
+                            null, null, "German Stainless Steel", 18m, null,
+                            demoCat.Id, compB.Id, Marker));
+                        await db.SaveChangesAsync(ct);
+                        logger.LogInformation("Bogus seeded shared-SKU demo listings for {A} and {B}.", compA.Name, compB.Name);
+                    }
+                }
+
+                var password = DemoPassword(config);
                 var staff = new List<ApplicationUser>();
                 for (var i = 1; i <= 2; i++)
                 {

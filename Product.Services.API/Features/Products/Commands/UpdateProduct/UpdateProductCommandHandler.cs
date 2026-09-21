@@ -42,9 +42,13 @@ namespace Product.Services.API.Features.Products.Commands.UpdateProduct
                 (!scope.CompanyId.HasValue || product.CompanyId != scope.CompanyId.Value))
                 return Result<ProductDto>.NotFound(LocalizationKeys.Product.NotFound);
 
+            // SKU uniqueness is per owning company (same instrument may be
+            // supplied by many providers).
+            var scopeId = scope.IsOrganizationUser ? scope.CompanyId : product.CompanyId;
+
             if (!string.Equals(product.Sku, request.Sku.Trim(), StringComparison.OrdinalIgnoreCase))
             {
-                var skuExists = await productRepo.ExistsAsync(p => !p.IsDeleted && p.Id != request.Id && p.Sku.ToLower() == request.Sku.Trim().ToLower(), cancellationToken);
+                var skuExists = await productRepo.ExistsAsync(p => !p.IsDeleted && p.Id != request.Id && p.CompanyId == scopeId && p.Sku.ToLower() == request.Sku.Trim().ToLower(), cancellationToken);
                 if (skuExists) return Result<ProductDto>.Conflict(LocalizationKeys.Product.SkuAlreadyExists);
             }
             if (!string.Equals(product.Slug, request.Slug.Trim(), StringComparison.OrdinalIgnoreCase))
