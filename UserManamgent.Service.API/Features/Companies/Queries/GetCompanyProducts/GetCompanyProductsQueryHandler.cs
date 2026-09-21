@@ -24,6 +24,19 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetCompanyProduct
                 query = query.Where(p => p.CategoryId == targetCatId || (p.Category != null && p.Category.ParentCategoryId == targetCatId));
             }
 
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+            {
+                var term = request.SearchTerm.Trim().ToLower();
+                query = query.Where(p =>
+                    p.NameEn.ToLower().Contains(term) ||
+                    p.NameAr.ToLower().Contains(term) ||
+                    p.Sku.ToLower().Contains(term) ||
+                    (p.Material != null && p.Material.ToLower().Contains(term)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Sku))
+                query = query.Where(p => p.Sku.ToLower().Contains(request.Sku.Trim().ToLower()));
+
             query = query.OrderByDescending(p => p.CreatedAt);
 
             return await query.ToPaginatedListAsync(p => new ProductDto

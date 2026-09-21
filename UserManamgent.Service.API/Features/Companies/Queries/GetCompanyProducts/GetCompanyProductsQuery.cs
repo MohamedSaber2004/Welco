@@ -12,6 +12,8 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetCompanyProduct
     {
         public Guid CompanyId { get; set; }
         public Guid? CategoryId { get; set; }
+        public string? SearchTerm { get; set; }
+        public string? Sku { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
     }
