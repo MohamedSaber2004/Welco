@@ -7,6 +7,7 @@ using UserManamgent.Service.API.Features.Companies.Commands.DeleteCompany;
 using UserManamgent.Service.API.Features.Companies.Commands.UpdateCompany;
 using UserManamgent.Service.API.Features.Companies.Queries.GetCompanies;
 using UserManamgent.Service.API.Features.Companies.Queries.GetCompanyById;
+using UserManamgent.Service.API.Features.Companies.Queries.GetCompanyProducts;
 using UserManamgent.Service.API.Features.Companies.Queries.GetMyCompany;
 using UserManamgent.Service.API.UserManagementRoutes;
 using Welco.Shared.Common.Attributes;
@@ -21,6 +22,7 @@ namespace UserManamgent.Service.API.Controllers
     {
         public CompaniesController(IMediator mediator) : base(mediator) { }
         [HttpGet][Route(UserManagementApiRoutes.Companies.GetMyCompany)] public async Task<IActionResult> GetMyCompany(CancellationToken ct) => ToActionResult(await _mediator.Send(new GetMyCompanyQuery(), ct));
+        [HttpGet][Route(UserManagementApiRoutes.Companies.GetProducts)][AllowAnonymous] public async Task<IActionResult> GetProducts([FromRoute] Guid companyId, [FromQuery] GetCompanyProductsQuery q, CancellationToken ct) { q.CompanyId = companyId; return ToActionResult(await _mediator.Send(q, ct)); }
         [HttpGet][Route(UserManagementApiRoutes.Companies.GetAll)][AllowAnonymous] public async Task<IActionResult> GetAll([FromQuery] GetCompaniesQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
         [HttpGet][Route(UserManagementApiRoutes.Companies.GetById)] public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetCompanyByIdQuery { Id = id }, ct));
         [HttpPost][Route(UserManagementApiRoutes.Companies.Create)][RoleAuthorize(UserType.Admin)] public async Task<IActionResult> Create([FromBody] CreateCompanyCommand c, CancellationToken ct) => ToActionResult(await _mediator.Send(c, ct));

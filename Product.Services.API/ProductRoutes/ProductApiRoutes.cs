@@ -17,6 +17,7 @@ namespace Product.Services.API.ProductRoutes
             public const string Update = "{id}";
             public const string Delete = "{id}";
             public const string GetProductsByCategory = "{categoryId}/products";
+            public const string GetProviders = "{categoryId}/providers";
         }
 
         public static class Products
@@ -25,6 +26,7 @@ namespace Product.Services.API.ProductRoutes
             public const string GetAll = "";
             public const string GetById = "{id:guid}";
             public const string GetMine = "mine";
+            public const string GetProvidersBySku = "by-sku/{sku}/providers";
             public const string Create = "";
             public const string Update = "{id:guid}";
             public const string Delete = "{id:guid}";
