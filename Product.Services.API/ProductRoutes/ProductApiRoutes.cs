@@ -32,6 +32,8 @@ namespace Product.Services.API.ProductRoutes
             public const string Delete = "{id:guid}";
             public const string GetVideos = "{id:guid}/videos";
             public const string UpdateVideos = "{id:guid}/videos";
+            public const string GetMostSelling = "most-selling";
+            public const string GetTopSelling = "top-selling";
         }
 
         public static class Currencies

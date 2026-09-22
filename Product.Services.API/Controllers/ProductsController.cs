@@ -6,6 +6,7 @@ using Product.Services.API.Features.Products.Commands.CreateProduct;
 using Product.Services.API.Features.Products.Commands.DeleteProduct;
 using Product.Services.API.Features.Products.Commands.UpdateProduct;
 using Product.Services.API.Features.Products.Commands.UpdateProductVideos;
+using Product.Services.API.Features.Products.Queries.GetMostSellingProducts;
 using Product.Services.API.Features.Products.Queries.GetMyProducts;
 using Product.Services.API.Features.Products.Queries.GetSkuProviders;
 using Product.Services.API.Features.Products.Queries.GetProductById;
@@ -18,12 +19,21 @@ using Welco.Shared.Enums;
 
 namespace Product.Services.API.Controllers
 {
-    [RoleAuthorize]
     [Route(ProductApiRoutes.Products.Base)]
     public class ProductsController : AppControllerBase
     {
         public ProductsController(IMediator mediator) : base(mediator)
         {
+        }
+
+        [HttpGet]
+        [Route(ProductApiRoutes.Products.GetMostSelling)]
+        [Route(ProductApiRoutes.Products.GetTopSelling)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetMostSelling([FromQuery] int limit = 8, CancellationToken cancellationToken = default)
+        {
+            var result = await _mediator.Send(new GetMostSellingProductsQuery { Limit = limit }, cancellationToken);
+            return ToActionResult(result);
         }
 
                 [HttpGet]
