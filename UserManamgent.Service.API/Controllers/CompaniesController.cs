@@ -16,7 +16,6 @@ using Welco.Shared.Enums;
 
 namespace UserManamgent.Service.API.Controllers
 {
-    [RoleAuthorize]
     [Route(UserManagementApiRoutes.Companies.Base)]
     public class CompaniesController : AppControllerBase
     {
