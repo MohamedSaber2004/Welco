@@ -103,10 +103,8 @@ namespace Welco.Shared.Common.Attributes
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = key,
-                    ValidateIssuer = !string.IsNullOrWhiteSpace(settings.ServiceIssuer),
-                    ValidIssuer = settings.ServiceIssuer,
-                    ValidateAudience = !string.IsNullOrWhiteSpace(settings.ServiceAudience),
-                    ValidAudience = settings.ServiceAudience,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.FromMinutes(2)
                 }, out _);
