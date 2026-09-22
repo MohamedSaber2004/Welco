@@ -37,32 +37,228 @@ namespace Welco.Shared.Persistance.Seeding
                 new[] { "مناظير", "أنابيب الشفط", "مكحتات" }),
         };
 
-        private static readonly string[] InstrumentEn =
-        {
-            "Mayo Scissors", "Metzenbaum Scissors", "Kelly Forceps", "Needle Holder",
-            "Army Retractor", "Scalpel Handle", "Towel Clamp", "Halsted Hemostat",
-            "Bone Rongeur", "Periosteal Elevator", "Mouth Mirror", "Explorer Probe",
-            "Nasal Speculum", "Osteotome Set", "Castroviejo Calipers", "Yankauer Suction",
-            "Adson Forceps", "Iris Scissors", "Dental Syringe", "Bone File",
-        };
+        public record SurgicalItemSeed(
+            string NameEn,
+            string NameAr,
+            string Specialty,
+            string Material,
+            decimal LengthCm,
+            decimal Price,
+            string DescEn,
+            string DescAr
+        );
 
-        private static readonly string[] InstrumentAr =
+        private static readonly SurgicalItemSeed[] RealSurgicalCatalog =
         {
-            "مشرط جراحي", "ملقط طبي", "مقص جراحي", "مبعد", "مسبار",
-            "مبضع", "حامل إبر", "مرآة فم", "محقنة", "مبرد عظام",
-            "أنبوب شفط", "فرجار قياس",
+            new(
+                "Mayo Dissecting Scissors 17cm Straight",
+                "مقص مايو للتشريح الجراحي 17 سم مستقيم",
+                "Plastic Surgery",
+                "German Stainless Steel (AISI 420)",
+                17.0m,
+                145.00m,
+                "Precision beveled blades engineered for cutting tough connective tissue, fascia, and deep surgical sutures. Hot-drop forged German steel with satin anti-glare finish.",
+                "شفرات مشطوفة فائقة الدقة لقطع الأنسجة الضامة السميكة واللفافات الجراحية. مصنوعة من الفولاذ الألماني المشكل حرارياً بتشطيب مطفأ مانع للتوهج."
+            ),
+            new(
+                "Metzenbaum Delicate Dissecting Scissors Curved 18cm",
+                "مقص ميتزنباوم الدقيق للتشريح الجراحي منحني 18 سم",
+                "Plastic Surgery",
+                "Tungsten Carbide / AISI 420",
+                18.0m,
+                185.00m,
+                "Gold-handled tungsten carbide curved blades designed specifically for blunt and sharp atraumatic dissection of delicate vascular and visceral tissues.",
+                "شفرات منحنية مدعمة بكربيد التنجستن ومقابض مذهبة مخصصة للتشريح الدقيق للأنسجة الرقيقة والأوعية الدموية دون إحداث تمزق رضحي."
+            ),
+            new(
+                "Adson Micro Tissue Forceps 1x2 Teeth 12cm",
+                "ملقط أنسجة أدسون الجراحي الدقيق 1×2 سن 12 سم",
+                "Plastic Surgery",
+                "German Stainless Steel (AISI 410)",
+                12.0m,
+                58.00m,
+                "Fine atraumatic interdigitating 1x2 teeth providing secure grip on fragile dermis and subcuticular flaps during precision cosmetic and reconstructive closure.",
+                "أسنان دقيقة 1×2 متداخلة توفر إمساكاً محكماً بحواف الجلد والأنسجة الدقيقة أثناء إجراءات الخياطة الترميمية والتجميلية."
+            ),
+            new(
+                "DeBakey Atraumatic Vascular Forceps 20cm",
+                "ملقط ديبيكي الجراحي للأوعية الدموية 20 سم",
+                "Orthopedic",
+                "Titanium Alloy / AISI 420",
+                20.0m,
+                210.00m,
+                "Patented non-crushing longitudinal ribbing designed to stabilize delicate arterial walls and venous grafts without intima disruption during cardiovascular and trauma surgery.",
+                "تضليع طولي غير راضخ ومصمم لتثبيت جدران الشرايين والأوردة الحساسة دون تلف بطانة الأوعية في الجراحات الوعائية."
+            ),
+            new(
+                "Hegar Needle Holder Tungsten Carbide Jaws 16cm",
+                "حامل إبر هيغار مع فكوك كربيد التنجستن 16 سم",
+                "Plastic Surgery",
+                "Tungsten Carbide / AISI 420",
+                16.0m,
+                175.00m,
+                "Cross-serrated tungsten carbide jaw inserts (0.4mm pitch) engineered to eliminate needle slippage and twisting under high tension wound approximation.",
+                "فكوك كربيد التنجستن بتسنين متقاطع يمنع تماماً انزلاق الإبرة أو دورانها أثناء إغلاق طبقات الجروح المشدودة."
+            ),
+            new(
+                "Castroviejo Micro Needle Holder Straight with Lock 14cm",
+                "حامل إبر كاستروفيجو الدقيق مع قفل 14 سم",
+                "Plastic Surgery",
+                "Titanium",
+                14.0m,
+                320.00m,
+                "Precision calibrated spring-action handle with ultra-smooth latching mechanism engineered for micro-vascular and ophthalmic sutures (6-0 through 9-0).",
+                "مقبض نوابضي فائق الدقة مع آلية قفل ناعمة مصمم خصيصاً للغرز الجراحية المجهرية والأوعية الدموية الدقيقة."
+            ),
+            new(
+                "Crile Hemostatic Forceps Curved 14cm",
+                "ملقط كرايل القاطع للنزيف منحني 14 سم",
+                "Dental",
+                "German Stainless Steel (AISI 410)",
+                14.0m,
+                62.00m,
+                "Transversely serrated along entire jaw length with interlocking ratchets for rapid secure hemostasis of medium vascular pedicles and tissue bleeders.",
+                "مسنن عرضياً بالكامل مع محبس قفل تدريجي لتأمين الإرقاء الفوري وإيقاف النزيف في الأوعية الدموية المتوسطة."
+            ),
+            new(
+                "Kelly Hemostatic Clamps Straight 14cm",
+                "ملقط كيلي الجراحي المستقيم 14 سم",
+                "Dental",
+                "German Stainless Steel (AISI 410)",
+                14.0m,
+                59.00m,
+                "Serrated on distal half of jaws allowing selective clamping of bleeding subcutaneous vessels without damaging adjacent healthy anatomical structures.",
+                "مسنن في النصف الطرفي فقط للتحكم في الأوعية النازفة بدقة متناهية دون الضغط على الأنسجة السليمة المجاورة."
+            ),
+            new(
+                "Babcock Intestinal Tissue Grasping Forceps 16cm",
+                "ملقط بابكوك الجراحي للإمساك بالأنسجة والأمعاء 16 سم",
+                "Orthopedic",
+                "German Stainless Steel (AISI 410)",
+                16.0m,
+                125.00m,
+                "Atraumatic fenestrated triangular loops with smooth rounded borders for holding tubular organs, ureters, and intestinal loops without ischemic trauma.",
+                "فكوك مثلثة مفرغة وناعمة الحواف مصممة لمسك الأعضاء الأنبوبية والأمعاء والحالب دون إحداث نقص تروية أو رضخ موضعي."
+            ),
+            new(
+                "Allis Tissue Grasping Clamps 5x6 Teeth 15cm",
+                "ملقط أليس الجراحي لمسك الأنسجة 5×6 أسنان 15 سم",
+                "Orthopedic",
+                "German Stainless Steel (AISI 410)",
+                15.0m,
+                88.00m,
+                "Multiple interlocking fine teeth delivering uniform traction on fascial edges and fibrous tendon sheaths without slippage.",
+                "أسنان متعددة متداخلة 5×6 توفر قوة شد متجانسة على اللفافات والأغماد الليفية دون انزلاق."
+            ),
+            new(
+                "Weitlaner Self-Retaining Retractor Sharp 3x4 Teeth 13cm",
+                "مبعد ويتلانر الجراحي ذاتي التثبيت 13 سم",
+                "Orthopedic",
+                "German Stainless Steel",
+                13.0m,
+                245.00m,
+                "Cam-ratchet self-locking arms with curved sharp 3x4 prongs maintaining deep wound cavity visualization hands-free during orthopedics and neurosurgery.",
+                "ذراعان بمحبس مسنن ومخالب حادة 3×4 تضمن بقاء المجال الجراحي مفتوحاً بثبات ودون إجهاد للأيدي المساعدة."
+            ),
+            new(
+                "Richardson-Eastman Retractor Handheld Set of 2",
+                "طقم مبعدات ريتشاردسون-إيستمان الجراحية المزدوجة",
+                "Orthopedic",
+                "German Stainless Steel (AISI 420)",
+                26.0m,
+                195.00m,
+                "Ergonomically contoured broad concave lateral blades providing deep pelvic and abdominal muscular wall exposure with minimal pressure necrosis.",
+                "شفرات مقعرة عريضة بتصميم مريح مخصصة لإبعاد الجدار العضلي للبطن والحوض مع تقليل ضغط النخر الموضعي."
+            ),
+            new(
+                "Liston High-Leverage Bone Cutting Forceps Angled 19cm",
+                "ملقط ليستون لقطع العظام بزاوية وقوة مضاعفة 19 سم",
+                "Orthopedic",
+                "German High-Carbon Steel",
+                19.0m,
+                365.00m,
+                "Compound double-action pivot system delivering high mechanical force to shear through dense cortical bone cleanly during joint reconstruction and amputations.",
+                "نظام مفصل مزدوج مضاعف القوة يتيح قص العظام القشرية الصلبة بقطع نظيف وأملس أثناء جراحات المفاصل وبتر الأطراف."
+            ),
+            new(
+                "Stille-Luer Double-Action Bone Rongeur Curved 22cm",
+                "قارضة عظام ستيل-لوير منحنية بمفصل مزدوج 22 سم",
+                "Orthopedic",
+                "German Stainless Steel (AISI 420)",
+                22.0m,
+                395.00m,
+                "Heavy-duty curved scoop jaws designed for rapid, controlled excision of thick articular bone fragments, bone spikes, and periosteal margins.",
+                "فكوك غائرة قوية ومنحنية مصممة للاستئصال السريع والمنضبط للنتوءات العظمية والحواف المفصلية الكثيفة."
+            ),
+            new(
+                "Kerrison Spinal Laminectomy Punch 40° Up-Biting 3mm",
+                "مثقاب كيريسون لاستئصال الصفيحة الفقرية 40 درجة 3 مم",
+                "Spine",
+                "German High-Tensile Steel",
+                20.0m,
+                520.00m,
+                "Thin-footplate laminectomy punch featuring 40-degree upward cutting action with ejector groove for precise spinal canal decompression.",
+                "مثقاب رفيع بزاوية صاعدة 40 درجة ومزود بمجرى تفريغ لضمان إزالة الضغط عن القناة الشوكية بدقة بالغة."
+            ),
+            new(
+                "Killian Nasal Speculum with Set Screw Adjuster",
+                "منظار كيليان للأنف مع برغي ضبط دقيق",
+                "ENT",
+                "German Stainless Steel",
+                14.0m,
+                165.00m,
+                "Serrated thin parallel blades with knurled thumbscrew lock mechanism providing stable, glare-free dilation of anterior nasal cavity.",
+                "شفرات متوازية رقيقة مسننة مع برغي تثبيت محزز يضمن اتساعاً ثابتاً ومستقراً لتجويف الأنف دون انعكاسات ضوئية مزعجة."
+            ),
+            new(
+                "Frazier Neuro Suction Cannula 10 French Angled",
+                "أنبوب شفط فريزر لجراحة الأعصاب قياس 10 فرنش",
+                "Spine",
+                "Medical Stainless Steel",
+                18.0m,
+                75.00m,
+                "Graduated thin cannula with angled shaft and ergonomic teardrop thumb vent for fingertip regulation of surgical vacuum pressure.",
+                "قنية رفيعة مدرجة بزاوية مريحة وفتحة إبهام دمعية للتحكم اللحظي الدقيق بقوة الشفط داخل الجروح العميقة."
+            ),
+            new(
+                "Dental Extracting Forceps #150 Universal Upper",
+                "ملقط خلع الأسنان رقم 150 العالمي للفك العلوي",
+                "Dental",
+                "AISI 420 Stainless",
+                17.5m,
+                110.00m,
+                "Universal anatomical beaks with textured non-slip grip handles designed for atraumatic luxation of upper incisors, canines, and bicuspids.",
+                "مناقير مصممة تشريحياً مع مقابض غير قابلة للانزلاق لخلع القواطع والأنياب والضواحك العلوية بدون كسر الحافة السنخية."
+            ),
+            new(
+                "Coupland Dental Root Elevator Straight Set (3-Piece)",
+                "طقم روافع كوبلاند لجذور الأسنان مستقيم 3 قطع",
+                "Dental",
+                "German Stainless Steel",
+                15.0m,
+                145.00m,
+                "Gouge-shaped concave working ends with sharp lateral cutting edges designed to sever periodontal fibers and elevate retained dental roots smoothly.",
+                "نهايات مقعرة وحواف جانبية حادة لقطع ألياف الرباط السني وخلخلة الجذور المتبقية بكل سلاسة."
+            ),
+            new(
+                "Molt #9 Dual-End Periosteal Elevator 18cm",
+                "رافعة السمحاق مولت رقم 9 مزدوجة الأطراف 18 سم",
+                "CMF",
+                "German Stainless Steel (AISI 420)",
+                18.0m,
+                72.00m,
+                "Features a sharp pointed triangular blade on one side and a broad curved spatula on the other for rapid dissection of mucoperiosteal flaps.",
+                "تحتوي على طرف مدبب حاد وطرف ملعقي مقوس لرفع الشرائح السمحاقية بسرعة وبأقل قدر من الرضخ للأنسجة."
+            ),
         };
-
-        private static readonly string[] InstrumentModifiers =
-            { "Standard", "Premium", "Deluxe", "Slim", "Curved", "Straight" };
 
         private static readonly string[] Materials =
-            { "German Stainless Steel", "Titanium", "Tungsten Carbide", "AISI 420 Steel" };
+            { "German Stainless Steel (AISI 420)", "Titanium Alloy", "Tungsten Carbide / Steel", "AISI 410 Surgical Steel" };
 
         private static readonly string[] ProcedureTags =
         {
-            "Oral Surgery", "Implantology", "Orthodontics", "Trauma",
-            "Arthroscopy", "Spine Fusion", "Rhinoplasty", "Otology",
+            "General Surgery", "Cardiovascular", "Orthopedic Trauma", "Spine Fusion",
+            "Plastic & Reconstructive", "Maxillofacial", "Dental Implantology", "ENT & Otology",
         };
 
         private static readonly (string Name, string ImageName, CompanyType Type)[] CompanySeedList =
@@ -224,65 +420,95 @@ List<Category> leaves;
                 List<Product> products;
                 if (await db.Products.AnyAsync(p => !p.IsDeleted, ct))
                 {
-                    logger.LogInformation("Products already present, skipping Bogus product seeding.");
+                    logger.LogInformation("Products already present, updating existing data to realistic surgical catalog...");
                     products = await db.Products.Where(p => !p.IsDeleted).Take(200).ToListAsync(ct);
+                    var updated = false;
+                    for (var i = 0; i < products.Count; i++)
+                    {
+                        var p = products[i];
+                        if (p.NameEn.Contains("Standard") || p.NameEn.Contains("Deluxe") || p.NameAr.Any(char.IsDigit) || (p.Description != null && p.Description.StartsWith("Lorem")))
+                        {
+                            var real = RealSurgicalCatalog[i % RealSurgicalCatalog.Length];
+                            p.NameEn = real.NameEn;
+                            p.NameAr = real.NameAr;
+                            p.Description = real.DescEn;
+                            p.Material = real.Material;
+                            if (real.LengthCm > 0) p.LengthCm = real.LengthCm;
+                            p.Price = real.Price;
+                            p.Specifications = $"Autoclave 134°C; DIN 1.4021; {p.Material}; CE Class IIa; Length {p.LengthCm} cm";
+                            updated = true;
+                        }
+                    }
+                    if (updated)
+                    {
+                        await db.SaveChangesAsync(ct);
+                        logger.LogInformation("Bogus updated existing products with realistic surgical data.");
+                    }
                 }
                 else
                 {
                     products = new List<Product>();
-                var specs = new List<ProductSpecification>();
-                var media = new List<ProductMedia>();
-                var tags = new List<ProductProcedureTag>();
-                var seq = 0;
-                foreach (var leaf in leaves)
-                {
-                    for (var i = 0; i < 5; i++)
+                    var specs = new List<ProductSpecification>();
+                    var media = new List<ProductMedia>();
+                    var tags = new List<ProductProcedureTag>();
+                    var seq = 0;
+                    foreach (var leaf in leaves)
                     {
-                        seq++;
-                        var nameEn = $"{faker.PickRandom(InstrumentEn)} {faker.PickRandom(InstrumentModifiers)}";
-                        var sku = $"WL-{100000 + seq}";
-                        var slug = $"{Slugify(nameEn)}-{seq}";
-                        var price = Math.Round(faker.Random.Decimal(15, 2500), 2);
-                        var length = faker.Random.Bool(0.7f) ? (decimal?)Math.Round(faker.Random.Decimal(10, 30), 1) : null;
-                        var material = faker.PickRandom(Materials);
-                        var product = Product.Create(
-                            nameEn,
-                            $"{faker.PickRandom(InstrumentAr)} {seq}",
-                            sku, slug,
-                            faker.Lorem.Sentence(8, 4),
-                            price,
-                            faker.Random.Int(0, 300),
-                            $"Autoclave 134°C; DIN 1.4021{(length.HasValue ? $"; {length} cm" : string.Empty)}",
-                            $"demo/products/{slug}.jpg",
-                            material, length,
-                            usd?.Id,
-                            leaf.Id, null, Marker);
-                        products.Add(product);
-                        specs.Add(new ProductSpecification { Id = Guid.NewGuid(), ProductId = product.Id, AttrName = "Material", AttrValue = material });
-                        specs.Add(new ProductSpecification { Id = Guid.NewGuid(), ProductId = product.Id, AttrName = "Sterilization", AttrValue = "Autoclave 134°C" });
-                        specs.Add(new ProductSpecification { Id = Guid.NewGuid(), ProductId = product.Id, AttrName = "Length", AttrValue = length.HasValue ? $"{length} cm" : "Standard" });
-                        foreach (var s in specs.TakeLast(3)) s.MarkAsCreated(Marker);
-                        media.Add(new ProductMedia { Id = Guid.NewGuid(), ProductId = product.Id, Type = ProductMediaType.Image, Url = $"demo/products/{slug}.jpg", SortOrder = 0 });
-                        media.Last().MarkAsCreated(Marker);
-                        if (faker.Random.Bool(0.3f))
+                        for (var i = 0; i < 5; i++)
                         {
-                            media.Add(new ProductMedia { Id = Guid.NewGuid(), ProductId = product.Id, Type = ProductMediaType.Image, Url = $"demo/products/{slug}-2.jpg", SortOrder = 1 });
+                            var real = RealSurgicalCatalog[seq % RealSurgicalCatalog.Length];
+                            seq++;
+                            var nameEn = seq <= RealSurgicalCatalog.Length
+                                ? real.NameEn
+                                : $"{real.NameEn} - Mod {seq}";
+                            var nameAr = seq <= RealSurgicalCatalog.Length
+                                ? real.NameAr
+                                : $"{real.NameAr} - إصدار {seq}";
+                            var sku = $"WL-{100000 + seq}";
+                            var slug = $"{Slugify(nameEn)}-{seq}";
+                            var price = real.Price;
+                            var length = real.LengthCm > 0 ? (decimal?)real.LengthCm : null;
+                            var material = real.Material;
+                            var desc = real.DescEn;
+                            var product = Product.Create(
+                                nameEn,
+                                nameAr,
+                                sku, slug,
+                                desc,
+                                price,
+                                faker.Random.Int(25, 350),
+                                $"Autoclave 134°C; DIN 1.4021; {material}; CE Class IIa{(length.HasValue ? $"; {length} cm" : string.Empty)}",
+                                $"demo/products/{slug}.jpg",
+                                material, length,
+                                usd?.Id,
+                                leaf.Id, null, Marker);
+                            products.Add(product);
+                            specs.Add(new ProductSpecification { Id = Guid.NewGuid(), ProductId = product.Id, AttrName = "Material", AttrValue = material });
+                            specs.Add(new ProductSpecification { Id = Guid.NewGuid(), ProductId = product.Id, AttrName = "Sterilization", AttrValue = "Autoclave 134°C / Chemical Vapor" });
+                            specs.Add(new ProductSpecification { Id = Guid.NewGuid(), ProductId = product.Id, AttrName = "Compliance", AttrValue = "ISO 13485; CE Mark MDR Class IIa" });
+                            if (length.HasValue) specs.Add(new ProductSpecification { Id = Guid.NewGuid(), ProductId = product.Id, AttrName = "Length", AttrValue = $"{length} cm" });
+                            foreach (var s in specs.TakeLast(length.HasValue ? 4 : 3)) s.MarkAsCreated(Marker);
+                            media.Add(new ProductMedia { Id = Guid.NewGuid(), ProductId = product.Id, Type = ProductMediaType.Image, Url = $"demo/products/{slug}.jpg", SortOrder = 0 });
                             media.Last().MarkAsCreated(Marker);
-                        }
-                        foreach (var tag in faker.PickRandom(ProcedureTags, faker.Random.Int(1, 2)).Distinct())
-                        {
-                            var t = new ProductProcedureTag { Id = Guid.NewGuid(), ProductId = product.Id, Label = tag };
-                            t.MarkAsCreated(Marker);
-                            tags.Add(t);
+                            if (faker.Random.Bool(0.3f))
+                            {
+                                media.Add(new ProductMedia { Id = Guid.NewGuid(), ProductId = product.Id, Type = ProductMediaType.Image, Url = $"demo/products/{slug}-2.jpg", SortOrder = 1 });
+                                media.Last().MarkAsCreated(Marker);
+                            }
+                            foreach (var tag in faker.PickRandom(ProcedureTags, faker.Random.Int(1, 2)).Distinct())
+                            {
+                                var t = new ProductProcedureTag { Id = Guid.NewGuid(), ProductId = product.Id, Label = tag };
+                                t.MarkAsCreated(Marker);
+                                tags.Add(t);
+                            }
                         }
                     }
-                }
-                await db.Products.AddRangeAsync(products, ct);
-                await db.ProductSpecifications.AddRangeAsync(specs, ct);
-                await db.ProductMedias.AddRangeAsync(media, ct);
-                await db.ProductProcedureTags.AddRangeAsync(tags, ct);
-                await db.SaveChangesAsync(ct);
-                logger.LogInformation("Bogus seeded {Count} products (+specs/media/tags).", products.Count);
+                    await db.Products.AddRangeAsync(products, ct);
+                    await db.ProductSpecifications.AddRangeAsync(specs, ct);
+                    await db.ProductMedias.AddRangeAsync(media, ct);
+                    await db.ProductProcedureTags.AddRangeAsync(tags, ct);
+                    await db.SaveChangesAsync(ct);
+                    logger.LogInformation("Bogus seeded {Count} products (+specs/media/tags).", products.Count);
                 }
 
                 List<Company> companies;
@@ -480,104 +706,185 @@ var membersWithAddress = new HashSet<Guid>(
                     await db.SaveChangesAsync(ct);
                 }
 
-var repId = staff.Count > 0 ? staff[0].Id : Guid.NewGuid();
+                var repId = staff.Count > 0 ? staff[0].Id : Guid.NewGuid();
                 var chainNo = 0;
                 var chainPrefix = $"WO-{year}-";
+                var topProducts = products.Take(12).ToList();
+                var tieredQuantities = new[] { 320, 275, 240, 195, 160, 135, 110, 85, 70, 55, 45, 35 };
+
                 if (await db.Orders.AnyAsync(o => !o.IsDeleted && (o.CreatedBy == Marker || o.OrderNumber.StartsWith(chainPrefix)), ct))
                 {
-                    logger.LogInformation("Orders already present, skipping Bogus RFQ→Quote→Order chains.");
+                    logger.LogInformation("Orders already present, checking if top surgical products have order items...");
+                    var topIds = topProducts.Select(p => p.Id).ToList();
+                    var existingTopItemsCount = await db.OrderItems.CountAsync(oi => !oi.IsDeleted && topIds.Contains(oi.ProductId), ct);
+                    if (existingTopItemsCount == 0 && topProducts.Count > 0)
+                    {
+                        var primaryUser = orgUsers.Count > 0 ? orgUsers[0].User : staff.FirstOrDefault();
+                        var primaryCompany = orgUsers.Count > 0 ? orgUsers[0].Company : approved.FirstOrDefault();
+                        if (primaryUser != null && primaryCompany != null)
+                        {
+                            var bulkOrder = new Order
+                            {
+                                Id = Guid.NewGuid(),
+                                OrderNumber = $"WO-{year}-BULK-001",
+                                Status = OrderStatus.Completed,
+                                UserId = primaryUser.Id,
+                                CompanyId = primaryCompany.Id,
+                                CurrencyId = usd?.Id,
+                                SnapshotBaseCurrency = "USD",
+                                SnapshotCurrencyCode = usd?.Code ?? "USD",
+                                SnapshotRate = 1,
+                                SnapshotRateDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                                SnapshotSource = Marker,
+                            };
+                            bulkOrder.MarkAsCreated(Marker);
+
+                            decimal bulkTotal = 0;
+                            for (var t = 0; t < topProducts.Count; t++)
+                            {
+                                var p = topProducts[t];
+                                var qty = t < tieredQuantities.Length ? tieredQuantities[t] : 30;
+                                var oi = new OrderItem
+                                {
+                                    Id = Guid.NewGuid(),
+                                    OrderId = bulkOrder.Id,
+                                    ProductId = p.Id,
+                                    Quantity = qty,
+                                    UnitPrice = p.Price,
+                                };
+                                oi.MarkAsCreated(Marker);
+                                bulkOrder.Items.Add(oi);
+                                bulkTotal += qty * p.Price;
+                            }
+                            bulkOrder.TotalAmount = bulkTotal;
+
+                            var bulkInvoice = new Invoice
+                            {
+                                Id = Guid.NewGuid(),
+                                OrderId = bulkOrder.Id,
+                                InvoiceNumber = $"INV-{year}-BULK-001",
+                                Amount = bulkTotal,
+                                Status = InvoiceStatus.Paid,
+                            };
+                            bulkInvoice.MarkAsCreated(Marker);
+                            bulkOrder.Invoices.Add(bulkInvoice);
+
+                            await db.Orders.AddAsync(bulkOrder, ct);
+                            await db.SaveChangesAsync(ct);
+                            logger.LogInformation("Bogus seeded hospital bulk procurement order with {Count} realistic surgical items.", topProducts.Count);
+                        }
+                    }
                 }
                 else
                 {
+                    var topProductIdx = 0;
                     foreach (var (user, company) in orgUsers.Take(products.Count > 0 ? 12 : 0))
-                {
-                    chainNo++;
-                    var items = PickSome(faker, products, 2, 5);
-                    var rfq = new RFQ
                     {
-                        Id = Guid.NewGuid(),
-                        RFQNumber = $"RFQ-{year}-{chainNo:0000}",
-                        CompanyId = company.Id,
-                        Status = RFQStatus.Ordered,
-                        AssignedSalesRepId = staff.Count > 0 ? repId : null,
-                    };
-                    rfq.MarkAsCreated(Marker);
-                    foreach (var p in items)
-                    {
-                        var ri = new RFQItem
-                        {
-                            Id = Guid.NewGuid(), RFQId = rfq.Id, ProductId = p.Id,
-                            Quantity = faker.Random.Int(5, 200), UnitPrice = p.Price,
-                            Notes = faker.Random.Bool(0.3f) ? "Urgent delivery requested" : null,
-                        };
-                        ri.MarkAsCreated(Marker);
-                        rfq.Items.Add(ri);
-                    }
-                    var quoteTotal = Math.Round(rfq.Items.Sum(i => i.Quantity * i.UnitPrice) * (decimal)faker.Random.Double(0.92, 1.05), 2);
-                    var quote = new Quote
-                    {
-                        Id = Guid.NewGuid(),
-                        QuoteNumber = $"QT-{year}-{chainNo:0000}",
-                        RFQId = rfq.Id,
-                        Amount = quoteTotal,
-                        ValidUntil = DateTime.UtcNow.AddDays(30),
-                        Status = QuoteStatus.Approved,
-                        CreatedBySalesRepId = repId,
-                    };
-                    quote.MarkAsCreated(Marker);
-                    foreach (var ri in rfq.Items)
-                    {
-                        var qi = new QuoteItem
-                        {
-                            Id = Guid.NewGuid(), QuoteId = quote.Id, ProductId = ri.ProductId,
-                            Quantity = ri.Quantity, UnitPrice = ri.UnitPrice,
-                        };
-                        qi.MarkAsCreated(Marker);
-                        quote.Items.Add(qi);
-                    }
-                    var order = new Order
-                    {
-                        Id = Guid.NewGuid(),
-                        OrderNumber = $"WO-{year}-{chainNo:0000}",
-                        Status = (OrderStatus)faker.Random.Int(2, 4),
-                        UserId = user.Id,
-                        CompanyId = company.Id,
-                        CurrencyId = usd?.Id,
-                        QuoteId = quote.Id,
-                        TotalAmount = quoteTotal,
-                        SnapshotBaseCurrency = "USD",
-                        SnapshotCurrencyCode = usd?.Code ?? "USD",
-                        SnapshotRate = 1,
-                        SnapshotRateDate = DateOnly.FromDateTime(DateTime.UtcNow),
-                        SnapshotSource = Marker,
-                    };
-                    order.MarkAsCreated(Marker);
-                    foreach (var qi in quote.Items)
-                    {
-                        var oi = new OrderItem
-                        {
-                            Id = Guid.NewGuid(), OrderId = order.Id, ProductId = qi.ProductId,
-                            Quantity = qi.Quantity, UnitPrice = qi.UnitPrice,
-                        };
-                        oi.MarkAsCreated(Marker);
-                        order.Items.Add(oi);
-                    }
-                    var invoice = new Invoice
-                    {
-                        Id = Guid.NewGuid(), OrderId = order.Id,
-                        InvoiceNumber = $"INV-{year}-{chainNo:0000}",
-                        Amount = quoteTotal,
-                        Status = faker.Random.Bool(0.6f) ? InvoiceStatus.Paid : InvoiceStatus.Issued,
-                    };
-                    invoice.MarkAsCreated(Marker);
-                    order.Invoices.Add(invoice);
+                        chainNo++;
+                        var items = new List<Product>();
 
-                    await db.RFQs.AddAsync(rfq, ct);
-                    await db.Quotes.AddAsync(quote, ct);
-                    await db.Orders.AddAsync(order, ct);
+                        // Inject top surgical products with realistic tiered sales volumes in the first few hospital orders
+                        if (topProductIdx < topProducts.Count)
+                        {
+                            var batchSize = Math.Min(3, topProducts.Count - topProductIdx);
+                            items.AddRange(topProducts.Skip(topProductIdx).Take(batchSize));
+                            topProductIdx += batchSize;
+                        }
+
+                        // Pick additional products to diversify the order
+                        var extraItems = PickSome(faker, products.Except(items).ToList(), 2, 4);
+                        items.AddRange(extraItems);
+
+                        var rfq = new RFQ
+                        {
+                            Id = Guid.NewGuid(),
+                            RFQNumber = $"RFQ-{year}-{chainNo:0000}",
+                            CompanyId = company.Id,
+                            Status = RFQStatus.Ordered,
+                            AssignedSalesRepId = staff.Count > 0 ? repId : null,
+                        };
+                        rfq.MarkAsCreated(Marker);
+                        foreach (var p in items)
+                        {
+                            var topIdx = topProducts.IndexOf(p);
+                            var qty = topIdx >= 0 && topIdx < tieredQuantities.Length
+                                ? tieredQuantities[topIdx]
+                                : faker.Random.Int(10, 45);
+
+                            var ri = new RFQItem
+                            {
+                                Id = Guid.NewGuid(), RFQId = rfq.Id, ProductId = p.Id,
+                                Quantity = qty, UnitPrice = p.Price,
+                                Notes = faker.Random.Bool(0.3f) ? "Urgent hospital clinical demand" : null,
+                            };
+                            ri.MarkAsCreated(Marker);
+                            rfq.Items.Add(ri);
+                        }
+                        var quoteTotal = Math.Round(rfq.Items.Sum(i => i.Quantity * i.UnitPrice) * (decimal)faker.Random.Double(0.92, 1.05), 2);
+                        var quote = new Quote
+                        {
+                            Id = Guid.NewGuid(),
+                            QuoteNumber = $"QT-{year}-{chainNo:0000}",
+                            RFQId = rfq.Id,
+                            Amount = quoteTotal,
+                            ValidUntil = DateTime.UtcNow.AddDays(30),
+                            Status = QuoteStatus.Approved,
+                            CreatedBySalesRepId = repId,
+                        };
+                        quote.MarkAsCreated(Marker);
+                        foreach (var ri in rfq.Items)
+                        {
+                            var qi = new QuoteItem
+                            {
+                                Id = Guid.NewGuid(), QuoteId = quote.Id, ProductId = ri.ProductId,
+                                Quantity = ri.Quantity, UnitPrice = ri.UnitPrice,
+                            };
+                            qi.MarkAsCreated(Marker);
+                            quote.Items.Add(qi);
+                        }
+                        var order = new Order
+                        {
+                            Id = Guid.NewGuid(),
+                            OrderNumber = $"WO-{year}-{chainNo:0000}",
+                            Status = (OrderStatus)faker.Random.Int(2, 4),
+                            UserId = user.Id,
+                            CompanyId = company.Id,
+                            CurrencyId = usd?.Id,
+                            QuoteId = quote.Id,
+                            TotalAmount = quoteTotal,
+                            SnapshotBaseCurrency = "USD",
+                            SnapshotCurrencyCode = usd?.Code ?? "USD",
+                            SnapshotRate = 1,
+                            SnapshotRateDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                            SnapshotSource = Marker,
+                        };
+                        order.MarkAsCreated(Marker);
+                        foreach (var qi in quote.Items)
+                        {
+                            var oi = new OrderItem
+                            {
+                                Id = Guid.NewGuid(), OrderId = order.Id, ProductId = qi.ProductId,
+                                Quantity = qi.Quantity, UnitPrice = qi.UnitPrice,
+                            };
+                            oi.MarkAsCreated(Marker);
+                            order.Items.Add(oi);
+                        }
+                        var invoice = new Invoice
+                        {
+                            Id = Guid.NewGuid(), OrderId = order.Id,
+                            InvoiceNumber = $"INV-{year}-{chainNo:0000}",
+                            Amount = quoteTotal,
+                            Status = faker.Random.Bool(0.6f) ? InvoiceStatus.Paid : InvoiceStatus.Issued,
+                        };
+                        invoice.MarkAsCreated(Marker);
+                        order.Invoices.Add(invoice);
+
+                        await db.RFQs.AddAsync(rfq, ct);
+                        await db.Quotes.AddAsync(quote, ct);
+                        await db.Orders.AddAsync(order, ct);
                     }
                     await db.SaveChangesAsync(ct);
-                    logger.LogInformation("Bogus seeded {Count} RFQ→Quote→Order chains.", chainNo);
+                    logger.LogInformation("Bogus seeded {Count} RFQ→Quote→Order chains with realistic hospital procurement volumes.", chainNo);
                 }
 
 var catEntities = new List<HelpCategory>();
