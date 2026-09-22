@@ -64,6 +64,7 @@ namespace UserManamgent.Service.API.UserManagementRoutes
             public const string Base = UserManagementApiRoutes.Base + "/companies";
             public const string GetAll = "";
             public const string GetMyCompany = "my";
+            public const string GetDirectory = "directory";
             public const string GetById = "{id:guid}";
             public const string GetProducts = "{companyId:guid}/products";
             public const string Create = "";

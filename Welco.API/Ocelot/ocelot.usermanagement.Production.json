@@ -106,6 +106,21 @@
       "DangerousAcceptAnyServerCertificateValidator": false
     },
     {
+      "DownstreamPathTemplate": "/api/v1/user-management/companies/directory",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "welco-user.runasp.net",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/user-management/companies/directory",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "DangerousAcceptAnyServerCertificateValidator": false
+    },
+    {
       "DownstreamPathTemplate": "/api/v1/user-management/companies/{companyId}/products",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
