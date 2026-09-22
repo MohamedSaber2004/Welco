@@ -29,6 +29,7 @@ namespace Product.Services.API.Controllers
         [HttpGet]
         [Route(ProductApiRoutes.Products.GetMostSelling)]
         [Route(ProductApiRoutes.Products.GetTopSelling)]
+        [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetMostSelling([FromQuery] int limit = 8, CancellationToken cancellationToken = default)
         {
