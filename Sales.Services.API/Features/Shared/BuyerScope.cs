@@ -14,8 +14,10 @@ namespace Sales.Services.API.Features.Shared
             if (cur.UserId == Guid.Empty) return new Caller(true, null);
             var user = await uow.GetRepository<ApplicationUser, Guid>().GetByIdAsync(cur.UserId, ct);
             if (user == null || user.IsDeleted) return new Caller(true, null);
-            var isOrg = user.UserType == UserType.OrganizationUser;
-            return new Caller(isOrg, isOrg ? user.CompanyId : null);
+            // Both OrganizationUser (provider) and provider-owned Sales staff (WelcoStaff with CompanyId)
+            // are scoped to their provider company.
+            var isScoped = user.UserType == UserType.OrganizationUser || (user.UserType == UserType.WelcoStaff && user.CompanyId.HasValue);
+            return new Caller(isScoped, isScoped ? user.CompanyId : null);
         }
     }
 }

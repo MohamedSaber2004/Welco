@@ -11,6 +11,7 @@ namespace UserManamgent.Service.API.Features.Users.Queries.GetUsers
         public int PageSize { get; set; } = 10;
         public string? SearchTerm { get; set; }
         public UserType? UserType { get; set; }
+        public Guid? CompanyId { get; set; }
         public bool? IsActive { get; set; }
     }
 }

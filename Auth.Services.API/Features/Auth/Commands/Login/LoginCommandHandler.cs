@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Auth.Responses;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
@@ -52,7 +53,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Login
                     new List<string> { LocalizationKeys.Auth.EmailNotConfirmed });
             }
 
-if (user.UserType == UserType.OrganizationUser)
+            if (user.UserType == UserType.OrganizationUser)
             {
                 if (user.CompanyId.HasValue)
                 {
@@ -79,6 +80,46 @@ if (user.UserType == UserType.OrganizationUser)
                             cancellationToken);
                         var key = hasPending ? LocalizationKeys.DistributorApplication.PendingApproval : LocalizationKeys.DistributorApplication.NotApplied;
                         return Result<AuthResponseDto>.Unauthorized(key, new List<string> { key });
+                    }
+
+                    // Auto-heal company link if missing
+                    var approvedApp = await distRepo.GetAll(d => !d.IsDeleted && (d.ContactEmail.ToLower() == userEmail || d.CreatedBy.ToLower() == userEmail) && d.Status == DistributorApplicationStatus.Approved)
+                        .OrderByDescending(d => d.UpdatedAt ?? d.CreatedAt)
+                        .FirstOrDefaultAsync(cancellationToken);
+                    if (approvedApp != null)
+                    {
+                        var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
+                        var comp = await companyRepo.GetAll(c => !c.IsDeleted && c.Name.ToLower() == approvedApp.CompanyName.ToLower() && c.Status == CompanyStatus.Approved)
+                            .FirstOrDefaultAsync(cancellationToken);
+                        if (comp != null)
+                        {
+                            user.CompanyId = comp.Id;
+                            await _userManager.UpdateAsync(user);
+                        }
+                    }
+                }
+            }
+            else if (user.UserType == UserType.Client)
+            {
+                var distRepo = _unitOfWork.GetRepository<DistributorApplication, Guid>();
+                var userEmail = (user.Email ?? "").Trim().ToLower();
+                var approvedApp = await distRepo.GetAll(d => !d.IsDeleted && (d.ContactEmail.ToLower() == userEmail || d.CreatedBy.ToLower() == userEmail) && d.Status == DistributorApplicationStatus.Approved)
+                    .OrderByDescending(d => d.UpdatedAt ?? d.CreatedAt)
+                    .FirstOrDefaultAsync(cancellationToken);
+                if (approvedApp != null)
+                {
+                    user.UserType = UserType.OrganizationUser;
+                    var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
+                    var comp = await companyRepo.GetAll(c => !c.IsDeleted && c.Name.ToLower() == approvedApp.CompanyName.ToLower() && c.Status == CompanyStatus.Approved)
+                        .FirstOrDefaultAsync(cancellationToken);
+                    if (comp != null)
+                    {
+                        user.CompanyId = comp.Id;
+                    }
+                    await _userManager.UpdateAsync(user);
+                    if (!await _userManager.IsInRoleAsync(user, nameof(UserType.OrganizationUser)))
+                    {
+                        await _userManager.AddToRoleAsync(user, nameof(UserType.OrganizationUser));
                     }
                 }
             }

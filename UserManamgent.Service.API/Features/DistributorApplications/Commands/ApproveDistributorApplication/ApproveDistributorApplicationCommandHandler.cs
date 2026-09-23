@@ -121,12 +121,25 @@ await TryLinkApplicantAsync(app, companyId, currentUserId, cancellationToken);
                     .FirstOrDefaultAsync(cancellationToken);
             }
 
-            if (applicant == null || applicant.IsDeleted || applicant.CompanyId == companyId)
+            if (applicant == null || applicant.IsDeleted)
                 return false;
 
-            applicant.CompanyId = companyId;
-            applicant.MarkAsUpdated(currentUserId);
-            return true;
+            var modified = false;
+            if (applicant.CompanyId != companyId)
+            {
+                applicant.CompanyId = companyId;
+                modified = true;
+            }
+            if (applicant.UserType != UserType.OrganizationUser)
+            {
+                applicant.UserType = UserType.OrganizationUser;
+                modified = true;
+            }
+            if (modified)
+            {
+                applicant.MarkAsUpdated(currentUserId);
+            }
+            return modified;
         }
 
         private static DistributorApplicationDto ToDto(DistributorApplication app)

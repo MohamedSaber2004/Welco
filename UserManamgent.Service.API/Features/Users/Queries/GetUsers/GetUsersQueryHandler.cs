@@ -38,6 +38,11 @@ namespace UserManamgent.Service.API.Features.Users.Queries.GetUsers
                 query = query.Where(u => u.UserType == request.UserType.Value);
             }
 
+            if (request.CompanyId.HasValue)
+            {
+                query = query.Where(u => u.CompanyId == request.CompanyId.Value);
+            }
+
             if (request.IsActive.HasValue)
             {
                 query = query.Where(u => u.IsActive == request.IsActive.Value);
