@@ -12,7 +12,9 @@ namespace Welco.Shared.Common.Extensions
 {
     public static class JwtAuthenticationExtensions
     {
-        private const string DefaultFallbackSecret = "V5B?*77+gzD_pk+2!%ORg<i)<D$DH+Xf.nECc?];2l;";
+        private const string DevelopmentFallbackSecret = "V5B?*77+gzD_pk+2!%ORg<i)<D$DH+Xf.nECc?];2l;";
+
+        private const int MinimumSecretLength = 32;
 
         public static IServiceCollection AddWelcoJwtAuthentication(
             this IServiceCollection services,
@@ -21,9 +23,27 @@ namespace Welco.Shared.Common.Extensions
             var jwtSettings = new JwtSettings();
             configuration.GetSection(JwtSettings.SectionName).Bind(jwtSettings);
 
-            var secret = !string.IsNullOrWhiteSpace(jwtSettings.Secret) && jwtSettings.Secret.Length >= 32
-                ? jwtSettings.Secret
-                : DefaultFallbackSecret;
+            var configuredSecret = jwtSettings.Secret;
+            var environment = configuration["ASPNETCORE_ENVIRONMENT"] ?? configuration["DOTNET_ENVIRONMENT"] ?? string.Empty;
+            var isDevelopment =
+                environment.Equals("Development", StringComparison.OrdinalIgnoreCase) ||
+                environment.Equals("Test", StringComparison.OrdinalIgnoreCase);
+
+            if (string.IsNullOrWhiteSpace(configuredSecret) || configuredSecret.Length < MinimumSecretLength)
+            {
+                if (!isDevelopment)
+                {
+                    throw new InvalidOperationException(
+                        $"'{JwtSettings.SectionName}:{nameof(JwtSettings.Secret)}' is missing or shorter than " +
+                        $"{MinimumSecretLength} characters. It MUST match the secret used by the token issuer " +
+                        "(Auth service) or every authenticated request will fail validation. Set it via " +
+                        "configuration (appsettings) or the JwtSettings__Secret environment variable.");
+                }
+
+                configuredSecret = DevelopmentFallbackSecret;
+            }
+
+            var secret = configuredSecret;
 
             var validIssuers = jwtSettings.GetAllValidIssuers().ToList();
             var validAudiences = jwtSettings.GetAllValidAudiences().ToList();
