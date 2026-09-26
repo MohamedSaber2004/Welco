@@ -191,6 +191,7 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                             Id = company.Id,
                             Name = company.Name,
                             Email = company.Email,
+                            ImageName = company.ImageName,
                             Type = company.Type,
                             CountryId = company.CountryId,
                             CountryNameEn = countryNameEn,
@@ -198,6 +199,7 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                             Status = company.Status,
                             AccountManagerId = company.AccountManagerId,
                             IsActive = company.IsActive,
+                            IsProvider = company.IsProvider,
                             CreatedAt = company.CreatedAt,
                             UpdatedAt = company.UpdatedAt
                         };
