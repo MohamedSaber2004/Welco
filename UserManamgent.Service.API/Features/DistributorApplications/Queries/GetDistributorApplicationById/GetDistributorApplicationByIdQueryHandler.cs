@@ -29,6 +29,27 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Queries.Get
                 return Result<DistributorApplicationDto>.NotFound(LocalizationKeys.DistributorApplication.NotFound);
             }
 
+            // Related applicant account: CreatedBy holds the signup email (MarkAsCreated),
+            // ContactEmail may be the company email instead — prefer CreatedBy.
+            var applicantEmail = !string.IsNullOrWhiteSpace(app.CreatedBy)
+                ? app.CreatedBy.Trim()
+                : app.ContactEmail.Trim();
+            var normalizedApplicant = applicantEmail.ToUpperInvariant();
+            var applicant = await _unitOfWork.GetRepository<ApplicationUser, Guid>()
+                .GetBy(u => u.NormalizedEmail == normalizedApplicant)
+                .Select(u => new ApplicantUserDto
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email ?? string.Empty,
+                    PhoneNumber = u.PhoneNumber,
+                    UserType = u.UserType,
+                    IsActive = u.IsActive,
+                    EmailConfirmed = u.EmailConfirmed,
+                    CreatedAt = u.CreatedAt
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+
             var dto = new DistributorApplicationDto
             {
                 Id = app.Id,
@@ -44,7 +65,8 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Queries.Get
                 Phone = app.Phone,
                 Status = app.Status.ToString(),
                 CreatedAt = app.CreatedAt,
-                UpdatedAt = app.UpdatedAt
+                UpdatedAt = app.UpdatedAt,
+                ApplicantUser = applicant
             };
 
             return Result<DistributorApplicationDto>.Success(dto, LocalizationKeys.DistributorApplication.Fetched);
