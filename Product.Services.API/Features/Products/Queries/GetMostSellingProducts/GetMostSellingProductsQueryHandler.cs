@@ -22,12 +22,17 @@ namespace Product.Services.API.Features.Products.Queries.GetMostSellingProducts
         public async Task<Result<IReadOnlyList<ProductDto>>> Handle(GetMostSellingProductsQuery request, CancellationToken cancellationToken)
         {
             var limit = request.Limit <= 0 ? 7 : Math.Min(request.Limit, 50);
+            var daysWindow = request.DaysWindow <= 0 ? 7 : Math.Min(request.DaysWindow, 365);
+            var cutoff = DateTime.UtcNow.AddDays(-daysWindow);
 
             var orderItemRepo = _unitOfWork.GetRepository<OrderItem, Guid>();
             var productRepo = _unitOfWork.GetRepository<ProductEntity, Guid>();
 
-            // Aggregate order items to find products with the highest sold quantities
-            var topProductQuantities = await orderItemRepo.GetAll(oi => !oi.IsDeleted && (oi.Order == null || (oi.Order.Status != OrderStatus.Cancelled && oi.Order.Status != OrderStatus.Rejected)))
+            // Aggregate order items placed within the last DaysWindow days to find products with the highest sold quantities
+            var topProductQuantities = await orderItemRepo.GetAll(oi =>
+                    !oi.IsDeleted &&
+                    oi.CreatedAt >= cutoff &&
+                    (oi.Order == null || (oi.Order.Status != OrderStatus.Cancelled && oi.Order.Status != OrderStatus.Rejected)))
                 .GroupBy(oi => oi.ProductId)
                 .Select(g => new { ProductId = g.Key, TotalSold = g.Sum(x => x.Quantity) })
                 .OrderByDescending(x => x.TotalSold)
