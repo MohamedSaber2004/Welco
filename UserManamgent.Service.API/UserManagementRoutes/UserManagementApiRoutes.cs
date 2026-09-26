@@ -64,11 +64,14 @@ namespace UserManamgent.Service.API.UserManagementRoutes
             public const string Base = UserManagementApiRoutes.Base + "/companies";
             public const string GetAll = "";
             public const string GetMyCompany = "my";
+            public const string UpdateMyCompany = "my";
             public const string GetDirectory = "directory";
             public const string GetById = "{id:guid}";
             public const string GetProducts = "{companyId:guid}/products";
             public const string Create = "";
-            public const string Update = "{id}";
+            // :guid keeps this from colliding with the literal "my" segment
+            // used by the provider self-service update below.
+            public const string Update = "{id:guid}";
             public const string Delete = "{id}";
         }
 
