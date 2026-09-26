@@ -20,6 +20,7 @@ namespace Welco.Shared.Common.DTOs.Products
         public decimal ConvertedAmount { get; set; }
         public DateOnly RateDate { get; set; }
         public string Source { get; set; } = string.Empty;
+        public decimal SafetyMarginPercent { get; set; }
     }
 
     public class CartTotalLineRequest
@@ -56,6 +57,7 @@ public class CartTotalLineResultDto
         public decimal Total { get; set; }
         public DateOnly RateDate { get; set; }
         public string Source { get; set; } = string.Empty;
+        public decimal SafetyMarginPercent { get; set; }
     }
 
 

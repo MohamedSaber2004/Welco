@@ -83,7 +83,7 @@ public class ExchangeRateServiceTests
 {
     private readonly FakeProvider _provider;
     private readonly ExchangeRateService _svc;
-    private readonly ExchangeRateSettings _settings = new() { BaseCurrency = "USD", TimeoutSeconds = 5 };
+    private readonly ExchangeRateSettings _settings = new() { BaseCurrency = "USD", TimeoutSeconds = 5, SafetyMarginPercent = 0m };
 
     public ExchangeRateServiceTests()
     {
@@ -189,5 +189,55 @@ public class ExchangeRateServiceTests
         var second = await _svc.GetLatestRatesAsync("USD", CancellationToken.None);
         // No cache: second call sees the live provider value
         Assert.Equal(999m, second.First(r => r.TargetCurrency == "EGP").Rate);
+    }
+
+    private static ExchangeRateService CreateServiceWithMargin(FakeProvider provider, decimal marginPercent)
+    {
+        var settings = new ExchangeRateSettings { BaseCurrency = "USD", TimeoutSeconds = 5, SafetyMarginPercent = marginPercent };
+        return new ExchangeRateService(provider, Options.Create(settings), NullLogger<ExchangeRateService>.Instance);
+    }
+
+    [Fact] public async Task SafetyMargin_ConvertAppliesMarginToTotals()
+    {
+        var svc = CreateServiceWithMargin(new FakeProvider(), 2m);
+        var r = await svc.ConvertWithDetailsAsync(100m, "USD", "EGP", CancellationToken.None);
+        Assert.Equal(50.9467m * 1.02m, r.Rate);
+        Assert.Equal(100m * 50.9467m * 1.02m, r.ConvertedAmount);
+        Assert.Equal(2m, r.SafetyMarginPercent);
+    }
+
+    [Fact] public async Task SafetyMargin_IdentityConversionExempt()
+    {
+        var svc = CreateServiceWithMargin(new FakeProvider(), 2m);
+        var r = await svc.ConvertWithDetailsAsync(100m, "USD", "USD", CancellationToken.None);
+        Assert.Equal(1m, r.Rate);
+        Assert.Equal(100m, r.ConvertedAmount);
+    }
+
+    [Fact] public async Task SafetyMargin_CartAppliesMarginExceptIdentityLines()
+    {
+        var svc = CreateServiceWithMargin(new FakeProvider(), 2m);
+        var req = new ConvertCartTotalRequest
+        {
+            ToCurrency = "EGP",
+            Lines = new List<CartTotalLineRequest>
+            {
+                new() { Key = "p1", UnitAmount = 100m, Quantity = 1, FromCurrency = "USD" },
+                new() { Key = "p2", UnitAmount = 10m, Quantity = 1, FromCurrency = "EGP" }
+            }
+        };
+        var res = await svc.ConvertCartTotalAsync(req, CancellationToken.None);
+        Assert.Equal(50.9467m * 1.02m, res.Lines[0].Rate);
+        Assert.Equal(100m * 50.9467m * 1.02m, res.Lines[0].LineTotal);
+        Assert.Equal(1m, res.Lines[1].Rate);
+        Assert.Equal(10m, res.Lines[1].LineTotal);
+        Assert.Equal(2m, res.SafetyMarginPercent);
+    }
+
+    [Fact] public async Task SafetyMargin_DisplayRatesStayPureMarket()
+    {
+        var svc = CreateServiceWithMargin(new FakeProvider(), 2m);
+        var rates = await svc.GetLatestRatesAsync("USD", CancellationToken.None);
+        Assert.Equal(50.9467m, rates.First(r => r.TargetCurrency == "EGP").Rate);
     }
 }

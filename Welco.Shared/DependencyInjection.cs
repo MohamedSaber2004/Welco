@@ -98,7 +98,16 @@ namespace Welco.Shared
                 client.DefaultRequestHeaders.Clear();
             });
 
-            services.AddScoped<IExchangeRateProvider>(sp => sp.GetRequiredService<FawazahmedCdnProvider>());
+            services.AddHttpClient<YahooFinanceProvider>((sp, client) =>
+            {
+                var opts = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
+                client.BaseAddress = new Uri(YahooFinanceProvider.DefaultBaseUrl + "/");
+                client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds > 0 ? opts.TimeoutSeconds : 10);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+            });
+
+            services.AddScoped<IExchangeRateProvider>(sp => sp.GetRequiredService<YahooFinanceProvider>());
 
             services.AddScoped<IWelcoDbContext>(provider => provider.GetRequiredService<WelcoDbContext>());
 

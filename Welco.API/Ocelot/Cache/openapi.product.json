@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "https://welco-product.runasp.net/"
+      "url": "https://localhost:7054/"
     }
   ],
   "paths": {
@@ -367,6 +367,66 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/categories/{categoryId}/providers": {
+      "get": {
+        "tags": [
+          "Categories"
+        ],
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "CategoryId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -936,14 +996,14 @@
         }
       }
     },
-    "/api/integration/products": {
+    "/api/v1/products/most-selling": {
       "get": {
         "tags": [
-          "IntegrationProducts"
+          "Products"
         ],
         "parameters": [
           {
-            "name": "page",
+            "name": "limit",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -952,11 +1012,30 @@
                 "string"
               ],
               "format": "int32",
-              "default": 1
+              "default": 8
             }
           },
           {
-            "name": "pageSize",
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/products/top-selling": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "parameters": [
+          {
+            "name": "limit",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -965,101 +1044,7 @@
                 "string"
               ],
               "format": "int32",
-              "default": 50
-            }
-          },
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/integration/products/{id}": {
-      "get": {
-        "tags": [
-          "IntegrationProducts"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/integration/providers": {
-      "get": {
-        "tags": [
-          "IntegrationProviders"
-        ],
-        "parameters": [
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/integration/categories": {
-      "get": {
-        "tags": [
-          "IntegrationCategories"
-        ],
-        "parameters": [
-          {
-            "name": "Accept-Language",
-            "in": "header",
-            "description": "Preferred language for localized response messages ('en' or 'ar')"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/integration/categories/{id}": {
-      "get": {
-        "tags": [
-          "IntegrationCategories"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
+              "default": 8
             }
           },
           {
@@ -1575,6 +1560,129 @@
         }
       }
     },
+    "/api/v1/products/mine": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SearchTerm",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Sku",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "CategoryId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/products/by-sku/{sku}/providers": {
+      "get": {
+        "tags": [
+          "Products"
+        ],
+        "parameters": [
+          {
+            "name": "sku",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Sku",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Preferred language for localized response messages ('en' or 'ar')"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/wishlist": {
       "get": {
         "tags": [
@@ -2081,15 +2189,6 @@
     },
     {
       "name": "ExchangeRates"
-    },
-    {
-      "name": "IntegrationProducts"
-    },
-    {
-      "name": "IntegrationProviders"
-    },
-    {
-      "name": "IntegrationCategories"
     },
     {
       "name": "Products"

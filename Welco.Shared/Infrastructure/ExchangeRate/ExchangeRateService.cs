@@ -9,6 +9,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
     public class ExchangeRateService : IExchangeRateService
     {
         private readonly IExchangeRateProvider _provider;
+        private readonly ExchangeRateSettings _settings;
         private readonly ILogger<ExchangeRateService> _logger;
 
         public ExchangeRateService(
@@ -17,8 +18,16 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             ILogger<ExchangeRateService> logger)
         {
             _provider = provider;
-            _ = options.Value;
+            _settings = options.Value;
             _logger = logger;
+        }
+
+        /// <summary>Safety margin applied to conversion totals (never to display rates or identity conversions).</summary>
+        private decimal ApplySafetyMargin(decimal marketRate)
+        {
+            var margin = _settings.SafetyMarginPercent;
+            if (margin <= 0 || marketRate <= 0) return marketRate;
+            return marketRate * (1m + margin / 100m);
         }
 
         public async Task<ExchangeRateDto?> GetLatestRateAsync(string fromCurrency, string toCurrency, CancellationToken cancellationToken)
@@ -71,16 +80,18 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
             }
 
             var details = await _provider.ConvertAsync(fromCurrency, toCurrency, amount, cancellationToken);
+            var safeRate = ApplySafetyMargin(details.Rate);
 
             return new ConversionResultDto
             {
                 Amount = details.Amount,
                 FromCurrency = details.FromCurrency,
                 ToCurrency = details.ToCurrency,
-                Rate = details.Rate,
-                ConvertedAmount = details.ConvertedAmount,
+                Rate = safeRate,
+                ConvertedAmount = amount * safeRate,
                 RateDate = details.RateDate,
-                Source = details.Source
+                Source = details.Source,
+                SafetyMarginPercent = _settings.SafetyMarginPercent > 0 ? _settings.SafetyMarginPercent : 0m
             };
         }
 
@@ -102,7 +113,9 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 if (line.UnitAmount < 0) throw new ArgumentException($"Invalid amount for '{line.Key}'");
                 var details = await _provider.ConvertAsync(line.FromCurrency, toCurrency, line.UnitAmount, cancellationToken);
                 var unitAmount = line.UnitAmount;
-                var convertedUnit = unitAmount * details.Rate;
+                var isIdentity = string.Equals(details.FromCurrency, toCurrency, StringComparison.OrdinalIgnoreCase);
+                var safeRate = isIdentity ? details.Rate : ApplySafetyMargin(details.Rate);
+                var convertedUnit = unitAmount * safeRate;
                 var lineTotal = convertedUnit * line.Quantity;
                 lines.Add(new CartTotalLineResultDto
                 {
@@ -111,7 +124,7 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                     UnitAmount = unitAmount,
                     CeiledUnitAmount = unitAmount,
                     Quantity = line.Quantity,
-                    Rate = details.Rate,
+                    Rate = safeRate,
                     ConvertedUnitAmount = convertedUnit,
                     LineTotal = lineTotal
                 });
@@ -127,7 +140,8 @@ namespace Welco.Shared.Infrastructure.ExchangeRate
                 Subtotal = subtotal,
                 Total = subtotal,
                 RateDate = rateDate,
-                Source = source
+                Source = source,
+                SafetyMarginPercent = _settings.SafetyMarginPercent > 0 ? _settings.SafetyMarginPercent : 0m
             };
         }
 
