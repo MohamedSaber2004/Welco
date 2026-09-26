@@ -45,9 +45,11 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Queries.Get
                 CountryId = a.CountryId,
                 CountryNameEn = a.Country != null ? a.Country.NameEn : null,
                 SalesVolumeBand = a.SalesVolumeBand,
+                CategoryInterest = a.CategoryInterest,
                 Website = a.Website,
                 ContactPerson = a.ContactPerson,
                 ContactEmail = a.ContactEmail,
+                Phone = a.Phone,
                 Status = a.Status.ToString(),
                 CreatedAt = a.CreatedAt,
                 UpdatedAt = a.UpdatedAt

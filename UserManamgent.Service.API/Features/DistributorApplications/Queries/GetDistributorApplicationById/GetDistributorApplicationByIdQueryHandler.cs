@@ -33,12 +33,15 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Queries.Get
             {
                 Id = app.Id,
                 CompanyName = app.CompanyName,
+                Type = app.Type,
                 CountryId = app.CountryId,
                 CountryNameEn = app.Country != null ? app.Country.NameEn : null,
                 SalesVolumeBand = app.SalesVolumeBand,
+                CategoryInterest = app.CategoryInterest,
                 Website = app.Website,
                 ContactPerson = app.ContactPerson,
                 ContactEmail = app.ContactEmail,
+                Phone = app.Phone,
                 Status = app.Status.ToString(),
                 CreatedAt = app.CreatedAt,
                 UpdatedAt = app.UpdatedAt

@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Options;
@@ -121,6 +122,20 @@ DistributorApplication? pendingApp = null;
             var expiryMinutes = _emailSettings.VerificationCodeExpiryMinutes > 0 ? _emailSettings.VerificationCodeExpiryMinutes : 10;
             var emailOtp = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
 
+            // A soft-deleted account is invisible to UserManager (global query filter),
+            // so a fresh insert would hit the DB unique index and return 500.
+            // Reactivate it instead and treat the signup as new (fresh OTP verification).
+            var normalizedEmail = request.Email.Trim().ToUpperInvariant();
+            var deletedUser = await _unitOfWork.GetRepository<ApplicationUser, Guid>()
+                .GetBy(u => u.NormalizedEmail == normalizedEmail && u.IsDeleted)
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (deletedUser != null)
+            {
+                return await ReactivateDeletedUserAsync(deletedUser, request, emailOtp, expiryMinutes, cancellationToken);
+            }
+
             var user = new ApplicationUser
             {
                 FullName = request.FullName,
@@ -153,6 +168,64 @@ var createResult = await _userManager.CreateAsync(user, request.Password);
             catch (Exception)
             {
                 
+            }
+
+            return Result<string>.Success(user.Email!, LocalizationKeys.Auth.RegisterSuccess);
+        }
+
+        private async Task<Result<string>> ReactivateDeletedUserAsync(
+            ApplicationUser user,
+            RegisterCommand request,
+            string emailOtp,
+            int expiryMinutes,
+            CancellationToken cancellationToken)
+        {
+            user.FullName = request.FullName.Trim();
+            user.PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim();
+            user.UserType = request.UserType;
+            user.Language = request.Language;
+            user.IsDeleted = false;
+            user.DeletedAt = null;
+            user.DeletedBy = null;
+            user.IsActive = false;
+            user.EmailConfirmed = false;
+            user.MarkAsUpdated(request.Email.Trim());
+            user.SetEmailConfirmationOtp(emailOtp, DateTime.UtcNow.AddMinutes(expiryMinutes));
+            user.ClearPasswordResetToken();
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                var errors = updateResult.Errors.Select(e => e.Description).ToList();
+                return Result<string>.BadRequest(
+                    errors.FirstOrDefault() ?? LocalizationKeys.ExceptionMessages.BadRequest,
+                    errors);
+            }
+
+            await _userManager.RemovePasswordAsync(user);
+            var passwordResult = await _userManager.AddPasswordAsync(user, request.Password);
+            if (!passwordResult.Succeeded)
+            {
+                var errors = passwordResult.Errors.Select(e => e.Description).ToList();
+                return Result<string>.BadRequest(
+                    errors.FirstOrDefault() ?? LocalizationKeys.ExceptionMessages.BadRequest,
+                    errors);
+            }
+
+            await _userManager.UpdateSecurityStampAsync(user);
+
+            var currentRoles = await _userManager.GetRolesAsync(user);
+            if (currentRoles.Count > 0)
+                await _userManager.RemoveFromRolesAsync(user, currentRoles);
+            await _userManager.AddToRoleAsync(user, request.UserType.ToString());
+
+            try
+            {
+                await _emailService.SendVerificationEmailAsync(user.Email!, emailOtp, user.Language.ToString().ToLower(), cancellationToken);
+            }
+            catch (Exception)
+            {
+
             }
 
             return Result<string>.Success(user.Email!, LocalizationKeys.Auth.RegisterSuccess);
