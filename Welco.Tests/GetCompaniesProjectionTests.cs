@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Welco.Shared.Common.DTOs.Auth.Responses;
 using Welco.Shared.Common.DTOs.UserManagement;
 using Welco.Shared.Domain.Models;
 using Welco.Shared.Enums;
@@ -96,6 +97,24 @@ public sealed class GetCompaniesProjectionTests : IDisposable
 
         var withoutLogo = Assert.Single(items, i => i.Name == "Provider Without Logo");
         Assert.Null(withoutLogo.ImageName);
+    }
+
+    /// <summary>
+    /// The profile endpoint embeds a CompanyDto, so the logo has to be
+    /// reachable through that nested type. This guards the shape: narrowing
+    /// UserProfileDto.Company to a smaller projection would silently drop the
+    /// brand image from the Profile "Organization Details" card.
+    /// </summary>
+    [Fact]
+    public void UserProfileCompanyPayload_ExposesImageName()
+    {
+        var prop = typeof(UserProfileDto)
+            .GetProperty(nameof(UserProfileDto.Company))
+            ?.PropertyType
+            .GetProperty(nameof(CompanyDto.ImageName));
+
+        Assert.NotNull(prop);
+        Assert.Equal(typeof(string), prop!.PropertyType);
     }
 
     public void Dispose()
