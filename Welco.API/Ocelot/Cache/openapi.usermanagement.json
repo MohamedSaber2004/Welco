@@ -2043,6 +2043,14 @@
             }
           },
           {
+            "name": "CompanyId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
             "name": "IsActive",
             "in": "query",
             "schema": {

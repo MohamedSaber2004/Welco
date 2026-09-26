@@ -22,56 +22,49 @@ public class StubHandler : HttpMessageHandler
     }
 }
 
-public class FastForexProviderTests
+public class FawazahmedCdnProviderTests
 {
-    private static FastForexProvider CreateProvider(StubHandler handler, string apiKey = "test-key")
+    private const string CdnBase = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/";
+
+    private static FawazahmedCdnProvider CreateProvider(StubHandler handler)
     {
-        var settings = new ExchangeRateSettings { BaseCurrency = "USD", TimeoutSeconds = 5, ApiKey = apiKey };
-        var client = new HttpClient(handler) { BaseAddress = new Uri("https://api.fastforex.io/") };
-        return new FastForexProvider(client, Options.Create(settings), NullLogger<FastForexProvider>.Instance);
+        var settings = new ExchangeRateSettings { BaseCurrency = "USD", TimeoutSeconds = 5, BaseUrl = CdnBase.TrimEnd('/') };
+        var client = new HttpClient(handler) { BaseAddress = new Uri(CdnBase) };
+        return new FawazahmedCdnProvider(client, Options.Create(settings), NullLogger<FawazahmedCdnProvider>.Instance);
     }
 
     private static HttpResponseMessage JsonResponse(string json, HttpStatusCode status = HttpStatusCode.OK)
         => new(status) { Content = new StringContent(json, Encoding.UTF8, "application/json") };
 
     [Fact]
-    public async Task GetLatestRates_UsesFetchOne_WithApiKey_AndParsesResultShape()
+    public async Task GetLatestRates_FetchesBaseTable_AndFiltersTargets()
     {
         var handler = new StubHandler
         {
-            Responder = req =>
-            {
-                var q = req.RequestUri!.Query;
-                if (q.Contains("to=EGP")) return JsonResponse("{\"base\":\"USD\",\"result\":{\"EGP\":51.8158},\"updated\":\"2026-09-15T14:17:21Z\",\"ms\":4}");
-                if (q.Contains("to=DZD")) return JsonResponse("{\"base\":\"USD\",\"result\":{\"DZD\":134.335},\"updated\":\"2026-09-15T14:17:21Z\",\"ms\":4}");
-                return JsonResponse("{}", HttpStatusCode.NotFound);
-            }
+            Response = JsonResponse("{\"date\":\"2026-09-25\",\"usd\":{\"egp\":48.1,\"dzd\":134.2,\"eur\":0.92}}")
         };
         var provider = CreateProvider(handler);
 
         var res = await provider.GetLatestRatesAsync("USD", new[] { "EGP", "DZD" }, CancellationToken.None);
 
-        Assert.Equal("FastForex", provider.ProviderName);
+        Assert.Equal("FawazahmedCDN", provider.ProviderName);
         Assert.Equal("USD", res.BaseCurrency);
-        Assert.Equal(new DateOnly(2026, 9, 15), res.Date);
-        Assert.Equal(51.8158m, res.Rates["EGP"]);
-        Assert.Equal(134.335m, res.Rates["DZD"]);
-        Assert.Equal("FastForex", res.Source);
-        // fetch-one endpoint with api_key query param, no Bearer header
-        foreach (var req in handler.Requests)
-        {
-            Assert.Contains("fetch-one", req.RequestUri!.ToString());
-            Assert.Contains("api_key=test-key", req.RequestUri!.ToString());
-            Assert.Null(req.Headers.Authorization);
-        }
+        Assert.Equal(new DateOnly(2026, 9, 25), res.Date);
+        Assert.Equal(48.1m, res.Rates["EGP"]);
+        Assert.Equal(134.2m, res.Rates["DZD"]);
+        Assert.Equal("FawazahmedCDN", res.Source);
+        // single CDN table fetch per call, lowercase file name
+        Assert.Single(handler.Requests);
+        Assert.EndsWith("usd.json", handler.LastRequest!.RequestUri!.ToString());
+        Assert.Null(handler.LastRequest.Headers.Authorization);
     }
 
     [Fact]
-    public async Task Convert_UsesFetchOne_AndMultipliesAmountByRate()
+    public async Task Convert_FetchesFromTable_AndMultipliesAmountByRate()
     {
         var handler = new StubHandler
         {
-            Response = JsonResponse("{\"base\":\"USD\",\"result\":{\"EGP\":51.8158},\"updated\":\"2026-09-15T14:17:21Z\",\"ms\":4}")
+            Response = JsonResponse("{\"date\":\"2026-09-25\",\"usd\":{\"egp\":48.1}}")
         };
         var provider = CreateProvider(handler);
 
@@ -80,13 +73,12 @@ public class FastForexProviderTests
         Assert.Equal(2m, res.Amount);
         Assert.Equal("USD", res.FromCurrency);
         Assert.Equal("EGP", res.ToCurrency);
-        Assert.Equal(51.8158m, res.Rate);
-        Assert.Equal(103.6316m, res.ConvertedAmount);
-        Assert.Equal(new DateOnly(2026, 9, 15), res.RateDate);
-        Assert.Equal("FastForex", res.Source);
+        Assert.Equal(48.1m, res.Rate);
+        Assert.Equal(96.2m, res.ConvertedAmount);
+        Assert.Equal(new DateOnly(2026, 9, 25), res.RateDate);
+        Assert.Equal("FawazahmedCDN", res.Source);
         Assert.Equal(2, res.DecimalDigits);
-        Assert.Contains("fetch-one", handler.LastRequest!.RequestUri!.ToString());
-        Assert.Contains("api_key=test-key", handler.LastRequest!.RequestUri!.ToString());
+        Assert.EndsWith("usd.json", handler.LastRequest!.RequestUri!.ToString());
     }
 
     [Fact]
@@ -103,5 +95,18 @@ public class FastForexProviderTests
         Assert.Equal(1m, res.Rate);
         Assert.Equal(5m, res.ConvertedAmount);
         Assert.Empty(handler.Requests);
+    }
+
+    [Fact]
+    public async Task GetLatestRates_MissingTarget_Throws()
+    {
+        var handler = new StubHandler
+        {
+            Response = JsonResponse("{\"date\":\"2026-09-25\",\"usd\":{\"egp\":48.1}}")
+        };
+        var provider = CreateProvider(handler);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(
+            () => provider.GetLatestRatesAsync("USD", new[] { "XXX" }, CancellationToken.None));
     }
 }

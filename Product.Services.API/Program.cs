@@ -91,7 +91,7 @@ var connectionString = builder.Configuration.GetConnectionString("DatabaseConnec
 
             var exchangeRateConfig = app.Configuration.GetSection(ExchangeRateSettings.SectionName).Get<ExchangeRateSettings>() ?? new ExchangeRateSettings();
             var exchangeRateLogger = app.Services.GetRequiredService<ILogger<Program>>();
-            exchangeRateLogger.LogInformation("ExchangeRateSettings loaded: Provider={Provider}, BaseUrl={BaseUrl}, TimeoutSeconds={TimeoutSeconds} (no cache, fetch-one per call)",
+            exchangeRateLogger.LogInformation("ExchangeRateSettings loaded: Provider={Provider}, BaseUrl={BaseUrl}, TimeoutSeconds={TimeoutSeconds} (no cache, CDN table per base)",
                 exchangeRateConfig.Provider,
                 exchangeRateConfig.BaseUrl,
                 exchangeRateConfig.TimeoutSeconds);

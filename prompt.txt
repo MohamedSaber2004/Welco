@@ -1,16 +1,14 @@
-[21:57:50 INF] Welco API Gateway is starting up at 09/16/2026 21:57:50
-[21:57:50 INF] Ocelot file ocelot.attachment.Test.json contributed 4 routes
-[21:57:50 INF] Ocelot file ocelot.auth.Test.json contributed 4 routes
-[21:57:50 INF] Ocelot file ocelot.certification.Test.json contributed 5 routes
-[21:57:50 INF] Ocelot file ocelot.commerce.Test.json contributed 6 routes
-[21:57:50 INF] Ocelot file ocelot.content.Test.json contributed 14 routes
-[21:57:50 INF] Ocelot file ocelot.integration.Test.json contributed 15 routes
-[21:57:50 INF] Ocelot file ocelot.product.Test.json contributed 19 routes
-[21:57:50 INF] Ocelot file ocelot.sales.Test.json contributed 6 routes
-[21:57:50 INF] Ocelot file ocelot.usermanagement.Test.json contributed 11 routes
-[21:57:50 INF] Merged 84 Ocelot routes from ocelot.attachment.Test.json, ocelot.auth.Test.json, ocelot.certification.Test.json, ocelot.commerce.Test.json, ocelot.content.Test.json, ocelot.integration.Test.json, ocelot.product.Test.json, ocelot.sales.Test.json, ocelot.usermanagement.Test.json into ocelot.merged.Test.json
-Unhandled exception. System.TypeLoadException: Could not load type 'Ocelot.Requester.QosDelegatingHandlerDelegate' from assembly 'Ocelot, Version=25.0.0.0, Culture=neutral, PublicKeyToken=null'.
-   at Ocelot.Provider.Polly.OcelotBuilderExtensions.AddPolly(IOcelotBuilder builder)
-   at Ocelot.Provider.Polly.OcelotBuilderExtensions.AddPolly(IOcelotBuilder builder)
-   at Welco.API.Program.Main(String[] args) in /home/runner/work/Welco/Welco/Welco.API/Program.cs:line 257
-   at Welco.API.Program.<Main>(String[] args)
+رمز USD هو اختصار لـ "United States Dollar"، أي الدولار الأمريكي.
+
+وهو الرمز القياسي العالمي لهذه العملة (حسب معيار ISO 4217)، ويتكون من ثلاثة أحرف مقسمة كالتالي:   
+TradingCharts
+
+US: ترمز إلى اسم الدولة، وهي الولايات المتحدة (United States).   
+MillTech
+
+D: ترمز إلى اسم العملة، وهي الدولار (Dollar).   
+MillTech
++ 1
+
+هذا هو الرمز الرسمي المُعتمد دولياً والذي تستخدمه محركات البحث مثل جوجل، بالإضافة إلى البنوك وأسواق المال ومنصات تحويل العملات للإشارة إلى الدولار الأمريكي.   
+TradingCharts

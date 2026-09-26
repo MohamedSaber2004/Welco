@@ -89,16 +89,16 @@ namespace Welco.Shared
             services.AddMemoryCache();
             services.AddScoped<IExchangeRateService, ExchangeRateService>();
 
-            services.AddHttpClient<FastForexProvider>((sp, client) =>
+            services.AddHttpClient<FawazahmedCdnProvider>((sp, client) =>
             {
                 var opts = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
-                var baseUrl = string.IsNullOrWhiteSpace(opts.BaseUrl) ? "https://api.fastforex.io" : opts.BaseUrl.TrimEnd('/');
+                var baseUrl = string.IsNullOrWhiteSpace(opts.BaseUrl) ? FawazahmedCdnProvider.DefaultBaseUrl : opts.BaseUrl.TrimEnd('/');
                 client.BaseAddress = new Uri(baseUrl + "/");
                 client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds > 0 ? opts.TimeoutSeconds : 10);
                 client.DefaultRequestHeaders.Clear();
             });
 
-            services.AddScoped<IExchangeRateProvider>(sp => sp.GetRequiredService<FastForexProvider>());
+            services.AddScoped<IExchangeRateProvider>(sp => sp.GetRequiredService<FawazahmedCdnProvider>());
 
             services.AddScoped<IWelcoDbContext>(provider => provider.GetRequiredService<WelcoDbContext>());
 

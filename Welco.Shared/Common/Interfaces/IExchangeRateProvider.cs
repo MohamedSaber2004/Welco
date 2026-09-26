@@ -26,8 +26,8 @@ namespace Welco.Shared.Common.Interfaces
         string ProviderName { get; }
 
         /// <summary>
-        /// Live daily rates via FastForex fetch-one
-        /// (GET fetch-one?from={FROM}&amp;to={TO}&amp;api_key={KEY} per pair).
+        /// Live daily rates from the currency CDN
+        /// (GET {base}.json per base currency, filtered to targets).
         /// </summary>
         /// <param name="targetCodes">Currency codes to quote.</param>
         Task<ExchangeRateResponse> GetLatestRatesAsync(
@@ -35,7 +35,7 @@ namespace Welco.Shared.Common.Interfaces
             IReadOnlyCollection<string>? targetCodes,
             CancellationToken cancellationToken);
 
-        /// <summary>Single-pair conversion via fetch-one; dated from "updated" (daily).</summary>
+        /// <summary>Single-pair conversion from the base currency table; dated from "date" (daily).</summary>
         Task<ConversionResult> ConvertAsync(
             string fromCurrency,
             string toCurrency,
