@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Welco.Shared.Common.DTOs.UserManagement;
+using Welco.Shared.Common.Helpers;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Domain.Models;
 using Welco.Shared.Enums;
@@ -41,9 +42,16 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetMyCompany
                     {
                         var distRepo = _unitOfWork.GetRepository<DistributorApplication, Guid>();
                         var userEmail = (user.Email ?? "").Trim().ToLower();
-                        var app = await distRepo.GetAll(d => !d.IsDeleted && (d.ContactEmail.ToLower() == userEmail || d.CreatedBy.ToLower() == userEmail))
-                            .OrderByDescending(d => d.CreatedAt)
-                            .FirstOrDefaultAsync(cancellationToken);
+                        var userIdText = user.Id.ToString();
+                        var candidates = await distRepo
+                            .GetAll(d => !d.IsDeleted
+                                && (d.CreatedBy == userIdText
+                                    || d.CreatedBy.ToLower() == userEmail
+                                    || d.ContactEmail.ToLower() == userEmail))
+                            .ToListAsync(cancellationToken);
+
+                        var app = DistributorApplicationResolver.ResolveForUser(
+                            candidates, userIdText, userEmail);
                         if (app != null)
                         {
                             string? countryNameEn = null;

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Auth.Responses;
 using Welco.Shared.Common.DTOs.UserManagement;
+using Welco.Shared.Common.Helpers;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Domain.Models;
@@ -217,9 +218,16 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                 {
                     var distRepo = _unitOfWork.GetRepository<DistributorApplication, Guid>();
                     var email = (user.Email ?? "").Trim().ToLower();
-                    var app = await distRepo.GetAll(d => !d.IsDeleted && (d.ContactEmail.ToLower() == email || d.CreatedBy.ToLower() == email))
-                        .OrderByDescending(d => d.CreatedAt)
-                        .FirstOrDefaultAsync(cancellationToken);
+                    var userIdText = user.Id.ToString();
+                    var candidates = await distRepo
+                        .GetAll(d => !d.IsDeleted
+                            && (d.CreatedBy == userIdText
+                                || d.CreatedBy.ToLower() == email
+                                || d.ContactEmail.ToLower() == email))
+                        .ToListAsync(cancellationToken);
+
+                    var app = DistributorApplicationResolver.ResolveForUser(
+                        candidates, userIdText, email);
                     if (app != null)
                     {
                         string? countryNameEn = null;
