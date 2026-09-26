@@ -25,6 +25,7 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetCompanies
             if (request.IsActive.HasValue) query = query.Where(c => c.IsActive == request.IsActive.Value);
             if (request.IsProvider.HasValue) query = query.Where(c => c.IsProvider == request.IsProvider.Value);
             if (request.Type.HasValue) query = query.Where(c => c.Type == request.Type.Value);
+            if (request.Status.HasValue) query = query.Where(c => c.Status == request.Status.Value);
             return await query.OrderBy(c => c.Name).ToPaginatedListAsync(c => new CompanyDto
             {
                 Id = c.Id, Name = c.Name, Email = c.Email, ImageName = c.ImageName, Type = c.Type, CountryId = c.CountryId, CountryNameEn = c.Country != null ? c.Country.NameEn : null, CountryNameAr = c.Country != null ? c.Country.NameAr : null, Status = c.Status, AccountManagerId = c.AccountManagerId, IsActive = c.IsActive, IsProvider = c.IsProvider, CreatedAt = c.CreatedAt, UpdatedAt = c.UpdatedAt

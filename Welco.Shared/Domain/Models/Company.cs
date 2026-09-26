@@ -13,7 +13,7 @@ namespace Welco.Shared.Domain.Models
         public virtual Country? Country { get; set; }
         public CompanyStatus Status { get; set; } = CompanyStatus.Pending;
         public Guid? AccountManagerId { get; set; }
-        public bool IsProvider { get; set; }
+        public bool IsProvider { get; set; } = true;
         public virtual ApplicationUser? AccountManager { get; set; }
         public virtual ICollection<ApplicationUser> Users { get; set; } = new List<ApplicationUser>();
         public virtual ICollection<CompanyAddress> Addresses { get; set; } = new List<CompanyAddress>();
@@ -38,7 +38,8 @@ namespace Welco.Shared.Domain.Models
                 Type = type,
                 CountryId = countryId,
                 Status = status,
-                AccountManagerId = accountManagerId
+                AccountManagerId = accountManagerId,
+                IsProvider = true
             };
             company.MarkAsCreated(createdBy);
             return company;

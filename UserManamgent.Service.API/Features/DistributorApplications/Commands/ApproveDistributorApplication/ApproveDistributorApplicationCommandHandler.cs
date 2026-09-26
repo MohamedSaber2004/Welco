@@ -75,6 +75,8 @@ var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
                     request.AccountManagerId,
                     currentUserId,
                     string.IsNullOrWhiteSpace(existingCompany.Email) ? app.ContactEmail : existingCompany.Email);
+                existingCompany.IsProvider = true;
+                existingCompany.SetActiveState(true, currentUserId);
                 companyId = existingCompany.Id;
             }
             else
@@ -87,6 +89,8 @@ var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
                     request.AccountManagerId,
                     currentUserId,
                     app.ContactEmail);
+                newCompany.IsProvider = true;
+                newCompany.SetActiveState(true, currentUserId);
                 await companyRepo.AddAsync(newCompany, cancellationToken);
                 companyId = newCompany.Id;
             }

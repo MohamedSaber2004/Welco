@@ -23,7 +23,14 @@ namespace UserManamgent.Service.API.Controllers
         [HttpGet][Route(UserManagementApiRoutes.Companies.GetMyCompany)] public async Task<IActionResult> GetMyCompany(CancellationToken ct) => ToActionResult(await _mediator.Send(new GetMyCompanyQuery(), ct));
         [HttpGet][Route(UserManagementApiRoutes.Companies.GetProducts)] public async Task<IActionResult> GetProducts([FromRoute] Guid companyId, [FromQuery] GetCompanyProductsQuery q, CancellationToken ct) { q.CompanyId = companyId; return ToActionResult(await _mediator.Send(q, ct)); }
         [HttpGet][Route(UserManagementApiRoutes.Companies.GetAll)] public async Task<IActionResult> GetAll([FromQuery] GetCompaniesQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
-        [HttpGet][Route(UserManagementApiRoutes.Companies.GetDirectory)] public async Task<IActionResult> GetDirectory([FromQuery] GetCompaniesQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
+        [HttpGet][Route(UserManagementApiRoutes.Companies.GetDirectory)] public async Task<IActionResult> GetDirectory([FromQuery] GetCompaniesQuery q, CancellationToken ct)
+        {
+            // Directory is a public listing — always return only active, approved provider companies
+            q.IsActive = true;
+            q.IsProvider = true;
+            q.Status = Welco.Shared.Enums.CompanyStatus.Approved;
+            return ToActionResult(await _mediator.Send(q, ct));
+        }
         [HttpGet][Route(UserManagementApiRoutes.Companies.GetById)] public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetCompanyByIdQuery { Id = id }, ct));
         [HttpPost][Route(UserManagementApiRoutes.Companies.Create)][RoleAuthorize(UserType.Admin)] public async Task<IActionResult> Create([FromBody] CreateCompanyCommand c, CancellationToken ct) => ToActionResult(await _mediator.Send(c, ct));
         [HttpPut][Route(UserManagementApiRoutes.Companies.Update)][RoleAuthorize(UserType.Admin)] public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateCompanyCommand c, CancellationToken ct) { c.Id = id; return ToActionResult(await _mediator.Send(c, ct)); }

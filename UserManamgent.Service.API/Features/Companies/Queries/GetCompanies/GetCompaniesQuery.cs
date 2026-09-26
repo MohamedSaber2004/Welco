@@ -12,5 +12,6 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetCompanies
         public bool? IsActive { get; set; }
         public bool? IsProvider { get; set; }
         public Welco.Shared.Enums.CompanyType? Type { get; set; }
+        public Welco.Shared.Enums.CompanyStatus? Status { get; set; }
     }
 }
