@@ -136,6 +136,7 @@ DistributorApplication? pendingApp = null;
                 return await ReactivateDeletedUserAsync(deletedUser, request, emailOtp, expiryMinutes, cancellationToken);
             }
 
+            var isOrgUser = request.UserType == UserType.OrganizationUser;
             var user = new ApplicationUser
             {
                 FullName = request.FullName,
@@ -144,8 +145,8 @@ DistributorApplication? pendingApp = null;
                 PhoneNumber = request.PhoneNumber,
                 UserType = request.UserType,
                 Language = request.Language,
-                IsActive = false,
-                EmailConfirmed = false,
+                IsActive = isOrgUser,
+                EmailConfirmed = isOrgUser,
                 EmailConfirmationOtp = emailOtp,
                 EmailConfirmationOtpExpiry = DateTime.UtcNow.AddMinutes(expiryMinutes)
             };
@@ -187,8 +188,9 @@ var createResult = await _userManager.CreateAsync(user, request.Password);
             user.IsDeleted = false;
             user.DeletedAt = null;
             user.DeletedBy = null;
-            user.IsActive = false;
-            user.EmailConfirmed = false;
+            var isOrgUser = request.UserType == UserType.OrganizationUser;
+            user.IsActive = isOrgUser;
+            user.EmailConfirmed = isOrgUser;
             user.MarkAsUpdated(request.Email.Trim());
             user.SetEmailConfirmationOtp(emailOtp, DateTime.UtcNow.AddMinutes(expiryMinutes));
             user.ClearPasswordResetToken();

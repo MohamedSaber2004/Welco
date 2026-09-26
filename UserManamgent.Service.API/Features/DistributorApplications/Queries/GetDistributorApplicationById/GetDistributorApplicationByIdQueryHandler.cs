@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.UserManagement;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
@@ -29,26 +29,45 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Queries.Get
                 return Result<DistributorApplicationDto>.NotFound(LocalizationKeys.DistributorApplication.NotFound);
             }
 
-            // Related applicant account: CreatedBy holds the signup email (MarkAsCreated),
-            // ContactEmail may be the company email instead — prefer CreatedBy.
-            var applicantEmail = !string.IsNullOrWhiteSpace(app.CreatedBy)
-                ? app.CreatedBy.Trim()
-                : app.ContactEmail.Trim();
-            var normalizedApplicant = applicantEmail.ToUpperInvariant();
-            var applicant = await _unitOfWork.GetRepository<ApplicationUser, Guid>()
-                .GetBy(u => u.NormalizedEmail == normalizedApplicant)
-                .Select(u => new ApplicantUserDto
+            var userRepo = _unitOfWork.GetRepository<ApplicationUser, Guid>();
+            ApplicationUser? applicantUser = null;
+
+            // 1. If CreatedBy is a valid Guid, lookup by Id
+            if (!string.IsNullOrWhiteSpace(app.CreatedBy) && Guid.TryParse(app.CreatedBy.Trim(), out var createdById) && createdById != Guid.Empty)
+            {
+                applicantUser = await userRepo.GetAll(u => !u.IsDeleted && u.Id == createdById)
+                    .FirstOrDefaultAsync(cancellationToken);
+            }
+
+            // 2. If CreatedBy is an email, lookup by NormalizedEmail
+            if (applicantUser == null && !string.IsNullOrWhiteSpace(app.CreatedBy) && app.CreatedBy.Contains('@'))
+            {
+                var norm = app.CreatedBy.Trim().ToUpperInvariant();
+                applicantUser = await userRepo.GetAll(u => !u.IsDeleted && u.NormalizedEmail == norm)
+                    .FirstOrDefaultAsync(cancellationToken);
+            }
+
+            // 3. Fallback: try ContactEmail if available
+            if (applicantUser == null && !string.IsNullOrWhiteSpace(app.ContactEmail) && app.ContactEmail.Contains('@'))
+            {
+                var normContact = app.ContactEmail.Trim().ToUpperInvariant();
+                applicantUser = await userRepo.GetAll(u => !u.IsDeleted && u.NormalizedEmail == normContact)
+                    .FirstOrDefaultAsync(cancellationToken);
+            }
+
+            var applicantDto = applicantUser != null && !applicantUser.IsDeleted
+                ? new ApplicantUserDto
                 {
-                    Id = u.Id,
-                    FullName = u.FullName,
-                    Email = u.Email ?? string.Empty,
-                    PhoneNumber = u.PhoneNumber,
-                    UserType = u.UserType,
-                    IsActive = u.IsActive,
-                    EmailConfirmed = u.EmailConfirmed,
-                    CreatedAt = u.CreatedAt
-                })
-                .FirstOrDefaultAsync(cancellationToken);
+                    Id = applicantUser.Id,
+                    FullName = applicantUser.FullName,
+                    Email = applicantUser.Email ?? string.Empty,
+                    PhoneNumber = applicantUser.PhoneNumber,
+                    UserType = applicantUser.UserType,
+                    IsActive = applicantUser.IsActive,
+                    EmailConfirmed = applicantUser.EmailConfirmed,
+                    CreatedAt = applicantUser.CreatedAt
+                }
+                : null;
 
             var dto = new DistributorApplicationDto
             {
@@ -66,7 +85,7 @@ namespace UserManamgent.Service.API.Features.DistributorApplications.Queries.Get
                 Status = app.Status.ToString(),
                 CreatedAt = app.CreatedAt,
                 UpdatedAt = app.UpdatedAt,
-                ApplicantUser = applicant
+                ApplicantUser = applicantDto
             };
 
             return Result<DistributorApplicationDto>.Success(dto, LocalizationKeys.DistributorApplication.Fetched);

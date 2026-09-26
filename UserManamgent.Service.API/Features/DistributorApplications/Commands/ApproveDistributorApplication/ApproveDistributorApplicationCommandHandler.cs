@@ -44,11 +44,14 @@ if (app.Status == DistributorApplicationStatus.Approved)
                     .FirstOrDefaultAsync(cancellationToken);
 
                 if (approvedCompany != null
-                    && approvedCompany.Status == CompanyStatus.Approved
-                    && await TryLinkApplicantAsync(app, approvedCompany.Id, currentUserId, cancellationToken))
+                    && approvedCompany.Status == CompanyStatus.Approved)
                 {
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-                    return Result<DistributorApplicationDto>.Success(ToDto(app), LocalizationKeys.DistributorApplication.Approved);
+                    var (healModified, healApplicant) = await TryLinkApplicantAsync(app, approvedCompany.Id, currentUserId, cancellationToken);
+                    if (healModified)
+                    {
+                        await _unitOfWork.SaveChangesAsync(cancellationToken);
+                        return Result<DistributorApplicationDto>.Success(ToDto(app, healApplicant), LocalizationKeys.DistributorApplication.Approved);
+                    }
                 }
 
                 return Result<DistributorApplicationDto>.BadRequest(LocalizationKeys.DistributorApplication.AlreadyProcessed);
@@ -88,14 +91,14 @@ var companyRepo = _unitOfWork.GetRepository<Company, Guid>();
                 companyId = newCompany.Id;
             }
 
-await TryLinkApplicantAsync(app, companyId, currentUserId, cancellationToken);
+            var (_, linkedApplicant) = await TryLinkApplicantAsync(app, companyId, currentUserId, cancellationToken);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result<DistributorApplicationDto>.Success(ToDto(app), LocalizationKeys.DistributorApplication.Approved);
+            return Result<DistributorApplicationDto>.Success(ToDto(app, linkedApplicant), LocalizationKeys.DistributorApplication.Approved);
         }
 
-                private async Task<bool> TryLinkApplicantAsync(DistributorApplication app, Guid companyId, string currentUserId, CancellationToken cancellationToken)
+        private async Task<(bool Modified, ApplicationUser? Applicant)> TryLinkApplicantAsync(DistributorApplication app, Guid companyId, string currentUserId, CancellationToken cancellationToken)
         {
             var userRepo = _unitOfWork.GetRepository<ApplicationUser, Guid>();
             ApplicationUser? applicant = null;
@@ -106,7 +109,7 @@ await TryLinkApplicantAsync(app, companyId, currentUserId, cancellationToken);
                 {
                     applicant = await userRepo.GetByIdAsync(createdById, cancellationToken);
                 }
-                else
+                else if (app.CreatedBy.Contains('@'))
                 {
                     var createdByEmail = app.CreatedBy.Trim().ToLower();
                     applicant = await userRepo.GetAll(u => !u.IsDeleted && (u.Email ?? "").ToLower() == createdByEmail)
@@ -114,7 +117,7 @@ await TryLinkApplicantAsync(app, companyId, currentUserId, cancellationToken);
                 }
             }
 
-            if ((applicant == null || applicant.IsDeleted) && !string.IsNullOrWhiteSpace(app.ContactEmail))
+            if ((applicant == null || applicant.IsDeleted) && !string.IsNullOrWhiteSpace(app.ContactEmail) && app.ContactEmail.Contains('@'))
             {
                 var email = app.ContactEmail.Trim().ToLower();
                 applicant = await userRepo.GetAll(u => !u.IsDeleted && (u.Email ?? "").ToLower() == email)
@@ -122,7 +125,7 @@ await TryLinkApplicantAsync(app, companyId, currentUserId, cancellationToken);
             }
 
             if (applicant == null || applicant.IsDeleted)
-                return false;
+                return (false, null);
 
             var modified = false;
             if (applicant.CompanyId != companyId)
@@ -135,14 +138,24 @@ await TryLinkApplicantAsync(app, companyId, currentUserId, cancellationToken);
                 applicant.UserType = UserType.OrganizationUser;
                 modified = true;
             }
+            if (!applicant.IsActive)
+            {
+                applicant.IsActive = true;
+                modified = true;
+            }
+            if (!applicant.EmailConfirmed)
+            {
+                applicant.EmailConfirmed = true;
+                modified = true;
+            }
             if (modified)
             {
                 applicant.MarkAsUpdated(currentUserId);
             }
-            return modified;
+            return (modified, applicant);
         }
 
-        private static DistributorApplicationDto ToDto(DistributorApplication app)
+        private static DistributorApplicationDto ToDto(DistributorApplication app, ApplicationUser? applicant = null)
         {
             return new DistributorApplicationDto
             {
@@ -152,12 +165,27 @@ await TryLinkApplicantAsync(app, companyId, currentUserId, cancellationToken);
                 CountryId = app.CountryId,
                 CountryNameEn = app.Country != null ? app.Country.NameEn : null,
                 SalesVolumeBand = app.SalesVolumeBand,
+                CategoryInterest = app.CategoryInterest,
                 Website = app.Website,
                 ContactPerson = app.ContactPerson,
                 ContactEmail = app.ContactEmail,
+                Phone = app.Phone,
                 Status = app.Status.ToString(),
                 CreatedAt = app.CreatedAt,
-                UpdatedAt = app.UpdatedAt
+                UpdatedAt = app.UpdatedAt,
+                ApplicantUser = applicant != null && !applicant.IsDeleted
+                    ? new ApplicantUserDto
+                    {
+                        Id = applicant.Id,
+                        FullName = applicant.FullName,
+                        Email = applicant.Email ?? string.Empty,
+                        PhoneNumber = applicant.PhoneNumber,
+                        UserType = applicant.UserType,
+                        IsActive = applicant.IsActive,
+                        EmailConfirmed = applicant.EmailConfirmed,
+                        CreatedAt = applicant.CreatedAt
+                    }
+                    : null
             };
         }
     }
