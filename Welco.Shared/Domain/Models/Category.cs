@@ -46,7 +46,7 @@ namespace Welco.Shared.Domain.Models
             NameEn = nameEn.Trim();
             NameAr = nameAr.Trim();
             if (description != null) Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim();
-            if (imageName != null) ImageName = string.IsNullOrWhiteSpace(imageName) ? null : imageName.Trim();
+            ImageName = string.IsNullOrWhiteSpace(imageName) ? null : imageName.Trim();
             ParentCategoryId = parentCategoryId;
             MarkAsUpdated(updatedBy);
         }

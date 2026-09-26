@@ -1,4 +1,5 @@
 using Attachment.Services.API.AttachmentRoutes;
+using Attachment.Services.API.Features.Attachments.Commands.DeleteFile;
 using Attachment.Services.API.Features.Attachments.Commands.DownloadFile;
 using Attachment.Services.API.Features.Attachments.Commands.UpdateFile;
 using Attachment.Services.API.Features.Attachments.Commands.UploadFile;
@@ -70,6 +71,18 @@ namespace Attachment.Services.API.Controllers
         {
             var result = await _mediator.Send(command, cancellationToken);
             return Success(result);
+        }
+
+        [HttpDelete]
+        [Route(AttachmentApiRoutes.Attachments.Update)]
+        [RoleAuthorize(UserType.OrganizationUser, UserType.WelcoStaff, UserType.Admin)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Delete([FromRoute] string name, [FromQuery] int place = 1, [FromQuery] MediaType fileType = MediaType.Image, CancellationToken cancellationToken = default)
+        {
+            var command = new DeleteFileCommand { FileName = name, Place = place, FileType = fileType };
+            var result = await _mediator.Send(command, cancellationToken);
+            return Success(result, "File deleted successfully");
         }
     }
 }

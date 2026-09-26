@@ -90,7 +90,7 @@ namespace Welco.Shared.Domain.Models
             Price = price;
             Stock = stock;
             if (specifications != null) Specifications = string.IsNullOrWhiteSpace(specifications) ? null : specifications.Trim();
-            if (imageName != null) ImageName = string.IsNullOrWhiteSpace(imageName) ? null : imageName.Trim();
+            ImageName = string.IsNullOrWhiteSpace(imageName) ? null : imageName.Trim();
             if (material != null) Material = string.IsNullOrWhiteSpace(material) ? null : material.Trim();
             LengthCm = lengthCm;
             CurrencyId = currencyId;
