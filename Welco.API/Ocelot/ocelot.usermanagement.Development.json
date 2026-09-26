@@ -103,7 +103,31 @@
       "UpstreamHttpMethod": [
         "GET"
       ],
-      "DangerousAcceptAnyServerCertificateValidator": true
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "DangerousAcceptAnyServerCertificateValidator": false
+    },
+    {
+      "DownstreamPathTemplate": "/api/v1/user-management/companies/my",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "welco-user.runasp.net",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/user-management/companies/my",
+      "UpstreamHttpMethod": [
+        "GET",
+        "PUT"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "DangerousAcceptAnyServerCertificateValidator": false
     },
     {
       "DownstreamPathTemplate": "/api/v1/user-management/companies/directory",

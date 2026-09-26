@@ -23,7 +23,7 @@ namespace UserManamgent.Service.API.Controllers
         public CompaniesController(IMediator mediator) : base(mediator) { }
         [HttpGet][Route(UserManagementApiRoutes.Companies.GetMyCompany)] public async Task<IActionResult> GetMyCompany(CancellationToken ct) => ToActionResult(await _mediator.Send(new GetMyCompanyQuery(), ct));
         [HttpGet][Route(UserManagementApiRoutes.Companies.GetProducts)] public async Task<IActionResult> GetProducts([FromRoute] Guid companyId, [FromQuery] GetCompanyProductsQuery q, CancellationToken ct) { q.CompanyId = companyId; return ToActionResult(await _mediator.Send(q, ct)); }
-        [HttpGet][Route(UserManagementApiRoutes.Companies.GetAll)] public async Task<IActionResult> GetAll([FromQuery] GetCompaniesQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
+        [HttpGet][Route(UserManagementApiRoutes.Companies.GetAll)][RoleAuthorize(UserType.Admin)] public async Task<IActionResult> GetAll([FromQuery] GetCompaniesQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
         [HttpGet]
         [Route(UserManagementApiRoutes.Companies.GetDirectory)]
         public async Task<IActionResult> GetDirectory([FromQuery] GetCompaniesQuery q, CancellationToken ct)
