@@ -48,7 +48,22 @@ namespace Welco.Shared.Common.Extensions
             var validIssuers = jwtSettings.GetAllValidIssuers().ToList();
             var validAudiences = jwtSettings.GetAllValidAudiences().ToList();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            // The default scheme must be pinned with the options overload, not the
+            // `AddAuthentication(string)` one. `AddIdentity<,>()` runs earlier in most
+            // services and sets DefaultAuthenticateScheme/DefaultChallengeScheme to
+            // "Identity.Application"; `AddAuthentication("Bearer")` only sets
+            // DefaultScheme, which ASP.NET Core consults *after* the authenticate
+            // scheme. The result was that UseAuthentication() ran cookie auth, left
+            // HttpContext.User anonymous, and every handler reading ICurrentUserService
+            // saw Guid.Empty — except those behind RoleAuthorizeAttribute, which
+            // re-authenticates explicitly and masked the fault.
+            services.AddAuthentication(authOptions =>
+            {
+                authOptions.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                authOptions.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                authOptions.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                authOptions.DefaultForbidScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
                 .AddJwtBearer(options =>
                 {
                     options.SaveToken = true;
