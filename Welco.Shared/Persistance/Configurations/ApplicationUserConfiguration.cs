@@ -21,10 +21,21 @@ namespace Welco.Shared.Persistance.Configurations
             builder.Property(u => u.Language)
                 .HasConversion<string>();
 
-builder.Property(u => u.UserType)
+            builder.Property(u => u.UserType)
                 .HasConversion(new ValueConverter<UserType, string>(
                     toProvider => toProvider.ToString(),
                     fromProvider => ToUserType(fromProvider)));
+
+            // Canonical phone key: one account per number, regardless of the
+            // formatting used at signup. Filtered so users who never supplied a
+            // phone (NULL) and soft-deleted rows are both excluded.
+            builder.Property(u => u.NormalizedPhoneNumber)
+                .HasMaxLength(20);
+
+            builder.HasIndex(u => u.NormalizedPhoneNumber)
+                .IsUnique()
+                .HasDatabaseName("IX_Users_NormalizedPhoneNumber")
+                .HasFilter("[NormalizedPhoneNumber] IS NOT NULL AND [NormalizedPhoneNumber] <> '' AND [IsDeleted] = 0");
         }
 
         private static UserType ToUserType(string? stored)

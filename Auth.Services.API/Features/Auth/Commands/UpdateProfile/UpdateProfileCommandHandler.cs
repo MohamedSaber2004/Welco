@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Auth.Responses;
 using Welco.Shared.Common.DTOs.UserManagement;
+using Welco.Shared.Common.Helpers;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Domain.Models;
@@ -54,7 +55,24 @@ namespace Auth.Services.API.Features.Auth.Commands.UpdateProfile
 
             if (request.PhoneNumber != null)
             {
-                user.PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim();
+                // Keep the canonical phone key in sync and block taking a number
+                // that already belongs to another account.
+                var normalizedPhone = PhoneNumberNormalizer.Normalize(request.PhoneNumber);
+
+                if (!string.IsNullOrEmpty(normalizedPhone))
+                {
+                    var phoneTaken = await _userManager.Users
+                        .AnyAsync(u => u.Id != user.Id && u.NormalizedPhoneNumber == normalizedPhone, cancellationToken);
+
+                    if (phoneTaken)
+                    {
+                        return Result<UserProfileDto>.BadRequest(
+                            LocalizationKeys.Auth.PhoneAlreadyExists,
+                            new List<string> { LocalizationKeys.Auth.PhoneAlreadyExists });
+                    }
+                }
+
+                user.SetPhoneNumber(request.PhoneNumber, currentUserId);
             }
 
             if (request.ProfilePictureName != null)

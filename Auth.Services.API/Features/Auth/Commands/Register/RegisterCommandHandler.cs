@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Welco.Shared.Common.Helpers;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Options;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
@@ -142,7 +143,8 @@ DistributorApplication? pendingApp = null;
                 FullName = request.FullName,
                 Email = request.Email,
                 UserName = request.Email,
-                PhoneNumber = request.PhoneNumber,
+                PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim(),
+                NormalizedPhoneNumber = PhoneNumberNormalizer.Normalize(request.PhoneNumber),
                 UserType = request.UserType,
                 Language = request.Language,
                 IsActive = isOrgUser,
@@ -183,6 +185,7 @@ var createResult = await _userManager.CreateAsync(user, request.Password);
         {
             user.FullName = request.FullName.Trim();
             user.PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim();
+            user.NormalizedPhoneNumber = PhoneNumberNormalizer.Normalize(request.PhoneNumber);
             user.UserType = request.UserType;
             user.Language = request.Language;
             user.IsDeleted = false;

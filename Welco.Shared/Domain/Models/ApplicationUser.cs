@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Welco.Shared.Common.Exceptions;
+using Welco.Shared.Common.Helpers;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Enums;
 using Welco.Shared.Localization;
@@ -19,6 +20,7 @@ namespace Welco.Shared.Domain.Models
 
         public string FullName { get; set; } = null!;
         public string? ProfilePictureName { get; set; }
+        public string? NormalizedPhoneNumber { get; set; }
         public string? PasswordResetToken { get; set; }
         public DateTime? PasswordResetTokenExpiry { get; set; }
         public string? EmailConfirmationOtp { get; set; }
@@ -72,6 +74,13 @@ namespace Welco.Shared.Domain.Models
 
             FullName = fullName;
             ProfilePictureName = profilePictureName;
+            MarkAsUpdated(updatedBy);
+        }
+
+        public void SetPhoneNumber(string? phoneNumber, string updatedBy)
+        {
+            PhoneNumber = string.IsNullOrWhiteSpace(phoneNumber) ? null : phoneNumber.Trim();
+            NormalizedPhoneNumber = PhoneNumberNormalizer.Normalize(phoneNumber);
             MarkAsUpdated(updatedBy);
         }
 

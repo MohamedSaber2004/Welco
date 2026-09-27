@@ -1,5 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Welco.Shared.Common.Helpers;
 using Welco.Shared.Domain.Models;
 using Welco.Shared.Localization;
 using Welco.Shared.Enums;
@@ -64,13 +66,25 @@ RuleFor(x => x.CompanyName)
 
             RuleFor(x => x).CustomAsync(async (command, context, ct) =>
             {
-                if (string.IsNullOrWhiteSpace(command.Email))
-                    return;
-
-                var existingUser = await userManager.FindByEmailAsync(command.Email);
-                if (existingUser != null)
+                if (!string.IsNullOrWhiteSpace(command.Email))
                 {
-                    context.AddFailure(nameof(command.Email), LocalizationKeys.Auth.EmailAlreadyExists);
+                    var existingUser = await userManager.FindByEmailAsync(command.Email);
+                    if (existingUser != null)
+                    {
+                        context.AddFailure(nameof(command.Email), LocalizationKeys.Auth.EmailAlreadyExists);
+                    }
+                }
+
+                var normalizedPhone = PhoneNumberNormalizer.Normalize(command.PhoneNumber);
+                if (!string.IsNullOrEmpty(normalizedPhone))
+                {
+                    var phoneTaken = await userManager.Users
+                        .AnyAsync(u => u.NormalizedPhoneNumber == normalizedPhone, ct);
+
+                    if (phoneTaken)
+                    {
+                        context.AddFailure(nameof(command.PhoneNumber), LocalizationKeys.Auth.PhoneAlreadyExists);
+                    }
                 }
             });
         }

@@ -61,6 +61,9 @@ namespace Welco.Shared.Localization
             public const string TooManyAttempts = "Auth.TooManyAttempts";
             public const string OtpSent = "Auth.OtpSent";
             public const string OtpVerified = "Auth.OtpVerified";
+            public const string OtpResent = "Auth.OtpResent";
+            public const string OtpResendTooSoon = "Auth.OtpResendTooSoon";
+            public const string EmailAlreadyConfirmed = "Auth.EmailAlreadyConfirmed";
             public const string PasswordResetSuccess = "Auth.PasswordResetSuccess";
             public const string InvalidOtp = "Auth.InvalidOtp";
             public const string EmailSendFailed = "Auth.EmailSendFailed";
@@ -83,6 +86,7 @@ namespace Welco.Shared.Localization
             public const string LanguageRequired = "Auth.LanguageRequired";
             public const string PhoneTooLong = "Auth.PhoneTooLong";
             public const string PhoneInvalidFormat = "Auth.PhoneInvalidFormat";
+            public const string PhoneAlreadyExists = "Auth.PhoneAlreadyExists";
             public const string PhoneCodeMismatch = "Auth.PhoneCodeMismatch";
             public const string SalesVolumeRequired = "Auth.SalesVolumeRequired";
             public const string WebsiteInvalid = "Auth.WebsiteInvalid";

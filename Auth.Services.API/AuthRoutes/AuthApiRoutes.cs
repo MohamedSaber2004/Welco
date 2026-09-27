@@ -9,6 +9,7 @@ namespace Auth.Services.API.AuthRoutes
             public const string Login = "login";
             public const string Register = "register";
             public const string VerifyEmailOtp = "verify-register-otp";
+            public const string ResendRegisterOtp = "resend-register-otp";
             public const string ForgotPassword = "forgot-password";
             public const string VerifyPasswordOtp = "verify-password-otp";
             public const string ResetPassword = "reset-password";

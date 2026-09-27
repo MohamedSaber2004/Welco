@@ -51,6 +51,9 @@
     "TooManyAttempts": "Too many failed attempts. Please wait.",
     "OtpSent": "OTP code has been sent successfully.",
     "OtpVerified": "OTP verified successfully.",
+    "OtpResent": "A new verification code has been sent to your email.",
+    "OtpResendTooSoon": "Please wait a moment before requesting another verification code.",
+    "EmailAlreadyConfirmed": "This email is already confirmed. Please sign in instead.",
     "PasswordResetSuccess": "Password reset successfully.",
     "InvalidOtp": "Invalid or expired OTP code.",
     "EmailSendFailed": "Failed to send email.",
@@ -73,6 +76,7 @@
     "LanguageRequired": "Language is required.",
     "PhoneTooLong": "Phone number is too long.",
     "PhoneInvalidFormat": "Phone number must be 6-20 digits, may start with +.",
+    "PhoneAlreadyExists": "This phone number is already registered. Please use a different number or sign in to your existing account.",
     "PhoneCodeMismatch": "Phone number must start with country phone code {0} ({1}).",
     "SalesVolumeRequired": "Sales volume is required.",
     "WebsiteInvalid": "Website must be a valid URL."

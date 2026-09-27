@@ -4,6 +4,7 @@ using Auth.Services.API.Features.Auth.Commands.Login;
 using Auth.Services.API.Features.Auth.Commands.Logout;
 using Auth.Services.API.Features.Auth.Commands.RefreshToken;
 using Auth.Services.API.Features.Auth.Commands.Register;
+using Auth.Services.API.Features.Auth.Commands.ResendRegisterOtp;
 using Auth.Services.API.Features.Auth.Commands.ResetPassword;
 using Auth.Services.API.Features.Auth.Commands.UpdateProfile;
 using Auth.Services.API.Features.Auth.Commands.VerifyEmailOtp;
@@ -23,9 +24,9 @@ namespace Auth.Services.API.Controllers
         {
         }
 
-                [HttpPost]
+        [HttpPost]
         [Route(AuthApiRoutes.Authentication.Register)]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Register([FromBody] RegisterCommand command, CancellationToken cancellationToken)
         {
@@ -56,6 +57,17 @@ namespace Auth.Services.API.Controllers
         }
 
                 [HttpPost]
+        [Route(AuthApiRoutes.Authentication.ResendRegisterOtp)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ResendRegisterOtp([FromBody] ResendRegisterOtpCommand command, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(command, cancellationToken);
+            return ToActionResult(result);
+        }
+
+        [HttpPost]
         [Route(AuthApiRoutes.Authentication.ForgotPassword)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
