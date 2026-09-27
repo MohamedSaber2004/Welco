@@ -11,7 +11,7 @@ namespace Product.Services.API.Features.Categories.Queries.GetCategories
                 .GreaterThanOrEqualTo(1).WithMessage(LocalizationKeys.UserManagement.PageNumberPositive);
 
             RuleFor(x => x.PageSize)
-                .InclusiveBetween(1, 50).WithMessage(LocalizationKeys.UserManagement.PageSizeRange);
+                .InclusiveBetween(1, 500).WithMessage(LocalizationKeys.UserManagement.PageSizeRange);
         }
     }
 }
