@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Product.Services.API.Features.Categories.Commands.CreateCategory;
 using Product.Services.API.Features.Categories.Commands.DeleteCategory;
 using Product.Services.API.Features.Categories.Commands.UpdateCategory;
+using Product.Services.API.Features.Categories.Queries.GetAllCategories;
 using Product.Services.API.Features.Categories.Queries.GetCategories;
 using Product.Services.API.Features.Categories.Queries.GetCategoryById;
 using Product.Services.API.Features.Categories.Queries.GetCategoryProducts;
@@ -24,7 +25,7 @@ namespace Product.Services.API.Controllers
         {
         }
 
-                [HttpGet]
+[HttpGet]
         [Route(ProductApiRoutes.Categories.GetAll)]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -34,7 +35,17 @@ namespace Product.Services.API.Controllers
             return ToActionResult(result);
         }
 
-                [HttpGet]
+        [HttpGet]
+        [Route(ProductApiRoutes.Categories.GetAllList)]
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllList(CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetAllCategoriesQuery(), cancellationToken);
+            return ToActionResult(result);
+        }
+
+        [HttpGet]
         [Route(ProductApiRoutes.Categories.GetById)]
         [AllowAnonymous]
         [ProducesResponseType(StatusCodes.Status200OK)]

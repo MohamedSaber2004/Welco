@@ -12,6 +12,7 @@ namespace Product.Services.API.ProductRoutes
         {
             public const string Base = CategoriesBase;
             public const string GetAll = "";
+            public const string GetAllList = "all";
             public const string GetById = "{id}";
             public const string Create = "";
             public const string Update = "{id}";
