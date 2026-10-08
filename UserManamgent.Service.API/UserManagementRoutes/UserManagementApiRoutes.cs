@@ -73,6 +73,7 @@ namespace UserManamgent.Service.API.UserManagementRoutes
             // used by the provider self-service update below.
             public const string Update = "{id:guid}";
             public const string Delete = "{id}";
+            public const string DeleteWithCascade = "{id}/delete-with-cascade";
         }
 
         public static class CompanyAddresses

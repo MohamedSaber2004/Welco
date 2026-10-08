@@ -20,7 +20,15 @@ namespace Sales.Services.API.Features.Quotes.Queries.GetQuotes
             var q = repo.GetAll(x => !x.IsDeleted).AsNoTracking();
             
             var caller = await BuyerScope.GetAsync(_uow, _cur, ct);
-            if (caller.IsOrganizationUser) q = q.Where(x => x.RFQ != null && x.RFQ.CompanyId == caller.CompanyId);
+            if (caller.IsOrganizationUser && caller.CompanyId.HasValue)
+            {
+                var companyId = caller.CompanyId.Value;
+                q = q.Where(x => (x.RFQ != null && x.RFQ.CompanyId == companyId) || x.Items.Any(i => !i.IsDeleted && i.Product != null && i.Product.CompanyId == companyId) || (x.RFQ != null && x.RFQ.Items.Any(i => !i.IsDeleted && i.Product != null && i.Product.CompanyId == companyId)));
+            }
+            else if (caller.IsOrganizationUser)
+            {
+                q = q.Where(x => x.RFQ != null && x.RFQ.CompanyId == caller.CompanyId);
+            }
             return await q.OrderByDescending(x => x.CreatedAt).ToPaginatedListAsync(x => new QuoteDto { Id = x.Id, QuoteNumber = x.QuoteNumber, RFQId = x.RFQId, Amount = x.Amount, ValidUntil = x.ValidUntil, Status = x.Status.ToString(), CreatedAt = x.CreatedAt }, r.PageNumber, r.PageSize, LocalizationKeys.Quote.ListFetched, ct);
         }
     }

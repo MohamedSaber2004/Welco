@@ -48,8 +48,8 @@ namespace Sales.Services.API.Controllers
     {
         public ProductInquiriesController(IMediator mediator) : base(mediator) { }
 
-[HttpGet][RoleAuthorize(UserType.Admin, UserType.WelcoStaff)] public async Task<IActionResult> GetAll([FromQuery] GetProductInquiriesQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
-        [HttpGet][Route(SalesApiRoutes.ProductInquiries.GetById)][RoleAuthorize(UserType.Admin, UserType.WelcoStaff)] public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetProductInquiryByIdQuery { Id = id }, ct));
+[HttpGet][RoleAuthorize(UserType.Admin, UserType.WelcoStaff, UserType.OrganizationUser)] public async Task<IActionResult> GetAll([FromQuery] GetProductInquiriesQuery q, CancellationToken ct) => ToActionResult(await _mediator.Send(q, ct));
+        [HttpGet][Route(SalesApiRoutes.ProductInquiries.GetById)][RoleAuthorize(UserType.Admin, UserType.WelcoStaff, UserType.OrganizationUser)] public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetProductInquiryByIdQuery { Id = id }, ct));
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Create([FromBody] CreateProductInquiryCommand c, CancellationToken ct) => ToActionResult(await _mediator.Send(c, ct));
