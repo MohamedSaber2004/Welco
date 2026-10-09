@@ -1,4 +1,4 @@
-namespace Welco.Shared.Localization
+﻿namespace Welco.Shared.Localization
 {
     public static class LocalizationKeys
     {
@@ -473,6 +473,8 @@ namespace Welco.Shared.Localization
             public const string OrganizationRequired = "ProductInquiry.OrganizationRequired";
             public const string MessageRequired = "ProductInquiry.MessageRequired";
             public const string EmailInvalid = "ProductInquiry.EmailInvalid";
+            public const string Responded = "ProductInquiry.Responded";
+            public const string ResponseRequired = "ProductInquiry.ResponseRequired";
         }
         public static class OemInquiry
         {

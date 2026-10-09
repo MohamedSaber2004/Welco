@@ -1,4 +1,4 @@
-namespace Welco.Shared.Common.DTOs.Sales
+﻿namespace Welco.Shared.Common.DTOs.Sales
 {
     public class RFQDto
     {
@@ -7,6 +7,7 @@ namespace Welco.Shared.Common.DTOs.Sales
         public Guid CompanyId { get; set; }
         public string Status { get; set; } = string.Empty;
         public Guid? AssignedSalesRepId { get; set; }
+        public string? ResponseNote { get; set; }
         public List<RFQItemDto> Items { get; set; } = new();
         public DateTime CreatedAt { get; set; }
     }
@@ -19,9 +20,28 @@ namespace Welco.Shared.Common.DTOs.Sales
         public decimal Amount { get; set; }
         public DateTime ValidUntil { get; set; }
         public string Status { get; set; } = string.Empty;
+        public string? Note { get; set; }
         public List<QuoteItemDto> Items { get; set; } = new();
         public DateTime CreatedAt { get; set; }
     }
     public class QuoteItemDto { public Guid Id { get; set; } public Guid QuoteId { get; set; } public Guid ProductId { get; set; } public string? ProductNameEn { get; set; } public string? ProductNameAr { get; set; } public int Quantity { get; set; } public decimal UnitPrice { get; set; } }
-    public class ProductInquiryDto { public Guid Id { get; set; } public Guid ProductId { get; set; } public string? ProductNameEn { get; set; } public string? ProductNameAr { get; set; } public string? ProductSku { get; set; } public string Name { get; set; } = string.Empty; public string Organization { get; set; } = string.Empty; public string Message { get; set; } = string.Empty; public string? Email { get; set; } public DateTime CreatedAt { get; set; } }
+    public class ProductInquiryDto
+    {
+        public Guid Id { get; set; }
+        public Guid ProductId { get; set; }
+        public string? ProductNameEn { get; set; }
+        public string? ProductNameAr { get; set; }
+        public string? ProductSku { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Organization { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+        public string? Email { get; set; }
+        public string Status { get; set; } = "Pending";
+        public Guid? UserId { get; set; }
+        public string? Response { get; set; }
+        public DateTime? RespondedAt { get; set; }
+        public Guid? RespondedById { get; set; }
+        public string? RespondedByName { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
 }

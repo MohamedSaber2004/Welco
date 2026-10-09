@@ -1,9 +1,10 @@
-using Welco.Shared.Common.Classes;
+﻿using Welco.Shared.Common.Classes;
 using Welco.Shared.Enums;
 namespace Welco.Shared.Domain.Models
 {
     public enum RFQStatus { Pending = 1, Quoted = 2, Ordered = 3, Cancelled = 4 }
     public enum QuoteStatus { Draft = 1, Sent = 2, Approved = 3, Declined = 4, Expired = 5 }
+    public enum ProductInquiryStatus { Pending = 1, Responded = 2, Closed = 3 }
     public enum DistributorApplicationStatus { Pending = 1, Approved = 2, Rejected = 3 }
     public class RFQ : BaseEntity<Guid>
     {
@@ -17,6 +18,7 @@ namespace Welco.Shared.Domain.Models
         public string? ExternalRfqId { get; set; }
         
         public string? SourceMarket { get; set; }
+        public string? ResponseNote { get; set; }
         public virtual ICollection<RFQItem> Items { get; set; } = new List<RFQItem>();
     }
     public class RFQItem : BaseEntity<Guid>
@@ -38,6 +40,7 @@ namespace Welco.Shared.Domain.Models
         public DateTime ValidUntil { get; set; }
         public QuoteStatus Status { get; set; } = QuoteStatus.Draft;
         public Guid CreatedBySalesRepId { get; set; }
+        public string? Note { get; set; }
         public virtual ICollection<QuoteItem> Items { get; set; } = new List<QuoteItem>();
     }
     public class QuoteItem : BaseEntity<Guid>
@@ -57,6 +60,13 @@ namespace Welco.Shared.Domain.Models
         public string Organization { get; set; } = null!;
         public string Message { get; set; } = null!;
         public string? Email { get; set; }
+        public Guid? UserId { get; set; }
+        public virtual ApplicationUser? User { get; set; }
+        public string? Response { get; set; }
+        public DateTime? RespondedAt { get; set; }
+        public Guid? RespondedById { get; set; }
+        public virtual ApplicationUser? RespondedBy { get; set; }
+        public ProductInquiryStatus Status { get; set; } = ProductInquiryStatus.Pending;
     }
     public class DistributorApplication : BaseEntity<Guid>
     {

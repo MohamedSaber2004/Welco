@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Sales;
 using Welco.Shared.Common.Interfaces;
@@ -24,7 +24,28 @@ namespace Sales.Services.API.Features.RFQs.Queries.GetRFQById
                 var ownsProduct = rfq.Items.Any(i => !i.IsDeleted && i.Product != null && i.Product.CompanyId == caller.CompanyId);
                 if (!ownsProduct) return Result<RFQDto>.NotFound(LocalizationKeys.RFQ.NotFound);
             }
-            return Result<RFQDto>.Success(new RFQDto { Id = rfq.Id, RFQNumber = rfq.RFQNumber, CompanyId = rfq.CompanyId, Status = rfq.Status.ToString(), AssignedSalesRepId = rfq.AssignedSalesRepId, Items = rfq.Items.Where(i => !i.IsDeleted).Select(i => new RFQItemDto { Id = i.Id, RFQId = i.RFQId, ProductId = i.ProductId, ProductNameEn = i.Product != null ? i.Product.NameEn : null, ProductNameAr = i.Product != null ? i.Product.NameAr : null, ImageName = i.Product != null ? i.Product.ImageName : null, Quantity = i.Quantity, UnitPrice = i.UnitPrice, Notes = i.Notes }).ToList(), CreatedAt = rfq.CreatedAt }, LocalizationKeys.RFQ.Fetched);
+            return Result<RFQDto>.Success(new RFQDto
+            {
+                Id = rfq.Id,
+                RFQNumber = rfq.RFQNumber,
+                CompanyId = rfq.CompanyId,
+                Status = rfq.Status.ToString(),
+                AssignedSalesRepId = rfq.AssignedSalesRepId,
+                ResponseNote = rfq.ResponseNote,
+                Items = rfq.Items.Where(i => !i.IsDeleted).Select(i => new RFQItemDto
+                {
+                    Id = i.Id,
+                    RFQId = i.RFQId,
+                    ProductId = i.ProductId,
+                    ProductNameEn = i.Product != null ? i.Product.NameEn : null,
+                    ProductNameAr = i.Product != null ? i.Product.NameAr : null,
+                    ImageName = i.Product != null ? i.Product.ImageName : null,
+                    Quantity = i.Quantity,
+                    UnitPrice = i.UnitPrice,
+                    Notes = i.Notes
+                }).ToList(),
+                CreatedAt = rfq.CreatedAt
+            }, LocalizationKeys.RFQ.Fetched);
         }
     }
 }

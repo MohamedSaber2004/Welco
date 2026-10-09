@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Sales;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
@@ -18,7 +18,24 @@ namespace Sales.Services.API.Features.ProductInquiries.Queries.GetProductInquiry
             if (x == null) return Result<ProductInquiryDto>.NotFound(LocalizationKeys.ProductInquiry.NotFound);
             var caller = await Sales.Services.API.Features.Shared.BuyerScope.GetAsync(_uow, _cur, ct);
             if (caller.IsOrganizationUser && caller.CompanyId.HasValue && (x.Product == null || x.Product.CompanyId != caller.CompanyId)) return Result<ProductInquiryDto>.NotFound(LocalizationKeys.ProductInquiry.NotFound);
-            return Result<ProductInquiryDto>.Success(new ProductInquiryDto { Id = x.Id, ProductId = x.ProductId, ProductNameEn = x.Product != null ? x.Product.NameEn : null, ProductNameAr = x.Product != null ? x.Product.NameAr : null, ProductSku = x.Product != null ? x.Product.Sku : null, Name = x.Name, Organization = x.Organization, Message = x.Message, Email = x.Email, CreatedAt = x.CreatedAt }, LocalizationKeys.ProductInquiry.Fetched);
+            return Result<ProductInquiryDto>.Success(new ProductInquiryDto
+            {
+                Id = x.Id,
+                ProductId = x.ProductId,
+                ProductNameEn = x.Product != null ? x.Product.NameEn : null,
+                ProductNameAr = x.Product != null ? x.Product.NameAr : null,
+                ProductSku = x.Product != null ? x.Product.Sku : null,
+                Name = x.Name,
+                Organization = x.Organization,
+                Message = x.Message,
+                Email = x.Email,
+                Status = x.Status.ToString(),
+                UserId = x.UserId,
+                Response = x.Response,
+                RespondedAt = x.RespondedAt,
+                RespondedById = x.RespondedById,
+                CreatedAt = x.CreatedAt
+            }, LocalizationKeys.ProductInquiry.Fetched);
         }
     }
 }

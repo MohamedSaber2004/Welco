@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Localization;
@@ -15,9 +15,24 @@ namespace Sales.Services.API.Features.Quotes.Commands.CreateQuote
         public async Task<Result<string>> Handle(CreateQuoteCommand r, CancellationToken ct)
         {
             var curId = _cur.UserId != Guid.Empty ? _cur.UserId.ToString() : "System";
-            var quote = new QuoteEntity { Id = Guid.NewGuid(), QuoteNumber = $"QT-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6].ToUpper()}", RFQId = r.RFQId, Amount = r.Amount, ValidUntil = r.ValidUntil, Status = Welco.Shared.Domain.Models.QuoteStatus.Draft, CreatedBySalesRepId = _cur.UserId };
+            var quote = new QuoteEntity
+            {
+                Id = Guid.NewGuid(),
+                QuoteNumber = $"QT-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString()[..6].ToUpper()}",
+                RFQId = r.RFQId,
+                Amount = r.Amount,
+                ValidUntil = r.ValidUntil,
+                Status = Welco.Shared.Domain.Models.QuoteStatus.Draft,
+                CreatedBySalesRepId = _cur.UserId,
+                Note = r.Note
+            };
             quote.MarkAsCreated(curId);
-            foreach (var it in r.Items) { var qi = new QuoteItemEntity { Id = Guid.NewGuid(), QuoteId = quote.Id, ProductId = it.ProductId, Quantity = it.Quantity, UnitPrice = it.UnitPrice }; qi.MarkAsCreated(curId); quote.Items.Add(qi); }
+            foreach (var it in r.Items)
+            {
+                var qi = new QuoteItemEntity { Id = Guid.NewGuid(), QuoteId = quote.Id, ProductId = it.ProductId, Quantity = it.Quantity, UnitPrice = it.UnitPrice };
+                qi.MarkAsCreated(curId);
+                quote.Items.Add(qi);
+            }
             var repo = _uow.GetRepository<QuoteEntity, Guid>();
             await repo.AddAsync(quote, ct);
             
@@ -25,9 +40,12 @@ namespace Sales.Services.API.Features.Quotes.Commands.CreateQuote
             {
                 var rfqRepo = _uow.GetRepository<RFQEntity, Guid>();
                 var rfq = await rfqRepo.GetByIdAsync(r.RFQId.Value, ct);
-                if (rfq != null && !rfq.IsDeleted && rfq.Status == Welco.Shared.Domain.Models.RFQStatus.Pending)
+                if (rfq != null && !rfq.IsDeleted)
                 {
-                    rfq.Status = Welco.Shared.Domain.Models.RFQStatus.Quoted;
+                    if (rfq.Status == Welco.Shared.Domain.Models.RFQStatus.Pending)
+                        rfq.Status = Welco.Shared.Domain.Models.RFQStatus.Quoted;
+                    if (!string.IsNullOrWhiteSpace(r.Note))
+                        rfq.ResponseNote = r.Note;
                     rfq.MarkAsUpdated(curId);
                 }
             }

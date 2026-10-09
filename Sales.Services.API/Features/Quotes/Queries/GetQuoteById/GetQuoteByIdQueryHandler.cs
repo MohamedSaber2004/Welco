@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Sales;
 using Welco.Shared.Common.Interfaces;
@@ -25,7 +25,18 @@ namespace Sales.Services.API.Features.Quotes.Queries.GetQuoteById
                     || (q.RFQ != null && q.RFQ.Items.Any(i => !i.IsDeleted && i.Product != null && i.Product.CompanyId == caller.CompanyId));
                 if (!ownsItem) return Result<QuoteDto>.NotFound(LocalizationKeys.Quote.NotFound);
             }
-            return Result<QuoteDto>.Success(new QuoteDto { Id = q.Id, QuoteNumber = q.QuoteNumber, RFQId = q.RFQId, Amount = q.Amount, ValidUntil = q.ValidUntil, Status = q.Status.ToString(), CreatedAt = q.CreatedAt, Items = q.Items.Where(i => !i.IsDeleted).Select(i => new QuoteItemDto { Id = i.Id, QuoteId = i.QuoteId, ProductId = i.ProductId, ProductNameEn = i.Product != null ? i.Product.NameEn : null, ProductNameAr = i.Product != null ? i.Product.NameAr : null, Quantity = i.Quantity, UnitPrice = i.UnitPrice }).ToList() }, LocalizationKeys.Quote.Fetched);
+            return Result<QuoteDto>.Success(new QuoteDto
+            {
+                Id = q.Id,
+                QuoteNumber = q.QuoteNumber,
+                RFQId = q.RFQId,
+                Amount = q.Amount,
+                ValidUntil = q.ValidUntil,
+                Status = q.Status.ToString(),
+                Note = q.Note,
+                CreatedAt = q.CreatedAt,
+                Items = q.Items.Where(i => !i.IsDeleted).Select(i => new QuoteItemDto { Id = i.Id, QuoteId = i.QuoteId, ProductId = i.ProductId, ProductNameEn = i.Product != null ? i.Product.NameEn : null, ProductNameAr = i.Product != null ? i.Product.NameAr : null, Quantity = i.Quantity, UnitPrice = i.UnitPrice }).ToList()
+            }, LocalizationKeys.Quote.Fetched);
         }
     }
 }

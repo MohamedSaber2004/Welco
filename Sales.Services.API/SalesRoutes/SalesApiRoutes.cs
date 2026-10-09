@@ -1,4 +1,4 @@
-namespace Sales.Services.API.SalesRoutes
+﻿namespace Sales.Services.API.SalesRoutes
 {
     public static class SalesApiRoutes
     {
@@ -13,6 +13,7 @@ namespace Sales.Services.API.SalesRoutes
             public const string GetById = "{id}";
             public const string Create = "";
             public const string UpdateStatus = "{id}/status";
+            public const string Respond = "{id}/respond";
         }
         public static class Quotes
         {
@@ -30,6 +31,7 @@ namespace Sales.Services.API.SalesRoutes
             public const string GetAll = "";
             public const string GetById = "{id}";
             public const string Create = "";
+            public const string Respond = "{id}/respond";
             public const string Delete = "{id}";
         }
     }

@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Sales;
 using Welco.Shared.Common.Extensions;
@@ -29,7 +29,17 @@ namespace Sales.Services.API.Features.Quotes.Queries.GetQuotes
             {
                 q = q.Where(x => x.RFQ != null && x.RFQ.CompanyId == caller.CompanyId);
             }
-            return await q.OrderByDescending(x => x.CreatedAt).ToPaginatedListAsync(x => new QuoteDto { Id = x.Id, QuoteNumber = x.QuoteNumber, RFQId = x.RFQId, Amount = x.Amount, ValidUntil = x.ValidUntil, Status = x.Status.ToString(), CreatedAt = x.CreatedAt }, r.PageNumber, r.PageSize, LocalizationKeys.Quote.ListFetched, ct);
+            return await q.OrderByDescending(x => x.CreatedAt).ToPaginatedListAsync(x => new QuoteDto
+            {
+                Id = x.Id,
+                QuoteNumber = x.QuoteNumber,
+                RFQId = x.RFQId,
+                Amount = x.Amount,
+                ValidUntil = x.ValidUntil,
+                Status = x.Status.ToString(),
+                Note = x.Note,
+                CreatedAt = x.CreatedAt
+            }, r.PageNumber, r.PageSize, LocalizationKeys.Quote.ListFetched, ct);
         }
     }
 }
