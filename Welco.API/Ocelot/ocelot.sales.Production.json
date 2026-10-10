@@ -1,6 +1,42 @@
 ﻿{
     "Routes":  [
                    {
+                       "DownstreamPathTemplate":  "/api/v1/rfqs",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "welco-sales.runasp.net",
+                                                          "Port":  443
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/rfqs",
+                       "UpstreamHttpMethod":  [
+                                                  "GET"
+                                              ],
+                       "DangerousAcceptAnyServerCertificateValidator":  false
+                   },
+                   {
+                       "DownstreamPathTemplate":  "/api/v1/rfqs",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "welco-sales.runasp.net",
+                                                          "Port":  443
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/rfqs",
+                       "UpstreamHttpMethod":  [
+                                                  "POST"
+                                              ],
+                       "AuthenticationOptions":  {
+                                                     "AuthenticationProviderKey":  "Bearer",
+                                                     "AllowedScopes":  [
+
+                                                                       ]
+                                                 },
+                       "DangerousAcceptAnyServerCertificateValidator":  false
+                   },
+                   {
                        "DownstreamPathTemplate":  "/api/v1/rfqs/{everything}",
                        "DownstreamScheme":  "https",
                        "DownstreamHostAndPorts":  [
@@ -15,6 +51,42 @@
                                                   "POST",
                                                   "PUT",
                                                   "DELETE"
+                                              ],
+                       "AuthenticationOptions":  {
+                                                     "AuthenticationProviderKey":  "Bearer",
+                                                     "AllowedScopes":  [
+
+                                                                       ]
+                                                 },
+                       "DangerousAcceptAnyServerCertificateValidator":  false
+                   },
+                   {
+                       "DownstreamPathTemplate":  "/api/v1/quotes",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "welco-sales.runasp.net",
+                                                          "Port":  443
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/quotes",
+                       "UpstreamHttpMethod":  [
+                                                  "GET"
+                                              ],
+                       "DangerousAcceptAnyServerCertificateValidator":  false
+                   },
+                   {
+                       "DownstreamPathTemplate":  "/api/v1/quotes",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "welco-sales.runasp.net",
+                                                          "Port":  443
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/quotes",
+                       "UpstreamHttpMethod":  [
+                                                  "POST"
                                               ],
                        "AuthenticationOptions":  {
                                                      "AuthenticationProviderKey":  "Bearer",
@@ -49,6 +121,42 @@
                        "DangerousAcceptAnyServerCertificateValidator":  false
                    },
                    {
+                       "DownstreamPathTemplate":  "/api/v1/product-inquiries",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "welco-sales.runasp.net",
+                                                          "Port":  443
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/product-inquiries",
+                       "UpstreamHttpMethod":  [
+                                                  "GET"
+                                              ],
+                       "AuthenticationOptions":  {
+                                                     "AuthenticationProviderKey":  "Bearer",
+                                                     "AllowedScopes":  [
+
+                                                                       ]
+                                                 },
+                       "DangerousAcceptAnyServerCertificateValidator":  false
+                   },
+                   {
+                       "DownstreamPathTemplate":  "/api/v1/product-inquiries",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "welco-sales.runasp.net",
+                                                          "Port":  443
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/product-inquiries",
+                       "UpstreamHttpMethod":  [
+                                                  "POST"
+                                              ],
+                       "DangerousAcceptAnyServerCertificateValidator":  false
+                   },
+                   {
                        "DownstreamPathTemplate":  "/api/v1/product-inquiries/{everything}",
                        "DownstreamScheme":  "https",
                        "DownstreamHostAndPorts":  [
@@ -77,13 +185,13 @@
                                                   "GET",
                                                   "DELETE"
                                               ],
-                       "DangerousAcceptAnyServerCertificateValidator":  false,
                        "AuthenticationOptions":  {
                                                      "AuthenticationProviderKey":  "Bearer",
                                                      "AllowedScopes":  [
 
                                                                        ]
-                                                 }
+                                                 },
+                       "DangerousAcceptAnyServerCertificateValidator":  false
                    },
                    {
                        "DownstreamPathTemplate":  "/openapi/v1.json",
