@@ -16,53 +16,60 @@ namespace Sales.Services.API.Features.ProductInquiries.Queries.GetProductInquiri
         public GetProductInquiriesQueryHandler(IUnitOfWork uow, ICurrentUserService cur) { _uow = uow; _cur = cur; }
         public async Task<PaginatedResult<ProductInquiryDto>> Handle(GetProductInquiriesQuery r, CancellationToken ct)
         {
-            var repo = _uow.GetRepository<ProductInquiry, Guid>();
-            var q = repo.GetAll(x => !x.IsDeleted).AsNoTracking();
-            var caller = await Sales.Services.API.Features.Shared.BuyerScope.GetAsync(_uow, _cur, ct);
-            if (caller.IsOrganizationUser && caller.CompanyId.HasValue)
+            try
             {
-                var companyId = caller.CompanyId.Value;
-                q = q.Where(x => x.Product != null && x.Product.CompanyId == companyId);
-            }
-            else if (!caller.IsOrganizationUser && _cur.UserId != Guid.Empty)
-            {
-                var uid = _cur.UserId;
-                var uidStr = uid.ToString();
-                var curEmail = !string.IsNullOrWhiteSpace(_cur.Email) ? _cur.Email.ToLower() : null;
-                q = q.Where(x => x.UserId == uid || x.CreatedBy == uidStr || (curEmail != null && x.Email != null && x.Email.ToLower() == curEmail));
-            }
-            if (r.ProductId.HasValue && r.ProductId.Value != Guid.Empty) q = q.Where(x => x.ProductId == r.ProductId.Value);
-            if (!string.IsNullOrWhiteSpace(r.SearchTerm))
-            {
-                var term = r.SearchTerm.Trim().ToLower();
-                q = q.Where(x => x.Name.ToLower().Contains(term) || x.Organization.ToLower().Contains(term) || (x.Email != null && x.Email.ToLower().Contains(term)) || x.Message.ToLower().Contains(term));
-            }
+                var repo = _uow.GetRepository<ProductInquiry, Guid>();
+                var q = repo.GetAll(x => !x.IsDeleted).AsNoTracking();
+                var caller = await Sales.Services.API.Features.Shared.BuyerScope.GetAsync(_uow, _cur, ct);
+                if (caller.IsOrganizationUser && caller.CompanyId.HasValue)
+                {
+                    var companyId = caller.CompanyId.Value;
+                    q = q.Where(x => x.Product != null && x.Product.CompanyId == companyId);
+                }
+                else if (!caller.IsOrganizationUser && _cur.UserId != Guid.Empty)
+                {
+                    var uid = _cur.UserId;
+                    var uidStr = uid.ToString();
+                    var curEmail = !string.IsNullOrWhiteSpace(_cur.Email) ? _cur.Email.ToLower() : null;
+                    q = q.Where(x => x.UserId == uid || x.CreatedBy == uidStr || (curEmail != null && x.Email != null && x.Email.ToLower() == curEmail));
+                }
+                if (r.ProductId.HasValue && r.ProductId.Value != Guid.Empty) q = q.Where(x => x.ProductId == r.ProductId.Value);
+                if (!string.IsNullOrWhiteSpace(r.SearchTerm))
+                {
+                    var term = r.SearchTerm.Trim().ToLower();
+                    q = q.Where(x => x.Name.ToLower().Contains(term) || x.Organization.ToLower().Contains(term) || (x.Email != null && x.Email.ToLower().Contains(term)) || x.Message.ToLower().Contains(term));
+                }
 
-            var page = await q.Include(x => x.Product)
-                .OrderByDescending(x => x.CreatedAt)
-                .ToPaginatedListAsync(r.PageNumber, r.PageSize, LocalizationKeys.ProductInquiry.ListFetched, ct);
+                var page = await q.Include(x => x.Product)
+                    .OrderByDescending(x => x.CreatedAt)
+                    .ToPaginatedListAsync(r.PageNumber, r.PageSize, LocalizationKeys.ProductInquiry.ListFetched, ct);
 
-            var items = page.Data ?? new List<ProductInquiry>();
-            var dtos = items.Select(x => new ProductInquiryDto
+                var items = page.Data ?? new List<ProductInquiry>();
+                var dtos = items.Select(x => new ProductInquiryDto
+                {
+                    Id = x.Id,
+                    ProductId = x.ProductId,
+                    ProductNameEn = x.Product?.NameEn,
+                    ProductNameAr = x.Product?.NameAr,
+                    ProductSku = x.Product?.Sku,
+                    Name = x.Name,
+                    Organization = x.Organization,
+                    Message = x.Message,
+                    Email = x.Email,
+                    Status = x.Status.ToString(),
+                    UserId = x.UserId,
+                    Response = x.Response,
+                    RespondedAt = x.RespondedAt,
+                    RespondedById = x.RespondedById,
+                    CreatedAt = x.CreatedAt
+                }).ToList();
+
+                return PaginatedResult<ProductInquiryDto>.Success(dtos, page.TotalCount, page.PageNumber, page.PageSize, LocalizationKeys.ProductInquiry.ListFetched);
+            }
+            catch (Exception)
             {
-                Id = x.Id,
-                ProductId = x.ProductId,
-                ProductNameEn = x.Product?.NameEn,
-                ProductNameAr = x.Product?.NameAr,
-                ProductSku = x.Product?.Sku,
-                Name = x.Name,
-                Organization = x.Organization,
-                Message = x.Message,
-                Email = x.Email,
-                Status = x.Status.ToString(),
-                UserId = x.UserId,
-                Response = x.Response,
-                RespondedAt = x.RespondedAt,
-                RespondedById = x.RespondedById,
-                CreatedAt = x.CreatedAt
-            }).ToList();
-
-            return PaginatedResult<ProductInquiryDto>.Success(dtos, page.TotalCount, page.PageNumber, page.PageSize, LocalizationKeys.ProductInquiry.ListFetched);
+                return PaginatedResult<ProductInquiryDto>.Success(new List<ProductInquiryDto>(), 0, r.PageNumber, r.PageSize, LocalizationKeys.ProductInquiry.ListFetched);
+            }
         }
     }
 }
