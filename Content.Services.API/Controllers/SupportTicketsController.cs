@@ -1,4 +1,4 @@
-using Content.Services.API.ContentRoutes;
+﻿using Content.Services.API.ContentRoutes;
 using Content.Services.API.Features.SupportTickets.Commands.CloseTicket;
 using Content.Services.API.Features.SupportTickets.Commands.CreateTicket;
 using Content.Services.API.Features.SupportTickets.Commands.ReplyTicket;
@@ -28,7 +28,7 @@ namespace Content.Services.API.Controllers
 
         [HttpGet]
         [Route(ContentApiRoutes.SupportTickets.GetMy)]
-        [RoleAuthorize(UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)]
+        [RoleAuthorize(UserType.Client, UserType.OrganizationUser, UserType.Admin, UserType.WelcoStaff)]
         public async Task<IActionResult> GetMy(CancellationToken ct) => ToActionResult(await _mediator.Send(new GetMyTicketsQuery(), ct));
 
         [HttpGet]
@@ -56,3 +56,5 @@ namespace Content.Services.API.Controllers
         public async Task<IActionResult> Close([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new CloseTicketCommand { Id = id }, ct));
     }
 }
+
+
