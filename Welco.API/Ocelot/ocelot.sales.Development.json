@@ -1,6 +1,42 @@
 ﻿{
     "Routes":  [
                    {
+                       "DownstreamPathTemplate":  "/api/v1/rfqs",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "localhost",
+                                                          "Port":  7046
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/rfqs",
+                       "UpstreamHttpMethod":  [
+                                                  "GET"
+                                              ],
+                       "DangerousAcceptAnyServerCertificateValidator":  true
+                   },
+                   {
+                       "DownstreamPathTemplate":  "/api/v1/rfqs",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "localhost",
+                                                          "Port":  7046
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/rfqs",
+                       "UpstreamHttpMethod":  [
+                                                  "POST"
+                                              ],
+                       "AuthenticationOptions":  {
+                                                     "AuthenticationProviderKey":  "Bearer",
+                                                     "AllowedScopes":  [
+
+                                                                       ]
+                                                 },
+                       "DangerousAcceptAnyServerCertificateValidator":  true
+                   },
+                   {
                        "DownstreamPathTemplate":  "/api/v1/rfqs/{everything}",
                        "DownstreamScheme":  "https",
                        "DownstreamHostAndPorts":  [
@@ -22,6 +58,102 @@
 
                                                                        ]
                                                  },
+                       "DangerousAcceptAnyServerCertificateValidator":  true
+                   },
+                   {
+                       "DownstreamPathTemplate":  "/api/v1/quotes",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "localhost",
+                                                          "Port":  7046
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/quotes",
+                       "UpstreamHttpMethod":  [
+                                                  "GET"
+                                              ],
+                       "DangerousAcceptAnyServerCertificateValidator":  true
+                   },
+                   {
+                       "DownstreamPathTemplate":  "/api/v1/quotes",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "localhost",
+                                                          "Port":  7046
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/quotes",
+                       "UpstreamHttpMethod":  [
+                                                  "POST"
+                                              ],
+                       "AuthenticationOptions":  {
+                                                     "AuthenticationProviderKey":  "Bearer",
+                                                     "AllowedScopes":  [
+
+                                                                       ]
+                                                 },
+                       "DangerousAcceptAnyServerCertificateValidator":  true
+                   },
+                   {
+                       "DownstreamPathTemplate":  "/api/v1/quotes/{everything}",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "localhost",
+                                                          "Port":  7046
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/quotes/{everything}",
+                       "UpstreamHttpMethod":  [
+                                                  "GET",
+                                                  "POST",
+                                                  "PUT",
+                                                  "DELETE"
+                                              ],
+                       "AuthenticationOptions":  {
+                                                     "AuthenticationProviderKey":  "Bearer",
+                                                     "AllowedScopes":  [
+
+                                                                       ]
+                                                 },
+                       "DangerousAcceptAnyServerCertificateValidator":  true
+                   },
+                   {
+                       "DownstreamPathTemplate":  "/api/v1/product-inquiries",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "localhost",
+                                                          "Port":  7046
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/product-inquiries",
+                       "UpstreamHttpMethod":  [
+                                                  "GET"
+                                              ],
+                       "AuthenticationOptions":  {
+                                                     "AuthenticationProviderKey":  "Bearer",
+                                                     "AllowedScopes":  [
+
+                                                                       ]
+                                                 },
+                       "DangerousAcceptAnyServerCertificateValidator":  true
+                   },
+                   {
+                       "DownstreamPathTemplate":  "/api/v1/product-inquiries",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "localhost",
+                                                          "Port":  7046
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/product-inquiries",
+                       "UpstreamHttpMethod":  [
+                                                  "POST"
+                                              ],
                        "DangerousAcceptAnyServerCertificateValidator":  true
                    },
                    {
@@ -51,30 +183,6 @@
                        "UpstreamPathTemplate":  "/api/v1/product-inquiries/{everything}",
                        "UpstreamHttpMethod":  [
                                                   "GET",
-                                                  "DELETE"
-                                              ],
-                       "DangerousAcceptAnyServerCertificateValidator":  true,
-                       "AuthenticationOptions":  {
-                                                     "AuthenticationProviderKey":  "Bearer",
-                                                     "AllowedScopes":  [
-
-                                                                       ]
-                                                 }
-                   },
-                   {
-                       "DownstreamPathTemplate":  "/api/v1/quotes/{everything}",
-                       "DownstreamScheme":  "https",
-                       "DownstreamHostAndPorts":  [
-                                                      {
-                                                          "Host":  "localhost",
-                                                          "Port":  7046
-                                                      }
-                                                  ],
-                       "UpstreamPathTemplate":  "/api/v1/quotes/{everything}",
-                       "UpstreamHttpMethod":  [
-                                                  "GET",
-                                                  "POST",
-                                                  "PUT",
                                                   "DELETE"
                                               ],
                        "AuthenticationOptions":  {
