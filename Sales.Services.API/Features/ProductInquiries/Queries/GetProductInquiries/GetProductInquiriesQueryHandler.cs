@@ -7,6 +7,7 @@ using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Domain.Models;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
+
 namespace Sales.Services.API.Features.ProductInquiries.Queries.GetProductInquiries
 {
     public class GetProductInquiriesQueryHandler : IRequestHandler<GetProductInquiriesQuery, PaginatedResult<ProductInquiryDto>>
@@ -36,13 +37,19 @@ namespace Sales.Services.API.Features.ProductInquiries.Queries.GetProductInquiri
                 var term = r.SearchTerm.Trim().ToLower();
                 q = q.Where(x => x.Name.ToLower().Contains(term) || x.Organization.ToLower().Contains(term) || (x.Email != null && x.Email.ToLower().Contains(term)) || x.Message.ToLower().Contains(term));
             }
-            return await q.OrderByDescending(x => x.CreatedAt).ToPaginatedListAsync(x => new ProductInquiryDto
+
+            var page = await q.Include(x => x.Product)
+                .OrderByDescending(x => x.CreatedAt)
+                .ToPaginatedListAsync(r.PageNumber, r.PageSize, LocalizationKeys.ProductInquiry.ListFetched, ct);
+
+            var items = page.Data ?? new List<ProductInquiry>();
+            var dtos = items.Select(x => new ProductInquiryDto
             {
                 Id = x.Id,
                 ProductId = x.ProductId,
-                ProductNameEn = x.Product != null ? x.Product.NameEn : null,
-                ProductNameAr = x.Product != null ? x.Product.NameAr : null,
-                ProductSku = x.Product != null ? x.Product.Sku : null,
+                ProductNameEn = x.Product?.NameEn,
+                ProductNameAr = x.Product?.NameAr,
+                ProductSku = x.Product?.Sku,
                 Name = x.Name,
                 Organization = x.Organization,
                 Message = x.Message,
@@ -53,7 +60,9 @@ namespace Sales.Services.API.Features.ProductInquiries.Queries.GetProductInquiri
                 RespondedAt = x.RespondedAt,
                 RespondedById = x.RespondedById,
                 CreatedAt = x.CreatedAt
-            }, r.PageNumber, r.PageSize, LocalizationKeys.ProductInquiry.ListFetched, ct);
+            }).ToList();
+
+            return PaginatedResult<ProductInquiryDto>.Success(dtos, page.TotalCount, page.PageNumber, page.PageSize, LocalizationKeys.ProductInquiry.ListFetched);
         }
     }
 }
