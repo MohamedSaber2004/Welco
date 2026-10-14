@@ -40,6 +40,7 @@ namespace Product.Services.API.Features.Currencies.Queries.GetCurrencyById
                 Symbol = currency.Symbol,
                 SymbolNative = currency.SymbolNative,
                 DecimalDigits = currency.DecimalDigits,
+                CountryCode = currency.CountryCode,
                 IsActive = currency.IsActive,
                 CreatedAt = currency.CreatedAt,
                 UpdatedAt = currency.UpdatedAt

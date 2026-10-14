@@ -38,6 +38,9 @@ namespace Welco.Shared.Persistance.Configurations
             builder.Property(x => x.DecimalDigits)
                 .IsRequired();
 
+            builder.Property(x => x.CountryCode)
+                .HasMaxLength(10);
+
             builder.Property(x => x.CreatedBy)
                 .IsRequired();
         }

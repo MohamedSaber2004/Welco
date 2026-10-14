@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Products;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Localization;
@@ -19,14 +20,30 @@ namespace Product.Services.API.Features.Categories.Queries.GetCategoryById
         public async Task<Result<CategoryDto>> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
         {
             var categoryRepo = _unitOfWork.GetRepository<CategoryEntity, Guid>();
-            var category = await categoryRepo.GetByIdAsync(request.Id, cancellationToken);
+            var dto = await categoryRepo.GetAll(c => !c.IsDeleted && c.Id == request.Id)
+                .AsNoTracking()
+                .Select(c => new CategoryDto
+                {
+                    Id = c.Id,
+                    NameEn = c.NameEn,
+                    NameAr = c.NameAr,
+                    Description = c.Description,
+                    ImageName = c.ImageName,
+                    ParentCategoryId = c.ParentCategoryId,
+                    IsActive = c.IsActive,
+                    ProductCount = c.Products.Count(p => !p.IsDeleted) +
+                                   c.SubCategories.Where(sc => !sc.IsDeleted).SelectMany(sc => sc.Products).Count(p => !p.IsDeleted),
+                    CreatedAt = c.CreatedAt,
+                    UpdatedAt = c.UpdatedAt
+                })
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (category == null || category.IsDeleted)
+            if (dto == null)
             {
                 return Result<CategoryDto>.NotFound(LocalizationKeys.Category.NotFound);
             }
 
-            return Result<CategoryDto>.Success(ToDto(category), LocalizationKeys.Category.Fetched);
+            return Result<CategoryDto>.Success(dto, LocalizationKeys.Category.Fetched);
         }
 
         internal static CategoryDto ToDto(CategoryEntity category)

@@ -10,6 +10,7 @@ namespace Welco.Shared.Domain.Models
         public string Symbol { get; set; } = null!;
         public string SymbolNative { get; set; } = null!;
         public int DecimalDigits { get; set; } = 2;
+        public string? CountryCode { get; set; }
 
         public static Currency Create(
             string nameEn,
@@ -18,7 +19,8 @@ namespace Welco.Shared.Domain.Models
             string symbol,
             string createdBy,
             string? symbolNative = null,
-            int decimalDigits = 2)
+            int decimalDigits = 2,
+            string? countryCode = null)
         {
             var currency = new Currency
             {
@@ -28,7 +30,8 @@ namespace Welco.Shared.Domain.Models
                 Code = code.Trim().ToUpperInvariant(),
                 Symbol = symbol.Trim(),
                 SymbolNative = (symbolNative ?? symbol).Trim(),
-                DecimalDigits = decimalDigits
+                DecimalDigits = decimalDigits,
+                CountryCode = countryCode?.Trim().ToUpperInvariant()
             };
             currency.MarkAsCreated(createdBy);
             return currency;
@@ -41,7 +44,8 @@ namespace Welco.Shared.Domain.Models
             string symbol,
             string updatedBy,
             string? symbolNative = null,
-            int? decimalDigits = null)
+            int? decimalDigits = null,
+            string? countryCode = null)
         {
             NameEn = nameEn.Trim();
             NameAr = nameAr.Trim();
@@ -49,6 +53,7 @@ namespace Welco.Shared.Domain.Models
             Symbol = symbol.Trim();
             if (symbolNative != null) SymbolNative = symbolNative.Trim();
             if (decimalDigits.HasValue) DecimalDigits = decimalDigits.Value;
+            if (countryCode != null) CountryCode = countryCode.Trim().ToUpperInvariant();
             MarkAsUpdated(updatedBy);
         }
     }

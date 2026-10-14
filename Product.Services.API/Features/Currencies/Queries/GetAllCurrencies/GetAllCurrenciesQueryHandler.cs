@@ -31,6 +31,7 @@ namespace Product.Services.API.Features.Currencies.Queries.GetAllCurrencies
                     Symbol = c.Symbol,
                     SymbolNative = c.SymbolNative,
                     DecimalDigits = c.DecimalDigits,
+                    CountryCode = c.CountryCode,
                     IsActive = c.IsActive,
                     CreatedAt = c.CreatedAt,
                     UpdatedAt = c.UpdatedAt

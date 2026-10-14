@@ -34,7 +34,7 @@ namespace UserManamgent.Service.API.Controllers
             q.Status = Welco.Shared.Enums.CompanyStatus.Approved;
             return ToActionResult(await _mediator.Send(q, ct));
         }
-        [HttpGet][Route(UserManagementApiRoutes.Companies.GetById)] public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetCompanyByIdQuery { Id = id }, ct));
+        [HttpGet][Route(UserManagementApiRoutes.Companies.GetById)][AllowAnonymous] public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct) => ToActionResult(await _mediator.Send(new GetCompanyByIdQuery { Id = id }, ct));
         [HttpPost][Route(UserManagementApiRoutes.Companies.Create)][RoleAuthorize(UserType.Admin)] public async Task<IActionResult> Create([FromBody] CreateCompanyCommand c, CancellationToken ct) => ToActionResult(await _mediator.Send(c, ct));
         [HttpPut][Route(UserManagementApiRoutes.Companies.Update)][RoleAuthorize(UserType.Admin)] public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateCompanyCommand c, CancellationToken ct) { c.Id = id; return ToActionResult(await _mediator.Send(c, ct)); }
         [HttpPut][Route(UserManagementApiRoutes.Companies.UpdateMyCompany)][RoleAuthorize] public async Task<IActionResult> UpdateMyCompany([FromBody] UpdateMyCompanyCommand c, CancellationToken ct) => ToActionResult(await _mediator.Send(c, ct));

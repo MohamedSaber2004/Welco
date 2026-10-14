@@ -48,7 +48,8 @@ namespace Product.Services.API.Features.Categories.Queries.GetCategories
                         ImageName = c.ImageName,
                         ParentCategoryId = c.ParentCategoryId,
                         IsActive = c.IsActive,
-                        ProductCount = c.Products.Count(p => !p.IsDeleted),
+                        ProductCount = c.Products.Count(p => !p.IsDeleted) +
+                                       c.SubCategories.Where(sc => !sc.IsDeleted).SelectMany(sc => sc.Products).Count(p => !p.IsDeleted),
                         CreatedAt = c.CreatedAt,
                         UpdatedAt = c.UpdatedAt
                     },

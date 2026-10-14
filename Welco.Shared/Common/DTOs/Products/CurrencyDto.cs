@@ -9,6 +9,7 @@ namespace Welco.Shared.Common.DTOs.Products
         public string Symbol { get; set; } = string.Empty;
         public string SymbolNative { get; set; } = string.Empty;
         public int DecimalDigits { get; set; }
+        public string? CountryCode { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

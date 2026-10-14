@@ -28,6 +28,7 @@ namespace Product.Services.API.Features.Currencies.Queries.GetCurrencyByCode
                 Symbol = cur.Symbol,
                 SymbolNative = cur.SymbolNative,
                 DecimalDigits = cur.DecimalDigits,
+                CountryCode = cur.CountryCode,
                 IsActive = cur.IsActive,
                 CreatedAt = cur.CreatedAt,
                 UpdatedAt = cur.UpdatedAt
