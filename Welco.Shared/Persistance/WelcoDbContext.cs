@@ -61,9 +61,7 @@ public DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
 
         public override int SaveChanges()
         {
-            ApplyAuditInformation();
-            CaptureAuditEntries();
-            return base.SaveChanges();
+            return SaveChanges(acceptAllChangesOnSuccess: true);
         }
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
@@ -73,11 +71,9 @@ public DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
             return base.SaveChanges(acceptAllChangesOnSuccess);
         }
 
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            ApplyAuditInformation();
-            CaptureAuditEntries();
-            return await base.SaveChangesAsync(cancellationToken);
+            return SaveChangesAsync(acceptAllChangesOnSuccess: true, cancellationToken);
         }
 
         public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
@@ -213,12 +209,18 @@ if (string.IsNullOrWhiteSpace(baseEntity.CreatedBy))
                 };
 
                 var idValue = entity.GetType().GetProperty("Id")?.GetValue(entity);
+                var entityName = entity.GetType().Name;
+                var entityIdStr = idValue?.ToString() ?? string.Empty;
+
+                // Guard against duplicate audit log entry being added in the same change-tracker batch
+                if (AuditLogs.Local.Any(a => a.EntityName == entityName && a.EntityId == entityIdStr && a.Action == action))
+                    continue;
 
                 var audit = new AuditLog
                 {
                     Id = Guid.NewGuid(),
-                    EntityName = entity.GetType().Name,
-                    EntityId = idValue?.ToString() ?? string.Empty,
+                    EntityName = entityName,
+                    EntityId = entityIdStr,
                     Action = action,
                     PerformedBy = currentUserId
                 };

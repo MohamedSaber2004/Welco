@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.Extensions;
 using Welco.Shared.Common.DTOs.UserManagement;
@@ -22,10 +22,31 @@ namespace UserManamgent.Service.API.Features.AuditLogs.Queries.GetAuditLogs.GetA
             var query = _context.AuditLogs.AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(request.EntityName))
-                query = query.Where(a => a.EntityName == request.EntityName);
+            {
+                var entityName = request.EntityName.Trim();
+                if (entityName.Equals("User", StringComparison.OrdinalIgnoreCase))
+                {
+                    query = query.Where(a => a.EntityName == "ApplicationUser" || a.EntityName == "User");
+                }
+                else if (entityName.Equals("Address", StringComparison.OrdinalIgnoreCase))
+                {
+                    query = query.Where(a => a.EntityName == "UserAddress" || a.EntityName == "CompanyAddress" || a.EntityName == "Address");
+                }
+                else if (entityName.Equals("Ticket", StringComparison.OrdinalIgnoreCase))
+                {
+                    query = query.Where(a => a.EntityName == "SupportTicket" || a.EntityName == "Ticket");
+                }
+                else
+                {
+                    query = query.Where(a => a.EntityName == entityName);
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(request.Action))
-                query = query.Where(a => a.Action == request.Action);
+            {
+                var action = request.Action.Trim();
+                query = query.Where(a => a.Action.ToUpper() == action.ToUpper());
+            }
 
             if (!string.IsNullOrWhiteSpace(request.PerformedBy))
                 query = query.Where(a => a.PerformedBy != null && a.PerformedBy.Contains(request.PerformedBy));
