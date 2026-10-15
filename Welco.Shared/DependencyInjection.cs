@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +24,18 @@ namespace Welco.Shared
             string connectionStringName = "DatabaseConnection")
         {
             services.AddHttpContextAccessor();
+
+            services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new Common.JsonConverters.UtcDateTimeJsonConverter());
+                options.JsonSerializerOptions.Converters.Add(new Common.JsonConverters.NullableUtcDateTimeJsonConverter());
+            });
+
+            services.ConfigureHttpJsonOptions(options =>
+            {
+                options.SerializerOptions.Converters.Add(new Common.JsonConverters.UtcDateTimeJsonConverter());
+                options.SerializerOptions.Converters.Add(new Common.JsonConverters.NullableUtcDateTimeJsonConverter());
+            });
             services.AddScoped<ICurrentUserService, CurrentUserService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));

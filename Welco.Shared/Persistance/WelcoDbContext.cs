@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -85,6 +85,13 @@ public DbSet<ApplicationUser> ApplicationUsers => Set<ApplicationUser>();
             ApplyAuditInformation();
             CaptureAuditEntries();
             return await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            base.ConfigureConventions(configurationBuilder);
+            configurationBuilder.Properties<DateTime>().HaveConversion<Converters.UtcDateTimeConverter>();
+            configurationBuilder.Properties<DateTime?>().HaveConversion<Converters.NullableUtcDateTimeConverter>();
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

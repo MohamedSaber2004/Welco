@@ -38,19 +38,19 @@ namespace Welco.Shared.Common.Classes
         {
             IsDeleted = true;
             IsActive = false;
-            DeletedAt = DateTime.Now;
+            DeletedAt = DateTime.UtcNow;
             DeletedBy = deletedBy;
         }
 
         public virtual void MarkAsUpdated(string updatedBy)
         {
-            UpdatedAt = DateTime.Now;
+            UpdatedAt = DateTime.UtcNow;
             UpdatedBy = updatedBy;
         }
 
         public virtual void MarkAsCreated(string createdBy)
         {
-            CreatedAt = DateTime.Now;
+            CreatedAt = DateTime.UtcNow;
             CreatedBy = createdBy;
             IsActive = true;
             IsDeleted = false;
