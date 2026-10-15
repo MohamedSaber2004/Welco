@@ -14,12 +14,25 @@ def deploy():
         print(f"Error: Missing required FTP parameters (Server: '{server}', User: '{user}', Password Set: {bool(password)}, LocalDir: '{local_dir}')")
         sys.exit(1)
 
-    print(f"Connecting to FTP server: {server} as {user}...")
-    ftp = ftplib.FTP()
-    ftp.connect(server, 21, timeout=60)
-    ftp.login(user, password)
-    ftp.set_pasv(True)
-    print("Connected successfully.")
+    ftp = None
+    max_connect_retries = 5
+    for attempt in range(max_connect_retries):
+        try:
+            print(f"Connecting to FTP server: {server} as {user} (attempt {attempt + 1}/{max_connect_retries})...")
+            ftp = ftplib.FTP()
+            ftp.connect(server, 21, timeout=60)
+            ftp.login(user, password)
+            ftp.set_pasv(True)
+            print("Connected successfully.")
+            break
+        except Exception as e:
+            if attempt < max_connect_retries - 1:
+                wait_time = (attempt + 1) * 3
+                print(f"  ⚠ FTP connection/login failed ({e}). Retrying in {wait_time}s...")
+                time.sleep(wait_time)
+            else:
+                print(f"  ✗ Failed to connect/login to FTP after {max_connect_retries} attempts: {e}")
+                raise
 
     target_base_dir = remote_dir if remote_dir else "/"
     print(f"Target deployment directory: '{target_base_dir}'")
