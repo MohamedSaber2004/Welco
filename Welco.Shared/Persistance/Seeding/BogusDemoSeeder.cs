@@ -594,7 +594,7 @@ List<Category> leaves;
                     .ToList();
                 if (providerPool.Count == 0)
                     providerPool = companies.Where(c => c.Status == CompanyStatus.Approved).ToList();
-                var unlinkedProducts = products.Where(p => !p.IsDeleted && p.CompanyId == null).ToList();
+                var unlinkedProducts = await db.Products.Where(p => !p.IsDeleted && p.CompanyId == null).ToListAsync(ct);
                 for (var pi = 0; pi < unlinkedProducts.Count; pi++)
                 {
                     if (providerPool.Count == 0) break;
@@ -846,7 +846,15 @@ var membersWithAddress = new HashSet<Guid>(
                         {
                             Id = Guid.NewGuid(),
                             OrderNumber = $"WO-{year}-{chainNo:0000}",
-                            Status = (OrderStatus)faker.Random.Int(2, 4),
+                            Status = faker.PickRandom(new[]
+                        {
+                            OrderStatus.Confirmed,
+                            OrderStatus.Processing,
+                            OrderStatus.Ready,
+                            OrderStatus.Shipped,
+                            OrderStatus.Delivered,
+                            OrderStatus.Completed
+                        }),
                             UserId = user.Id,
                             CompanyId = company.Id,
                             CurrencyId = usd?.Id,
@@ -1299,7 +1307,16 @@ logger.LogInformation("AuditLogs auto-captured: {Count}.", await db.AuditLogs.Co
             CancellationToken ct)
         {
             var existing = await userManager.FindByEmailAsync(email);
-            if (existing != null) return existing;
+            if (existing != null)
+            {
+                if (companyId.HasValue && existing.CompanyId == null)
+                {
+                    existing.CompanyId = companyId;
+                    existing.MarkAsUpdated(Marker);
+                    await userManager.UpdateAsync(existing);
+                }
+                return existing;
+            }
             var user = new ApplicationUser
             {
                 FullName = fullName,

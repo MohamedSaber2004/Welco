@@ -1,7 +1,7 @@
-using Welco.Shared.Common.Classes;
+﻿using Welco.Shared.Common.Classes;
 namespace Welco.Shared.Domain.Models
 {
-    public enum OrderStatus { Pending = 1, Confirmed = 2, Processing = 3, Ready = 4, Completed = 5, Cancelled = 6, Rejected = 7 }
+    public enum OrderStatus { Pending = 1, Confirmed = 2, Processing = 3, Ready = 4, Shipped = 5, Delivered = 6, Completed = 7, Cancelled = 8, Rejected = 9 }
     public enum InvoiceStatus { Draft = 1, Issued = 2, Paid = 3, Overdue = 4, Cancelled = 5 }
     public class Cart : BaseEntity<Guid>
     {
