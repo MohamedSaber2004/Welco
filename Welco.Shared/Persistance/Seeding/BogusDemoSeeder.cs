@@ -750,8 +750,15 @@ var membersWithAddress = new HashSet<Guid>(
                     logger.LogInformation("Bogus seeded {Count} RFQ→Quote→Order chains with realistic hospital procurement volumes.", chainNo);
                 }
 
-var catEntities = new List<HelpCategory>();
-                if (!await db.HelpCategories.AnyAsync(c => !c.IsDeleted, ct))
+var testCats = await db.HelpCategories.Where(c => !c.IsDeleted && (c.Name.ToLower() == "test" || c.Name.ToLower().Contains("Ø§Ø®ØªØ¨Ø§Ø±"))).ToListAsync(ct);
+                if (testCats.Count > 0)
+                {
+                    foreach (var tc in testCats) tc.MarkAsDeleted("SeedCleanup");
+                    await db.SaveChangesAsync(ct);
+                }
+
+                var catEntities = new List<HelpCategory>();
+                if (!await db.HelpCategories.AnyAsync(c => !c.IsDeleted && c.Name.ToLower() != "test", ct))
                 {
                     var helpCats = new[] { "Ordering", "Shipping & Incoterms", "Returns & RMA", "Sterilization", "Warranty" };
                     var icons = new[] { "shopping_cart", "local_shipping", "restart_alt", "cleaning_services", "verified" };
