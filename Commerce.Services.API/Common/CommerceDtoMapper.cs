@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Welco.Shared.Common.DTOs.Commerce;
 using CartEntity = Welco.Shared.Domain.Models.Cart;
 using CartItemEntity = Welco.Shared.Domain.Models.CartItem;
@@ -7,7 +7,7 @@ using OrderItemEntity = Welco.Shared.Domain.Models.OrderItem;
 
 namespace Commerce.Services.API.Common
 {
-    internal static class CommerceDtoMapper
+    public static class CommerceDtoMapper
     {
         public static Expression<Func<CartEntity, CartDto>> CartProjection => c => new CartDto
         {
@@ -58,7 +58,7 @@ namespace Commerce.Services.API.Common
             UserId = o.UserId,
             CompanyId = o.CompanyId,
             CurrencyId = o.CurrencyId,
-            CurrencyCode = o.Currency != null ? o.Currency.Code : "USD",
+            CurrencyCode = o.Currency != null ? o.Currency.Code : (o.SnapshotCurrencyCode ?? "USD"),
             CurrencySymbol = o.Currency != null ? o.Currency.Symbol : "$",
             TotalAmount = o.TotalAmount,
             IsActive = o.IsActive,
@@ -84,7 +84,7 @@ namespace Commerce.Services.API.Common
                 UserId = o.UserId,
                 CompanyId = o.CompanyId,
                 CurrencyId = o.CurrencyId,
-                CurrencyCode = o.Currency != null ? o.Currency.Code : "USD",
+                CurrencyCode = o.Currency != null ? o.Currency.Code : (o.SnapshotCurrencyCode ?? "USD"),
                 CurrencySymbol = o.Currency != null ? o.Currency.Symbol : "$",
                 TotalAmount = o.TotalAmount,
                 IsActive = o.IsActive,

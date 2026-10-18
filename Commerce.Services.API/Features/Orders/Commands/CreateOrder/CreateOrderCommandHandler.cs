@@ -1,4 +1,4 @@
-using Commerce.Services.API.Common;
+﻿using Commerce.Services.API.Common;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Commerce;
@@ -156,6 +156,7 @@ string? snapshotBase = null;
             await _uow.SaveChangesAsync(cancellationToken);
 
             var saved = await repo.GetAll(o => !o.IsDeleted && o.Id == order.Id)
+                .Include(o => o.Currency)
                 .Include(o => o.Items)
                 .FirstOrDefaultAsync(cancellationToken);
 

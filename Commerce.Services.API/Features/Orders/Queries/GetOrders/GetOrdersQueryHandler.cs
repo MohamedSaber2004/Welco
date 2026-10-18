@@ -1,3 +1,4 @@
+﻿using Commerce.Services.API.Common;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Commerce;
@@ -28,7 +29,7 @@ namespace Commerce.Services.API.Features.Orders.Queries.GetOrders
             var repo = _uow.GetRepository<OrderEntity, Guid>();
             var query = repo.GetAll(o => !o.IsDeleted).AsNoTracking();
 
-if (_currentUser.UserId != Guid.Empty)
+            if (_currentUser.UserId != Guid.Empty)
             {
                 var userRepo = _uow.GetRepository<ApplicationUser, Guid>();
                 var user = await userRepo.GetByIdAsync(_currentUser.UserId, cancellationToken);
@@ -51,19 +52,7 @@ if (_currentUser.UserId != Guid.Empty)
                 query = query.Where(o => o.CompanyId == request.CompanyId.Value);
 
             return await query.OrderByDescending(o => o.CreatedAt)
-                .ToPaginatedListAsync(o => new OrderDto
-                {
-                    Id = o.Id,
-                    OrderNumber = o.OrderNumber,
-                    Status = o.Status.ToString(),
-                    UserId = o.UserId,
-                    CompanyId = o.CompanyId,
-                    CurrencyId = o.CurrencyId,
-                    TotalAmount = o.TotalAmount,
-                    IsActive = o.IsActive,
-                    CreatedAt = o.CreatedAt,
-                    Items = new List<OrderItemDto>()
-                }, request.PageNumber, request.PageSize, LocalizationKeys.Order.ListFetched, cancellationToken);
+                .ToPaginatedListAsync(CommerceDtoMapper.OrderProjection, request.PageNumber, request.PageSize, LocalizationKeys.Order.ListFetched, cancellationToken);
         }
     }
 }
