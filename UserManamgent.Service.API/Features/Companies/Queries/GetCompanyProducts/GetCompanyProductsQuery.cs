@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Welco.Shared.Common.DTOs.Products;
 using Welco.Shared.Results;
 
@@ -12,7 +12,20 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetCompanyProduct
     {
         public Guid CompanyId { get; set; }
         public Guid? CategoryId { get; set; }
-        public string? SearchTerm { get; set; }
+
+        private string? _searchTerm;
+        public string? SearchTerm
+        {
+            get => !string.IsNullOrWhiteSpace(_searchTerm)
+                ? _searchTerm
+                : (!string.IsNullOrWhiteSpace(Search) ? Search : (!string.IsNullOrWhiteSpace(Q) ? Q : Query));
+            set => _searchTerm = value;
+        }
+
+        public string? Search { get; set; }
+        public string? Q { get; set; }
+        public string? Query { get; set; }
+
         public string? Sku { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;

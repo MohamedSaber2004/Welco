@@ -26,6 +26,7 @@
     <ProjectReference Include="..\Welco.API\Welco.Gateway.API.csproj" />
     <ProjectReference Include="..\Commerce.Services.API\Commerce.Services.API.csproj" />
     <ProjectReference Include="..\Content.Services.API\Content.Services.API.csproj" />
+    <ProjectReference Include="..\Product.Services.API\Product.Services.API.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Product.Services.API.Common;
 using Welco.Shared.Common.DTOs.Products;
 using Welco.Shared.Common.Extensions;
@@ -23,14 +23,21 @@ namespace Product.Services.API.Features.Products.Queries.GetProducts
             var productRepo = _unitOfWork.GetRepository<ProductEntity, Guid>();
             var query = productRepo.GetAll(p => !p.IsDeleted);
 
-            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+            var rawSearch = request.SearchTerm;
+            if (!string.IsNullOrWhiteSpace(rawSearch))
             {
-                var term = request.SearchTerm.Trim().ToLower();
-                query = query.Where(p =>
-                    p.NameEn.ToLower().Contains(term) ||
-                    p.NameAr.ToLower().Contains(term) ||
-                    p.Sku.ToLower().Contains(term) ||
-                    (p.Material != null && p.Material.ToLower().Contains(term)));
+                var trimmed = rawSearch.Trim().ToLower();
+                var tokens = trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var token in tokens)
+                {
+                    var t = token;
+                    query = query.Where(p =>
+                        p.NameEn.ToLower().Contains(t) ||
+                        p.NameAr.ToLower().Contains(t) ||
+                        p.Sku.ToLower().Contains(t) ||
+                        (p.Material != null && p.Material.ToLower().Contains(t)));
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(request.Sku))
@@ -75,6 +82,14 @@ namespace Product.Services.API.Features.Products.Queries.GetProducts
                 else if (s == "price-desc") query = query.OrderByDescending(p => p.Price);
                 else if (s == "newest") query = query.OrderByDescending(p => p.CreatedAt);
                 else query = query.OrderByDescending(p => p.CreatedAt);
+            }
+            else if (!string.IsNullOrWhiteSpace(rawSearch))
+            {
+                var term = rawSearch.Trim().ToLower();
+                query = query.OrderByDescending(p => p.NameEn.ToLower().StartsWith(term) || p.NameAr.ToLower().StartsWith(term))
+                             .ThenByDescending(p => p.NameEn.ToLower().Contains(term) || p.NameAr.ToLower().Contains(term))
+                             .ThenByDescending(p => p.Sku.ToLower().Contains(term))
+                             .ThenByDescending(p => p.CreatedAt);
             }
             else
             {

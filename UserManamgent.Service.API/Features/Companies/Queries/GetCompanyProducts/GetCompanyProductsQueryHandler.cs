@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Welco.Shared.Common.DTOs.Products;
 using Welco.Shared.Common.Extensions;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
@@ -24,20 +24,38 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetCompanyProduct
                 query = query.Where(p => p.CategoryId == targetCatId || (p.Category != null && p.Category.ParentCategoryId == targetCatId));
             }
 
-            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+            var rawSearch = request.SearchTerm;
+            if (!string.IsNullOrWhiteSpace(rawSearch))
             {
-                var term = request.SearchTerm.Trim().ToLower();
-                query = query.Where(p =>
-                    p.NameEn.ToLower().Contains(term) ||
-                    p.NameAr.ToLower().Contains(term) ||
-                    p.Sku.ToLower().Contains(term) ||
-                    (p.Material != null && p.Material.ToLower().Contains(term)));
+                var trimmed = rawSearch.Trim().ToLower();
+                var tokens = trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var token in tokens)
+                {
+                    var t = token;
+                    query = query.Where(p =>
+                        p.NameEn.ToLower().Contains(t) ||
+                        p.NameAr.ToLower().Contains(t) ||
+                        p.Sku.ToLower().Contains(t) ||
+                        (p.Material != null && p.Material.ToLower().Contains(t)));
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(request.Sku))
                 query = query.Where(p => p.Sku.ToLower().Contains(request.Sku.Trim().ToLower()));
 
-            query = query.OrderByDescending(p => p.CreatedAt);
+            if (!string.IsNullOrWhiteSpace(rawSearch))
+            {
+                var term = rawSearch.Trim().ToLower();
+                query = query.OrderByDescending(p => p.NameEn.ToLower().StartsWith(term) || p.NameAr.ToLower().StartsWith(term))
+                             .ThenByDescending(p => p.NameEn.ToLower().Contains(term) || p.NameAr.ToLower().Contains(term))
+                             .ThenByDescending(p => p.Sku.ToLower().Contains(term))
+                             .ThenByDescending(p => p.CreatedAt);
+            }
+            else
+            {
+                query = query.OrderByDescending(p => p.CreatedAt);
+            }
 
             return await query.ToPaginatedListAsync(p => new ProductDto
             {
