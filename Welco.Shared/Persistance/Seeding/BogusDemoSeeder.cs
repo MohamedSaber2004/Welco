@@ -48,208 +48,50 @@ namespace Welco.Shared.Persistance.Seeding
             string DescAr
         );
 
-        private static readonly SurgicalItemSeed[] RealSurgicalCatalog =
+        private static readonly SurgicalItemSeed[] RealSurgicalCatalog = ComprehensiveSurgicalCatalog.Catalog94;
+
+        private static readonly (string Subject, string Message, string Reply)[] RealisticMedicalTickets =
         {
-            new(
-                "Mayo Dissecting Scissors 17cm Straight",
-                "مقص مايو للتشريح الجراحي 17 سم مستقيم",
-                "Plastic Surgery",
-                "German Stainless Steel (AISI 420)",
-                17.0m,
-                145.00m,
-                "Precision beveled blades engineered for cutting tough connective tissue, fascia, and deep surgical sutures. Hot-drop forged German steel with satin anti-glare finish.",
-                "شفرات مشطوفة فائقة الدقة لقطع الأنسجة الضامة السميكة واللفافات الجراحية. مصنوعة من الفولاذ الألماني المشكل حرارياً بتشطيب مطفأ مانع للتوهج."
+            (
+                "CE MDR Class IIa Certification Documents Request",
+                "Hello Welco Support, could you please provide the updated CE MDR Class IIa certificate and Declaration of Conformity for Hegar Needle Holders (batch #WH-2024)? Our hospital procurement compliance audit is scheduled for next week.",
+                "Dear Customer, we have attached the verified CE MDR Class IIa Certificate and manufacturer Declaration of Conformity for the Hegar Needle Holder series. All instruments comply with EN ISO 13485:2016."
             ),
-            new(
-                "Metzenbaum Delicate Dissecting Scissors Curved 18cm",
-                "مقص ميتزنباوم الدقيق للتشريح الجراحي منحني 18 سم",
-                "Plastic Surgery",
-                "Tungsten Carbide / AISI 420",
-                18.0m,
-                185.00m,
-                "Gold-handled tungsten carbide curved blades designed specifically for blunt and sharp atraumatic dissection of delicate vascular and visceral tissues.",
-                "شفرات منحنية مدعمة بكربيد التنجستن ومقابض مذهبة مخصصة للتشريح الدقيق للأنسجة الرقيقة والأوعية الدموية دون إحداث تمزق رضحي."
+            (
+                "Bulk Order Lead Time and Custom Laser Marking",
+                "We are planning an annual procurement of 150 units of DeBakey Vascular Forceps. Can we request custom hospital department laser marking, and what is the estimated freight lead time to Riyadh?",
+                "Thank you for reaching out. Department-specific laser etching is supported for orders above 50 units at no additional cost. Delivery lead time to Riyadh is 5-7 business days via temperature-controlled air freight."
             ),
-            new(
-                "Adson Micro Tissue Forceps 1x2 Teeth 12cm",
-                "ملقط أنسجة أدسون الجراحي الدقيق 1×2 سن 12 سم",
-                "Plastic Surgery",
-                "German Stainless Steel (AISI 410)",
-                12.0m,
-                58.00m,
-                "Fine atraumatic interdigitating 1x2 teeth providing secure grip on fragile dermis and subcuticular flaps during precision cosmetic and reconstructive closure.",
-                "أسنان دقيقة 1×2 متداخلة توفر إمساكاً محكماً بحواف الجلد والأنسجة الدقيقة أثناء إجراءات الخياطة الترميمية والتجميلية."
+            (
+                "Autoclave Reprocessing and Sterilization Protocol Query",
+                "Could your biomedical engineering team confirm whether the tungsten carbide inserts in Metzenbaum scissors can withstand high-vacuum steam sterilization cycles at 134°C for 18 minutes?",
+                "Yes, our tungsten carbide series is rated for steam sterilization at 134°C (273°F) for up to 20 minutes under DIN 58953 / ISO 17665 standards. Please ensure pH-neutral enzymatic detergent is used during pre-cleaning."
             ),
-            new(
-                "DeBakey Atraumatic Vascular Forceps 20cm",
-                "ملقط ديبيكي الجراحي للأوعية الدموية 20 سم",
-                "Orthopedic",
-                "Titanium Alloy / AISI 420",
-                20.0m,
-                210.00m,
-                "Patented non-crushing longitudinal ribbing designed to stabilize delicate arterial walls and venous grafts without intima disruption during cardiovascular and trauma surgery.",
-                "تضليع طولي غير راضخ ومصمم لتثبيت جدران الشرايين والأوردة الحساسة دون تلف بطانة الأوعية في الجراحات الوعائية."
+            (
+                "Inquiry on Micro-Vascular Castroviejo Jaw Replacement",
+                "We have two Castroviejo micro needle holders with worn latching teeth. Does Welco offer precision recalibration and jaw insert replacement services under warranty?",
+                "Our regional service depot provides precision refurbishment and spring tension calibration. Please generate an RMA shipping slip from your provider portal and our courier will collect the instruments."
             ),
-            new(
-                "Hegar Needle Holder Tungsten Carbide Jaws 16cm",
-                "حامل إبر هيغار مع فكوك كربيد التنجستن 16 سم",
-                "Plastic Surgery",
-                "Tungsten Carbide / AISI 420",
-                16.0m,
-                175.00m,
-                "Cross-serrated tungsten carbide jaw inserts (0.4mm pitch) engineered to eliminate needle slippage and twisting under high tension wound approximation.",
-                "فكوك كربيد التنجستن بتسنين متقاطع يمنع تماماً انزلاق الإبرة أو دورانها أثناء إغلاق طبقات الجروح المشدودة."
+            (
+                "VAT TRN Update and Consolidated Monthly Invoicing",
+                "We recently updated our tax registration number. We need all pending orders and historical invoices for Q3 to reflect our updated VAT TRN for local tax authority submission.",
+                "Your organization VAT TRN has been successfully updated in our financial ledger. Revised consolidated tax invoices for Q3 have been re-issued and sent to your billing email."
             ),
-            new(
-                "Castroviejo Micro Needle Holder Straight with Lock 14cm",
-                "حامل إبر كاستروفيجو الدقيق مع قفل 14 سم",
-                "Plastic Surgery",
-                "Titanium",
-                14.0m,
-                320.00m,
-                "Precision calibrated spring-action handle with ultra-smooth latching mechanism engineered for micro-vascular and ophthalmic sutures (6-0 through 9-0).",
-                "مقبض نوابضي فائق الدقة مع آلية قفل ناعمة مصمم خصيصاً للغرز الجراحية المجهرية والأوعية الدموية الدقيقة."
+            (
+                "Expedited Shipping for Emergency Trauma Retractor Kit",
+                "We have an urgent orthopedic requirement for Weitlaner and Richardson retractor sets. Is same-day dispatch available to our medical complex in Dammam?",
+                "Emergency dispatch has been arranged with priority logistics. Tracking reference has been generated and courier pickup is scheduled for 14:00 today."
             ),
-            new(
-                "Crile Hemostatic Forceps Curved 14cm",
-                "ملقط كرايل القاطع للنزيف منحني 14 سم",
-                "Dental",
-                "German Stainless Steel (AISI 410)",
-                14.0m,
-                62.00m,
-                "Transversely serrated along entire jaw length with interlocking ratchets for rapid secure hemostasis of medium vascular pedicles and tissue bleeders.",
-                "مسنن عرضياً بالكامل مع محبس قفل تدريجي لتأمين الإرقاء الفوري وإيقاف النزيف في الأوعية الدموية المتوسطة."
+            (
+                "Biocompatibility Test Reports for Titanium Osteotomes",
+                "Our regulatory committee requires cytotoxicity and biocompatibility reports (ISO 10993) for the titanium surgical osteotomes prior to approving hospital formulary inclusion.",
+                "The complete ISO 10993 biological evaluation summary and material test certificates from accredited testing laboratories have been dispatched to your committee liaison."
             ),
-            new(
-                "Kelly Hemostatic Clamps Straight 14cm",
-                "ملقط كيلي الجراحي المستقيم 14 سم",
-                "Dental",
-                "German Stainless Steel (AISI 410)",
-                14.0m,
-                59.00m,
-                "Serrated on distal half of jaws allowing selective clamping of bleeding subcutaneous vessels without damaging adjacent healthy anatomical structures.",
-                "مسنن في النصف الطرفي فقط للتحكم في الأوعية النازفة بدقة متناهية دون الضغط على الأنسجة السليمة المجاورة."
-            ),
-            new(
-                "Babcock Intestinal Tissue Grasping Forceps 16cm",
-                "ملقط بابكوك الجراحي للإمساك بالأنسجة والأمعاء 16 سم",
-                "Orthopedic",
-                "German Stainless Steel (AISI 410)",
-                16.0m,
-                125.00m,
-                "Atraumatic fenestrated triangular loops with smooth rounded borders for holding tubular organs, ureters, and intestinal loops without ischemic trauma.",
-                "فكوك مثلثة مفرغة وناعمة الحواف مصممة لمسك الأعضاء الأنبوبية والأمعاء والحالب دون إحداث نقص تروية أو رضخ موضعي."
-            ),
-            new(
-                "Allis Tissue Grasping Clamps 5x6 Teeth 15cm",
-                "ملقط أليس الجراحي لمسك الأنسجة 5×6 أسنان 15 سم",
-                "Orthopedic",
-                "German Stainless Steel (AISI 410)",
-                15.0m,
-                88.00m,
-                "Multiple interlocking fine teeth delivering uniform traction on fascial edges and fibrous tendon sheaths without slippage.",
-                "أسنان متعددة متداخلة 5×6 توفر قوة شد متجانسة على اللفافات والأغماد الليفية دون انزلاق."
-            ),
-            new(
-                "Weitlaner Self-Retaining Retractor Sharp 3x4 Teeth 13cm",
-                "مبعد ويتلانر الجراحي ذاتي التثبيت 13 سم",
-                "Orthopedic",
-                "German Stainless Steel",
-                13.0m,
-                245.00m,
-                "Cam-ratchet self-locking arms with curved sharp 3x4 prongs maintaining deep wound cavity visualization hands-free during orthopedics and neurosurgery.",
-                "ذراعان بمحبس مسنن ومخالب حادة 3×4 تضمن بقاء المجال الجراحي مفتوحاً بثبات ودون إجهاد للأيدي المساعدة."
-            ),
-            new(
-                "Richardson-Eastman Retractor Handheld Set of 2",
-                "طقم مبعدات ريتشاردسون-إيستمان الجراحية المزدوجة",
-                "Orthopedic",
-                "German Stainless Steel (AISI 420)",
-                26.0m,
-                195.00m,
-                "Ergonomically contoured broad concave lateral blades providing deep pelvic and abdominal muscular wall exposure with minimal pressure necrosis.",
-                "شفرات مقعرة عريضة بتصميم مريح مخصصة لإبعاد الجدار العضلي للبطن والحوض مع تقليل ضغط النخر الموضعي."
-            ),
-            new(
-                "Liston High-Leverage Bone Cutting Forceps Angled 19cm",
-                "ملقط ليستون لقطع العظام بزاوية وقوة مضاعفة 19 سم",
-                "Orthopedic",
-                "German High-Carbon Steel",
-                19.0m,
-                365.00m,
-                "Compound double-action pivot system delivering high mechanical force to shear through dense cortical bone cleanly during joint reconstruction and amputations.",
-                "نظام مفصل مزدوج مضاعف القوة يتيح قص العظام القشرية الصلبة بقطع نظيف وأملس أثناء جراحات المفاصل وبتر الأطراف."
-            ),
-            new(
-                "Stille-Luer Double-Action Bone Rongeur Curved 22cm",
-                "قارضة عظام ستيل-لوير منحنية بمفصل مزدوج 22 سم",
-                "Orthopedic",
-                "German Stainless Steel (AISI 420)",
-                22.0m,
-                395.00m,
-                "Heavy-duty curved scoop jaws designed for rapid, controlled excision of thick articular bone fragments, bone spikes, and periosteal margins.",
-                "فكوك غائرة قوية ومنحنية مصممة للاستئصال السريع والمنضبط للنتوءات العظمية والحواف المفصلية الكثيفة."
-            ),
-            new(
-                "Kerrison Spinal Laminectomy Punch 40° Up-Biting 3mm",
-                "مثقاب كيريسون لاستئصال الصفيحة الفقرية 40 درجة 3 مم",
-                "Spine",
-                "German High-Tensile Steel",
-                20.0m,
-                520.00m,
-                "Thin-footplate laminectomy punch featuring 40-degree upward cutting action with ejector groove for precise spinal canal decompression.",
-                "مثقاب رفيع بزاوية صاعدة 40 درجة ومزود بمجرى تفريغ لضمان إزالة الضغط عن القناة الشوكية بدقة بالغة."
-            ),
-            new(
-                "Killian Nasal Speculum with Set Screw Adjuster",
-                "منظار كيليان للأنف مع برغي ضبط دقيق",
-                "ENT",
-                "German Stainless Steel",
-                14.0m,
-                165.00m,
-                "Serrated thin parallel blades with knurled thumbscrew lock mechanism providing stable, glare-free dilation of anterior nasal cavity.",
-                "شفرات متوازية رقيقة مسننة مع برغي تثبيت محزز يضمن اتساعاً ثابتاً ومستقراً لتجويف الأنف دون انعكاسات ضوئية مزعجة."
-            ),
-            new(
-                "Frazier Neuro Suction Cannula 10 French Angled",
-                "أنبوب شفط فريزر لجراحة الأعصاب قياس 10 فرنش",
-                "Spine",
-                "Medical Stainless Steel",
-                18.0m,
-                75.00m,
-                "Graduated thin cannula with angled shaft and ergonomic teardrop thumb vent for fingertip regulation of surgical vacuum pressure.",
-                "قنية رفيعة مدرجة بزاوية مريحة وفتحة إبهام دمعية للتحكم اللحظي الدقيق بقوة الشفط داخل الجروح العميقة."
-            ),
-            new(
-                "Dental Extracting Forceps #150 Universal Upper",
-                "ملقط خلع الأسنان رقم 150 العالمي للفك العلوي",
-                "Dental",
-                "AISI 420 Stainless",
-                17.5m,
-                110.00m,
-                "Universal anatomical beaks with textured non-slip grip handles designed for atraumatic luxation of upper incisors, canines, and bicuspids.",
-                "مناقير مصممة تشريحياً مع مقابض غير قابلة للانزلاق لخلع القواطع والأنياب والضواحك العلوية بدون كسر الحافة السنخية."
-            ),
-            new(
-                "Coupland Dental Root Elevator Straight Set (3-Piece)",
-                "طقم روافع كوبلاند لجذور الأسنان مستقيم 3 قطع",
-                "Dental",
-                "German Stainless Steel",
-                15.0m,
-                145.00m,
-                "Gouge-shaped concave working ends with sharp lateral cutting edges designed to sever periodontal fibers and elevate retained dental roots smoothly.",
-                "نهايات مقعرة وحواف جانبية حادة لقطع ألياف الرباط السني وخلخلة الجذور المتبقية بكل سلاسة."
-            ),
-            new(
-                "Molt #9 Dual-End Periosteal Elevator 18cm",
-                "رافعة السمحاق مولت رقم 9 مزدوجة الأطراف 18 سم",
-                "CMF",
-                "German Stainless Steel (AISI 420)",
-                18.0m,
-                72.00m,
-                "Features a sharp pointed triangular blade on one side and a broad curved spatula on the other for rapid dissection of mucoperiosteal flaps.",
-                "تحتوي على طرف مدبب حاد وطرف ملعقي مقوس لرفع الشرائح السمحاقية بسرعة وبأقل قدر من الرضخ للأنسجة."
-            ),
+            (
+                "Request for Quote: Annual Surgical Scissors Maintenance",
+                "Please provide a commercial quote for annual preventative maintenance and micro-hone sharpening of 80 surgical scissors across our outpatient surgical suites.",
+                "Our commercial team has prepared a tailored maintenance agreement proposal. The detailed quotation with tier discounts has been uploaded to your account dashboard."
+            )
         };
 
         private static readonly string[] Materials =
@@ -421,23 +263,26 @@ List<Category> leaves;
                 if (await db.Products.AnyAsync(p => !p.IsDeleted, ct))
                 {
                     logger.LogInformation("Products already present, updating existing data to realistic surgical catalog...");
-                    products = await db.Products.Where(p => !p.IsDeleted).Take(200).ToListAsync(ct);
+                    products = await db.Products.Where(p => !p.IsDeleted).OrderBy(p => p.CreatedAt).Take(200).ToListAsync(ct);
                     var updated = false;
                     for (var i = 0; i < products.Count; i++)
                     {
                         var p = products[i];
-                        if (p.NameEn.Contains("Standard") || p.NameEn.Contains("Deluxe") || p.NameAr.Any(char.IsDigit) || (p.Description != null && p.Description.StartsWith("Lorem")))
-                        {
-                            var real = RealSurgicalCatalog[i % RealSurgicalCatalog.Length];
-                            p.NameEn = real.NameEn;
-                            p.NameAr = real.NameAr;
-                            p.Description = real.DescEn;
-                            p.Material = real.Material;
-                            if (real.LengthCm > 0) p.LengthCm = real.LengthCm;
-                            p.Price = real.Price;
-                            p.Specifications = $"Autoclave 134°C; DIN 1.4021; {p.Material}; CE Class IIa; Length {p.LengthCm} cm";
-                            updated = true;
-                        }
+                        var real = RealSurgicalCatalog[i % RealSurgicalCatalog.Length];
+                        var expectedName = i < RealSurgicalCatalog.Length ? real.NameEn : $"{real.NameEn} - Mod {i + 1}";
+                        var expectedNameAr = i < RealSurgicalCatalog.Length ? real.NameAr : $"{real.NameAr} - إصدار {i + 1}";
+                        var expectedSku = $"WL-{100001 + i}";
+                        var slug = $"{Slugify(expectedName)}-{i + 1}";
+
+                        if (p.NameEn != expectedName) { p.NameEn = expectedName; updated = true; }
+                        if (p.NameAr != expectedNameAr) { p.NameAr = expectedNameAr; updated = true; }
+                        if (p.Sku != expectedSku) { p.Sku = expectedSku; updated = true; }
+                        if (string.IsNullOrWhiteSpace(p.ImageName) || p.ImageName == "null") { p.ImageName = $"demo/products/{slug}.jpg"; updated = true; }
+                        if (p.CurrencyId == null && usd != null) { p.CurrencyId = usd.Id; updated = true; }
+                        if (p.Material != real.Material) { p.Material = real.Material; updated = true; }
+                        if (real.LengthCm > 0 && p.LengthCm != real.LengthCm) { p.LengthCm = real.LengthCm; updated = true; }
+                        if (string.IsNullOrWhiteSpace(p.Description) || p.Description.StartsWith("Lorem")) { p.Description = real.DescEn; updated = true; }
+                        if (string.IsNullOrWhiteSpace(p.Specifications)) { p.Specifications = $"Autoclave 134°C; DIN 1.4021; {p.Material}; CE Class IIa; Length {p.LengthCm} cm"; updated = true; }
                     }
                     if (updated)
                     {
@@ -525,9 +370,14 @@ List<Category> leaves;
                             comp.IsProvider = true;
                             updatedExisting = true;
                         }
+                        var seedMatch = CompanySeedList.FirstOrDefault(s => s.Name.Equals(comp.Name, StringComparison.OrdinalIgnoreCase));
+                        if (seedMatch != default && comp.Type != seedMatch.Type)
+                        {
+                            comp.Type = seedMatch.Type;
+                            updatedExisting = true;
+                        }
                         if (string.IsNullOrWhiteSpace(comp.ImageName))
                         {
-                            var seedMatch = CompanySeedList.FirstOrDefault(s => s.Name.Equals(comp.Name, StringComparison.OrdinalIgnoreCase));
                             comp.ImageName = seedMatch.ImageName ?? CompanySeedList[idx % CompanySeedList.Length].ImageName;
                             updatedExisting = true;
                         }
@@ -610,27 +460,32 @@ List<Category> leaves;
                 // at different prices (drives the product "Offered by" scenario).
                 if (providerPool.Count >= 2 && leaves.Count > 0)
                 {
-                    const string sharedSku = "WL-SHARED-001";
-                    var sharedExists = await db.Products.AnyAsync(p => !p.IsDeleted && p.Sku == sharedSku, ct);
+                    const string demoSkuA = "WL-100093";
+                    const string demoSkuB = "WL-100094";
+                    var sharedExists = await db.Products.AnyAsync(p => !p.IsDeleted && (p.Sku == demoSkuA || p.Sku == demoSkuB), ct);
                     if (!sharedExists)
                     {
                         var demoCat = leaves[0];
                         var compA = providerPool[0];
                         var compB = providerPool[1];
                         db.Products.Add(Product.Create(
-                            "Metzenbaum Dissecting Scissors", "مقص تشريح ميتزنباوم",
-                            sharedSku, "metzenbaum-dissecting-scissors-a",
-                            "Demo shared listing from provider A.", 310.80m, 24,
-                            null, null, "German Stainless Steel", 18m, null,
+                            "Metzenbaum Dissecting Scissors Curv 18cm (Provider A)", "مقص تشريح ميتزنباوم 18 سم (المورد أ)",
+                            demoSkuA, "metzenbaum-dissecting-scissors-provider-a",
+                            "Demo listing from provider A with CE Class IIa certification.", 310.80m, 24,
+                            "Autoclave 134°C; DIN 1.4021; Tungsten Carbide / AISI 420; CE Class IIa; Length 18 cm",
+                            "demo/products/metzenbaum-dissecting-scissors-provider-a.jpg",
+                            "Tungsten Carbide / AISI 420", 18m, usd?.Id,
                             demoCat.Id, compA.Id, Marker));
                         db.Products.Add(Product.Create(
-                            "Metzenbaum Dissecting Scissors", "مقص تشريح ميتزنباوم",
-                            sharedSku, "metzenbaum-dissecting-scissors-b",
-                            "Demo shared listing from provider B.", 289.50m, 12,
-                            null, null, "German Stainless Steel", 18m, null,
+                            "Metzenbaum Dissecting Scissors Curv 18cm (Provider B)", "مقص تشريح ميتزنباوم 18 سم (المورد ب)",
+                            demoSkuB, "metzenbaum-dissecting-scissors-provider-b",
+                            "Demo listing from provider B with fast regional fulfillment.", 289.50m, 12,
+                            "Autoclave 134°C; DIN 1.4021; Tungsten Carbide / AISI 420; CE Class IIa; Length 18 cm",
+                            "demo/products/metzenbaum-dissecting-scissors-provider-b.jpg",
+                            "Tungsten Carbide / AISI 420", 18m, usd?.Id,
                             demoCat.Id, compB.Id, Marker));
                         await db.SaveChangesAsync(ct);
-                        logger.LogInformation("Bogus seeded shared-SKU demo listings for {A} and {B}.", compA.Name, compB.Name);
+                        logger.LogInformation("Bogus seeded demo listings for {A} and {B}.", compA.Name, compB.Name);
                     }
                 }
 
@@ -993,9 +848,11 @@ var catEntities = new List<HelpCategory>();
                     var ticketUsers = activeMembers.Take(8).ToList();
                     var statuses = new[] { "Open", "Answered", "Closed" };
                     var tickets = new List<SupportTicket>();
-                    foreach (var tu in ticketUsers)
+                    for (var ti = 0; ti < ticketUsers.Count; ti++)
                     {
-                        var st = faker.PickRandom(statuses);
+                        var tu = ticketUsers[ti];
+                        var tmpl = RealisticMedicalTickets[ti % RealisticMedicalTickets.Length];
+                        var st = statuses[ti % statuses.Length];
                         var createdDaysAgo = faker.Random.Int(3, 14);
                         var createdAt = DateTime.UtcNow.AddDays(-createdDaysAgo);
                         DateTime? repliedAt = null;
@@ -1009,10 +866,10 @@ var catEntities = new List<HelpCategory>();
                         {
                             Id = Guid.NewGuid(),
                             UserId = tu.Id,
-                            Subject = faker.Lorem.Sentence(5, 2).TrimEnd('.'),
-                            Message = faker.Lorem.Paragraph(1),
+                            Subject = tmpl.Subject,
+                            Message = tmpl.Message,
                             Status = st,
-                            Reply = st == "Open" ? null : faker.Lorem.Paragraph(1),
+                            Reply = st == "Open" ? null : tmpl.Reply,
                             RepliedAt = repliedAt,
                             RepliedBy = st == "Open" || staff.Count == 0 ? null : repId,
                         };
@@ -1023,19 +880,41 @@ var catEntities = new List<HelpCategory>();
                     await db.SaveChangesAsync(ct);
                     logger.LogInformation("Bogus seeded {Count} support tickets.", tickets.Count);
                 }
-                else if (await db.SupportTickets.AnyAsync(t => !t.IsDeleted && t.RepliedAt != null && t.RepliedAt < t.CreatedAt, ct))
+                else
                 {
-                    var invalidTickets = await db.SupportTickets
-                        .Where(t => !t.IsDeleted && t.RepliedAt != null && t.RepliedAt < t.CreatedAt)
+                    var latinTickets = await db.SupportTickets
+                        .Where(t => !t.IsDeleted && (t.Subject.Contains("Lorem") || t.Message.Contains("Lorem") || t.Message.Contains("ipsum") || t.Message.Contains("dolor")))
                         .ToListAsync(ct);
-                    foreach (var it in invalidTickets)
+                    if (latinTickets.Count > 0)
                     {
-                        var healed = it.CreatedAt.AddHours(2);
-                        if (healed > DateTime.UtcNow) healed = DateTime.UtcNow;
-                        it.RepliedAt = healed;
+                        for (var i = 0; i < latinTickets.Count; i++)
+                        {
+                            var tmpl = RealisticMedicalTickets[i % RealisticMedicalTickets.Length];
+                            latinTickets[i].Subject = tmpl.Subject;
+                            latinTickets[i].Message = tmpl.Message;
+                            if (latinTickets[i].Status != "Open")
+                            {
+                                latinTickets[i].Reply = tmpl.Reply;
+                            }
+                        }
+                        await db.SaveChangesAsync(ct);
+                        logger.LogInformation("Bogus sanitized {Count} support tickets with realistic medical B2B interactions.", latinTickets.Count);
                     }
-                    await db.SaveChangesAsync(ct);
-                    logger.LogInformation("Bogus healed {Count} support tickets with replied date before created date.", invalidTickets.Count);
+
+                    if (await db.SupportTickets.AnyAsync(t => !t.IsDeleted && t.RepliedAt != null && t.RepliedAt < t.CreatedAt, ct))
+                    {
+                        var invalidTickets = await db.SupportTickets
+                            .Where(t => !t.IsDeleted && t.RepliedAt != null && t.RepliedAt < t.CreatedAt)
+                            .ToListAsync(ct);
+                        foreach (var it in invalidTickets)
+                        {
+                            var healed = it.CreatedAt.AddHours(2);
+                            if (healed > DateTime.UtcNow) healed = DateTime.UtcNow;
+                            it.RepliedAt = healed;
+                        }
+                        await db.SaveChangesAsync(ct);
+                        logger.LogInformation("Bogus healed {Count} support tickets with replied date before created date.", invalidTickets.Count);
+                    }
                 }
                 if (!await db.Notifications.AnyAsync(n => !n.IsDeleted, ct) && activeMembers.Count > 0)
                 {
