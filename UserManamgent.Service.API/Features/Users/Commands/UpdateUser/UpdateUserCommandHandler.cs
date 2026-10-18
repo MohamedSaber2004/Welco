@@ -1,3 +1,5 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Welco.Shared.Common.Helpers;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Welco.Shared.Common.DTOs.UserManagement;
@@ -41,7 +43,17 @@ namespace UserManamgent.Service.API.Features.Users.Commands.UpdateUser
 
             if (request.PhoneNumber != null)
             {
-                user.PhoneNumber = request.PhoneNumber;
+                var normalized = PhoneNumberNormalizer.Normalize(request.PhoneNumber, request.PhoneCode);
+                if (!string.IsNullOrEmpty(normalized))
+                {
+                    var phoneTaken = await _userManager.Users
+                        .AnyAsync(u => u.Id != user.Id && !u.IsDeleted && (u.NormalizedPhoneNumber == normalized || u.PhoneNumber == request.PhoneNumber.Trim()), cancellationToken);
+                    if (phoneTaken)
+                    {
+                        return Result<UserDto>.BadRequest(LocalizationKeys.Auth.PhoneAlreadyExists, new List<string> { LocalizationKeys.Auth.PhoneAlreadyExists });
+                    }
+                }
+                user.SetPhoneNumber(request.PhoneNumber, request.PhoneCode, currentUserId);
             }
 
             if (request.ProfilePictureName != null)
@@ -90,6 +102,7 @@ namespace UserManamgent.Service.API.Features.Users.Commands.UpdateUser
                 FullName = user.FullName,
                 Email = user.Email ?? string.Empty,
                 PhoneNumber = user.PhoneNumber,
+                PhoneCode = user.PhoneCode,
                 ProfilePictureName = user.ProfilePictureName,
                 UserType = user.UserType,
                 CompanyId = user.CompanyId,

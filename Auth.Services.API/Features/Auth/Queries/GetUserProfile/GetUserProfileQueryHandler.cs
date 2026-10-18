@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Auth.Responses;
@@ -151,7 +151,7 @@ namespace Auth.Services.API.Features.Auth.Queries.GetUserProfile
                 FullName = user.FullName,
                 Email = user.Email ?? string.Empty,
                 PhoneNumber = user.PhoneNumber,
-                PhoneCode = phoneCode,
+                PhoneCode = user.PhoneCode ?? phoneCode,
                 ProfilePictureName = user.ProfilePictureName,
                 UserType = user.UserType,
                 CompanyId = user.CompanyId,

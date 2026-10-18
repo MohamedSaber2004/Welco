@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Welco.Shared.Domain.Models;
@@ -29,6 +29,9 @@ namespace Welco.Shared.Persistance.Configurations
             // Canonical phone key: one account per number, regardless of the
             // formatting used at signup. Filtered so users who never supplied a
             // phone (NULL) and soft-deleted rows are both excluded.
+            builder.Property(u => u.PhoneCode)
+                .HasMaxLength(10);
+
             builder.Property(u => u.NormalizedPhoneNumber)
                 .HasMaxLength(20);
 

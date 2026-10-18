@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.UserManagement;
@@ -63,6 +63,7 @@ namespace UserManamgent.Service.API.Features.Users.Queries.GetUserById
                 FullName = user.FullName,
                 Email = user.Email ?? string.Empty,
                 PhoneNumber = user.PhoneNumber,
+                PhoneCode = user.PhoneCode,
                 ProfilePictureName = user.ProfilePictureName,
                 UserType = user.UserType,
                 CompanyId = user.CompanyId,

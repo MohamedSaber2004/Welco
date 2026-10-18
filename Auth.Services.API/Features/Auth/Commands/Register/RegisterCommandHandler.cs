@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -144,7 +144,8 @@ DistributorApplication? pendingApp = null;
                 Email = request.Email,
                 UserName = request.Email,
                 PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim(),
-                NormalizedPhoneNumber = PhoneNumberNormalizer.Normalize(request.PhoneNumber),
+                PhoneCode = string.IsNullOrWhiteSpace(request.PhoneCode) ? null : request.PhoneCode.Trim(),
+                NormalizedPhoneNumber = PhoneNumberNormalizer.Normalize(request.PhoneNumber, request.PhoneCode),
                 UserType = request.UserType,
                 Language = request.Language,
                 IsActive = isOrgUser,
@@ -185,7 +186,8 @@ var createResult = await _userManager.CreateAsync(user, request.Password);
         {
             user.FullName = request.FullName.Trim();
             user.PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim();
-            user.NormalizedPhoneNumber = PhoneNumberNormalizer.Normalize(request.PhoneNumber);
+            user.PhoneCode = string.IsNullOrWhiteSpace(request.PhoneCode) ? null : request.PhoneCode.Trim();
+            user.NormalizedPhoneNumber = PhoneNumberNormalizer.Normalize(request.PhoneNumber, request.PhoneCode);
             user.UserType = request.UserType;
             user.Language = request.Language;
             user.IsDeleted = false;

@@ -1,3 +1,7 @@
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Welco.Shared.Common.Helpers;
+using Welco.Shared.Domain.Models;
 using FluentValidation;
 using Welco.Shared.Localization;
 

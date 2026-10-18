@@ -1,3 +1,5 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Welco.Shared.Common.Helpers;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Welco.Shared.Common.DTOs.UserManagement;
@@ -30,6 +32,20 @@ namespace UserManamgent.Service.API.Features.Users.Commands.CreateUser
                 return Result<UserDto>.Conflict(LocalizationKeys.UserManagement.UserAlreadyExists);
             }
 
+                        if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
+            {
+                var normalized = PhoneNumberNormalizer.Normalize(request.PhoneNumber, request.PhoneCode);
+                if (!string.IsNullOrEmpty(normalized))
+                {
+                    var phoneTaken = await _userManager.Users
+                        .AnyAsync(u => !u.IsDeleted && (u.NormalizedPhoneNumber == normalized || u.PhoneNumber == request.PhoneNumber.Trim()), cancellationToken);
+                    if (phoneTaken)
+                    {
+                        return Result<UserDto>.BadRequest(LocalizationKeys.Auth.PhoneAlreadyExists, new List<string> { LocalizationKeys.Auth.PhoneAlreadyExists });
+                    }
+                }
+            }
+
             var currentUserId = _currentUserService.UserId != Guid.Empty
                 ? _currentUserService.UserId.ToString()
                 : "System";
@@ -39,7 +55,9 @@ namespace UserManamgent.Service.API.Features.Users.Commands.CreateUser
                 FullName = request.FullName,
                 Email = request.Email,
                 UserName = request.Email,
-                PhoneNumber = request.PhoneNumber,
+                PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber.Trim(),
+                PhoneCode = string.IsNullOrWhiteSpace(request.PhoneCode) ? null : request.PhoneCode.Trim(),
+                NormalizedPhoneNumber = PhoneNumberNormalizer.Normalize(request.PhoneNumber, request.PhoneCode),
                 UserType = request.UserType,
                 Language = AppLanguage.En,
                 ProfilePictureName = string.IsNullOrWhiteSpace(request.ProfilePictureName) ? null : request.ProfilePictureName.Trim(),
@@ -68,6 +86,7 @@ namespace UserManamgent.Service.API.Features.Users.Commands.CreateUser
                 FullName = user.FullName,
                 Email = user.Email ?? string.Empty,
                 PhoneNumber = user.PhoneNumber,
+                PhoneCode = user.PhoneCode,
                 ProfilePictureName = user.ProfilePictureName,
                 UserType = user.UserType,
                 CompanyId = user.CompanyId,

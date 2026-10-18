@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Welco.Shared.Enums;
 using Welco.Shared.Results;
 
@@ -11,6 +11,7 @@ namespace Auth.Services.API.Features.Auth.Commands.Register
         public string Password { get; set; } = string.Empty;
         public string ConfirmPassword { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }
+        public string? PhoneCode { get; set; }
         public Guid? PhoneCountryId { get; set; }
         public string? PhoneCountryCode { get; set; }
         public UserType UserType { get; set; } = UserType.Client;  // Default: end buyer
