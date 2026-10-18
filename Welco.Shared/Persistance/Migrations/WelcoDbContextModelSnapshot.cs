@@ -236,6 +236,10 @@ namespace Welco.Shared.Persistance.Migrations
                     b.Property<DateTime?>("PasswordResetTokenExpiry")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("PhoneCode")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -528,7 +532,13 @@ namespace Welco.Shared.Persistance.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentCategoryId");
+                    b.HasIndex("ParentCategoryId", "NameAr")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("ParentCategoryId", "NameEn")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.ToTable("Categories", (string)null);
                 });
@@ -897,6 +907,10 @@ namespace Welco.Shared.Persistance.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("CountryCode")
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
@@ -2982,8 +2996,7 @@ namespace Welco.Shared.Persistance.Migrations
                     b.HasOne("Welco.Shared.Domain.Models.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Welco.Shared.Domain.Models.Company", "Company")
                         .WithMany("Products")

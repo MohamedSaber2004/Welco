@@ -216,6 +216,7 @@
             public const string CategoryIdRequired = "Category.CategoryIdRequired";
             public const string ProvidersFetched = "Category.ProvidersFetched";
             public const string ProductsFetched = "Category.ProductsFetched";
+            public const string AlreadyExists = "Category.AlreadyExists";
         }
 
         public static class Currency

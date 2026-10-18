@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Welco.Shared.Domain.Models;
 
@@ -30,6 +30,14 @@ namespace Welco.Shared.Persistance.Configurations
                 .WithMany(x => x.SubCategories)
                 .HasForeignKey(x => x.ParentCategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(x => new { x.ParentCategoryId, x.NameEn })
+                .IsUnique()
+                .HasFilter("[IsDeleted] = 0");
+
+            builder.HasIndex(x => new { x.ParentCategoryId, x.NameAr })
+                .IsUnique()
+                .HasFilter("[IsDeleted] = 0");
 
             builder.Property(x => x.CreatedBy)
                 .IsRequired();

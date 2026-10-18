@@ -1,4 +1,4 @@
-{
+﻿{
   "ActionResults": {
     "Ok": "تمت العملية بنجاح.",
     "Created": "تم إنشاء المورد بنجاح.",
@@ -191,7 +191,8 @@
     "ParentCategoryNotFound": "التصنيف الرئيسي غير موجود.",
     "CategoryIdRequired": "معرّف التصنيف مطلوب.",
     "ProvidersFetched": "تم استرجاع الموردين بنجاح.",
-    "ProductsFetched": "تم استرجاع المنتجات بنجاح."
+    "ProductsFetched": "تم استرجاع المنتجات بنجاح.",
+    "AlreadyExists": "يوجد تصنيف بهذا الاسم مسبقاً تحت نفس التصنيف الرئيسي."
   },
   "Currency": {
     "Created": "تم إنشاء العملة بنجاح.",

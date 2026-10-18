@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Welco.Shared.Common.DTOs.Products;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
@@ -48,13 +48,30 @@ namespace Product.Services.API.Features.Categories.Commands.UpdateCategory
                 }
             }
 
+            var nameEnTrimmed = request.NameEn?.Trim() ?? string.Empty;
+            var nameArTrimmed = request.NameAr?.Trim() ?? string.Empty;
+            var nameEnLower = nameEnTrimmed.ToLower();
+            var nameArLower = nameArTrimmed.ToLower();
+
+            var duplicateExists = await categoryRepo.ExistsAsync(
+                c => c.Id != request.Id &&
+                     !c.IsDeleted &&
+                     c.ParentCategoryId == request.ParentCategoryId &&
+                     (c.NameEn.ToLower() == nameEnLower || c.NameAr.ToLower() == nameArLower),
+                cancellationToken);
+
+            if (duplicateExists)
+            {
+                return Result<CategoryDto>.BadRequest(LocalizationKeys.Category.AlreadyExists);
+            }
+
             var currentUserId = _currentUserService.UserId != Guid.Empty
                 ? _currentUserService.UserId.ToString()
                 : "System";
 
             category.Update(
-                request.NameEn.Trim(),
-                request.NameAr.Trim(),
+                nameEnTrimmed,
+                nameArTrimmed,
                 request.Description,
                 request.ImageName,
                 request.ParentCategoryId,

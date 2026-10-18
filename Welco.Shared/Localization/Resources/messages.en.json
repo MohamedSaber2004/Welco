@@ -1,4 +1,4 @@
-{
+﻿{
   "ActionResults": {
     "Ok": "Operation completed successfully.",
     "Created": "Resource created successfully.",
@@ -191,7 +191,8 @@
     "ParentCategoryNotFound": "Parent category not found.",
     "CategoryIdRequired": "Category ID is required.",
     "ProvidersFetched": "Providers retrieved successfully.",
-    "ProductsFetched": "Products retrieved successfully."
+    "ProductsFetched": "Products retrieved successfully.",
+    "AlreadyExists": "A category with this name already exists under the selected parent category."
   },
   "Currency": {
     "Created": "Currency created successfully.",
