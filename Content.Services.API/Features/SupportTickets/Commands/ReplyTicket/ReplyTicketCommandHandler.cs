@@ -1,4 +1,4 @@
-using Content.Services.API.Common;
+﻿using Content.Services.API.Common;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Content;
@@ -22,10 +22,7 @@ namespace Content.Services.API.Features.SupportTickets.Commands.ReplyTicket
             var entity = await repo.GetByIdAsync(request.Id, cancellationToken);
             if (entity == null || entity.IsDeleted) return Result<SupportTicketDto>.NotFound(LocalizationKeys.SupportTicket.NotFound);
             var currentUserId = _currentUser.UserId != Guid.Empty ? _currentUser.UserId.ToString() : "System";
-            entity.Reply = request.Reply.Trim();
-            entity.RepliedAt = DateTime.UtcNow;
-            entity.RepliedBy = _currentUser.UserId;
-            entity.Status = "Answered";
+            entity.SetReply(request.Reply, _currentUser.UserId);
             entity.MarkAsUpdated(currentUserId);
             repo.Update(entity);
             await _uow.SaveChangesAsync(cancellationToken);

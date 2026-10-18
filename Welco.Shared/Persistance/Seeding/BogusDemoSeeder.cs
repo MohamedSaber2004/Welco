@@ -1,4 +1,4 @@
-using Bogus;
+﻿using Bogus;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -988,21 +988,46 @@ var catEntities = new List<HelpCategory>();
                     foreach (var tu in ticketUsers)
                     {
                         var st = faker.PickRandom(statuses);
+                        var createdDaysAgo = faker.Random.Int(3, 14);
+                        var createdAt = DateTime.UtcNow.AddDays(-createdDaysAgo);
+                        DateTime? repliedAt = null;
+                        if (st != "Open")
+                        {
+                            var replyTime = createdAt.AddHours(faker.Random.Int(2, 24));
+                            if (replyTime > DateTime.UtcNow) replyTime = DateTime.UtcNow;
+                            repliedAt = replyTime;
+                        }
                         var t = new SupportTicket
                         {
-                            Id = Guid.NewGuid(), UserId = tu.Id,
+                            Id = Guid.NewGuid(),
+                            UserId = tu.Id,
                             Subject = faker.Lorem.Sentence(5, 2).TrimEnd('.'),
-                            Message = faker.Lorem.Paragraph(1), Status = st,
+                            Message = faker.Lorem.Paragraph(1),
+                            Status = st,
                             Reply = st == "Open" ? null : faker.Lorem.Paragraph(1),
-                            RepliedAt = st == "Open" ? null : DateTime.UtcNow.AddDays(-faker.Random.Int(1, 9)),
+                            RepliedAt = repliedAt,
                             RepliedBy = st == "Open" || staff.Count == 0 ? null : repId,
                         };
-                        t.MarkAsCreated(Marker);
+                        t.MarkAsCreated(Marker, createdAt);
                         tickets.Add(t);
                     }
                     await db.SupportTickets.AddRangeAsync(tickets, ct);
                     await db.SaveChangesAsync(ct);
                     logger.LogInformation("Bogus seeded {Count} support tickets.", tickets.Count);
+                }
+                else if (await db.SupportTickets.AnyAsync(t => !t.IsDeleted && t.RepliedAt != null && t.RepliedAt < t.CreatedAt, ct))
+                {
+                    var invalidTickets = await db.SupportTickets
+                        .Where(t => !t.IsDeleted && t.RepliedAt != null && t.RepliedAt < t.CreatedAt)
+                        .ToListAsync(ct);
+                    foreach (var it in invalidTickets)
+                    {
+                        var healed = it.CreatedAt.AddHours(2);
+                        if (healed > DateTime.UtcNow) healed = DateTime.UtcNow;
+                        it.RepliedAt = healed;
+                    }
+                    await db.SaveChangesAsync(ct);
+                    logger.LogInformation("Bogus healed {Count} support tickets with replied date before created date.", invalidTickets.Count);
                 }
                 if (!await db.Notifications.AnyAsync(n => !n.IsDeleted, ct) && activeMembers.Count > 0)
                 {

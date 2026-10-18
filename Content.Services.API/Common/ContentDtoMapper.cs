@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Welco.Shared.Common.DTOs.Content;
 using DocumentEntity = Welco.Shared.Domain.Models.Document;
 using LandingPageEntity = Welco.Shared.Domain.Models.LandingPage;
@@ -10,7 +10,7 @@ using SupportContactEntity = Welco.Shared.Domain.Models.SupportContact;
 
 namespace Content.Services.API.Common
 {
-    internal static class ContentDtoMapper
+    public static class ContentDtoMapper
     {
         public static Expression<Func<DocumentEntity, DocumentDto>> DocumentProjection => d => new DocumentDto
         {
@@ -77,7 +77,7 @@ namespace Content.Services.API.Common
             Status = t.Status,
             Reply = t.Reply,
             CreatedAt = t.CreatedAt,
-            RepliedAt = t.RepliedAt
+            RepliedAt = t.RepliedAt != null && t.RepliedAt < t.CreatedAt ? t.CreatedAt : t.RepliedAt
         };
 
         public static Expression<Func<SupportContactEntity, SupportContactDto>> SupportContactProjection => c => new SupportContactDto

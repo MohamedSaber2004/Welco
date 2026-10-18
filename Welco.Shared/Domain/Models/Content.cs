@@ -1,4 +1,4 @@
-using Welco.Shared.Common.Classes;
+﻿using Welco.Shared.Common.Classes;
 namespace Welco.Shared.Domain.Models
 {
     public class Document : BaseEntity<Guid>
@@ -58,6 +58,19 @@ namespace Welco.Shared.Domain.Models
         public string? Reply { get; set; }
         public DateTime? RepliedAt { get; set; }
         public Guid? RepliedBy { get; set; }
+
+        public void SetReply(string reply, Guid? repliedBy = null, DateTime? repliedAt = null)
+        {
+            Reply = reply?.Trim();
+            Status = "Answered";
+            RepliedBy = repliedBy;
+            var time = repliedAt ?? DateTime.UtcNow;
+            if (time < CreatedAt)
+            {
+                time = CreatedAt;
+            }
+            RepliedAt = time;
+        }
     }
     public class SupportContact : BaseEntity<Guid>
     {

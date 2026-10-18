@@ -48,9 +48,9 @@ namespace Welco.Shared.Common.Classes
             UpdatedBy = updatedBy;
         }
 
-        public virtual void MarkAsCreated(string createdBy)
+        public virtual void MarkAsCreated(string createdBy, DateTime? createdAt = null)
         {
-            CreatedAt = DateTime.UtcNow;
+            CreatedAt = createdAt ?? DateTime.UtcNow;
             CreatedBy = createdBy;
             IsActive = true;
             IsDeleted = false;
