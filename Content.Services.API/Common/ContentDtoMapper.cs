@@ -87,6 +87,8 @@ namespace Content.Services.API.Common
             PhoneNumber = c.PhoneNumber,
             WhatsAppNumber = c.WhatsAppNumber,
             WorkingHours = c.WorkingHours,
+            FacebookUrl = c.FacebookUrl,
+            InstagramUrl = c.InstagramUrl,
             UpdatedAt = c.UpdatedAt ?? c.CreatedAt
         };
     }

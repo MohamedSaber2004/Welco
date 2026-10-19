@@ -98,6 +98,8 @@ namespace Welco.Shared.Persistance.Configurations
             b.Property(x => x.PhoneNumber).IsRequired().HasMaxLength(50);
             b.Property(x => x.WhatsAppNumber).IsRequired().HasMaxLength(50);
             b.Property(x => x.WorkingHours).HasMaxLength(200);
+            b.Property(x => x.FacebookUrl).HasMaxLength(500);
+            b.Property(x => x.InstagramUrl).HasMaxLength(500);
             b.Property(x => x.CreatedBy).IsRequired();
         }
     }

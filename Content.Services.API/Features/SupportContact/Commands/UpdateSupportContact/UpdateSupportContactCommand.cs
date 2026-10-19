@@ -10,5 +10,7 @@ namespace Content.Services.API.Features.SupportContact.Commands.UpdateSupportCon
         public string PhoneNumber { get; set; } = string.Empty;
         public string WhatsAppNumber { get; set; } = string.Empty;
         public string? WorkingHours { get; set; }
+        public string? FacebookUrl { get; set; }
+        public string? InstagramUrl { get; set; }
     }
 }

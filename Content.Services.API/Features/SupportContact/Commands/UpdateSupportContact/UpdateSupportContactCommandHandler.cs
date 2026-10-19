@@ -36,6 +36,8 @@ namespace Content.Services.API.Features.SupportContact.Commands.UpdateSupportCon
                 entity.PhoneNumber = request.PhoneNumber.Trim();
                 entity.WhatsAppNumber = request.WhatsAppNumber.Trim();
                 entity.WorkingHours = request.WorkingHours?.Trim();
+                entity.FacebookUrl = request.FacebookUrl?.Trim();
+                entity.InstagramUrl = request.InstagramUrl?.Trim();
                 entity.MarkAsUpdated(currentUserId);
                 repo.Update(entity);
             }
@@ -46,7 +48,9 @@ namespace Content.Services.API.Features.SupportContact.Commands.UpdateSupportCon
                     SupportEmail = request.SupportEmail.Trim(),
                     PhoneNumber = request.PhoneNumber.Trim(),
                     WhatsAppNumber = request.WhatsAppNumber.Trim(),
-                    WorkingHours = request.WorkingHours?.Trim()
+                    WorkingHours = request.WorkingHours?.Trim(),
+                    FacebookUrl = request.FacebookUrl?.Trim(),
+                    InstagramUrl = request.InstagramUrl?.Trim()
                 };
                 entity.MarkAsCreated(currentUserId);
                 await repo.AddAsync(entity, cancellationToken);
@@ -63,6 +67,8 @@ namespace Content.Services.API.Features.SupportContact.Commands.UpdateSupportCon
                     PhoneNumber = entity.PhoneNumber,
                     WhatsAppNumber = entity.WhatsAppNumber,
                     WorkingHours = entity.WorkingHours,
+                    FacebookUrl = entity.FacebookUrl,
+                    InstagramUrl = entity.InstagramUrl,
                     UpdatedAt = entity.UpdatedAt ?? entity.CreatedAt
                 };
 

@@ -78,6 +78,8 @@ namespace Welco.Shared.Domain.Models
         public string PhoneNumber { get; set; } = "+971500000000";
         public string WhatsAppNumber { get; set; } = "+971500000000";
         public string? WorkingHours { get; set; } = "Mon - Fri: 8:00 AM - 6:00 PM (GST)";
+        public string? FacebookUrl { get; set; }
+        public string? InstagramUrl { get; set; }
     }
     public class OemInquiry : BaseEntity<Guid>
     {
