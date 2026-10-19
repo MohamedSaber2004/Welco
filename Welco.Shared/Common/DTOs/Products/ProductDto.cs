@@ -1,4 +1,4 @@
-namespace Welco.Shared.Common.DTOs.Products
+﻿namespace Welco.Shared.Common.DTOs.Products
 {
     public class ProductDto
     {
@@ -12,6 +12,8 @@ namespace Welco.Shared.Common.DTOs.Products
         public int Stock { get; set; }
         public string? Specifications { get; set; }
         public string? ImageName { get; set; }
+        public List<string> Images { get; set; } = new();
+        public string? VideoUrl { get; set; }
         public string? Material { get; set; }
         public decimal? LengthCm { get; set; }
         public Guid? CurrencyId { get; set; }

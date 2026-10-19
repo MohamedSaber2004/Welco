@@ -1,4 +1,4 @@
-using FluentValidation;
+﻿using FluentValidation;
 using Welco.Shared.Localization;
 
 namespace Product.Services.API.Features.Products.Commands.UpdateProduct
@@ -15,15 +15,16 @@ namespace Product.Services.API.Features.Products.Commands.UpdateProduct
                 .MaximumLength(200);
 
             RuleFor(x => x.NameAr)
-                .NotEmpty().WithMessage(LocalizationKeys.Product.NameArRequired)
-                .MaximumLength(200);
+                .MaximumLength(200)
+                .When(x => !string.IsNullOrEmpty(x.NameAr));
 
             RuleFor(x => x.Price)
-                .NotEmpty().WithMessage(LocalizationKeys.Product.PriceRequired)
-                .GreaterThan(0).WithMessage(LocalizationKeys.Product.PricePositive);
+                .GreaterThanOrEqualTo(0).WithMessage(LocalizationKeys.Product.PricePositive)
+                .When(x => x.Price.HasValue);
 
             RuleFor(x => x.Stock)
-                .GreaterThanOrEqualTo(0).WithMessage(LocalizationKeys.Product.StockNotNegative);
+                .GreaterThanOrEqualTo(0).WithMessage(LocalizationKeys.Product.StockNotNegative)
+                .When(x => x.Stock.HasValue);
 
             RuleFor(x => x.Sku)
                 .NotEmpty().WithMessage(LocalizationKeys.Product.SkuRequired)

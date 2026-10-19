@@ -1,10 +1,11 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Product.Services.API.Common;
 using Product.Services.API.Features.Shared;
 using Welco.Shared.Common.DTOs.Products;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
+using Welco.Shared.Domain.Models;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
 using CategoryEntity = Welco.Shared.Domain.Models.Category;
@@ -67,16 +68,23 @@ namespace Product.Services.API.Features.Products.Commands.CreateProduct
 
             var currentUserId = _currentUserService.UserId != Guid.Empty ? _currentUserService.UserId.ToString() : "System";
 
+            var nameAr = string.IsNullOrWhiteSpace(request.NameAr) ? request.NameEn.Trim() : request.NameAr.Trim();
+            var price = request.Price ?? 0m;
+            var stock = request.Stock ?? 0;
+            var primaryImage = (request.Images != null && request.Images.Count > 0)
+                ? request.Images[0].Trim()
+                : (string.IsNullOrWhiteSpace(request.ImageName) ? null : request.ImageName.Trim());
+
             var product = ProductEntity.Create(
                 request.NameEn.Trim(),
-                request.NameAr.Trim(),
+                nameAr,
                 sku,
                 slug,
                 request.Description,
-                request.Price,
-                request.Stock,
+                price,
+                stock,
                 request.Specifications,
-                request.ImageName,
+                primaryImage,
                 request.Material,
                 request.LengthCm,
                 request.CurrencyId,
@@ -85,11 +93,61 @@ namespace Product.Services.API.Features.Products.Commands.CreateProduct
                 currentUserId);
 
             await productRepo.AddAsync(product, cancellationToken);
+
+            var mediaRepo = _unitOfWork.GetRepository<ProductMedia, Guid>();
+
+            if (request.Images != null && request.Images.Count > 0)
+            {
+                int order = 0;
+                foreach (var img in request.Images)
+                {
+                    if (string.IsNullOrWhiteSpace(img)) continue;
+                    order++;
+                    var media = new ProductMedia
+                    {
+                        Id = Guid.NewGuid(),
+                        ProductId = product.Id,
+                        Type = ProductMediaType.Image,
+                        Url = img.Trim(),
+                        SortOrder = order
+                    };
+                    media.MarkAsCreated(currentUserId);
+                    await mediaRepo.AddAsync(media, cancellationToken);
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.VideoUrl))
+            {
+                var videoMedia = new ProductMedia
+                {
+                    Id = Guid.NewGuid(),
+                    ProductId = product.Id,
+                    Type = ProductMediaType.Video,
+                    Url = request.VideoUrl.Trim(),
+                    SortOrder = 1
+                };
+                videoMedia.MarkAsCreated(currentUserId);
+                await mediaRepo.AddAsync(videoMedia, cancellationToken);
+            }
+
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             var dto = await productRepo.GetAll(p => !p.IsDeleted && p.Id == product.Id)
                 .Select(ProductDtoMapper.Projection)
                 .FirstOrDefaultAsync(cancellationToken);
+
+            if (dto != null)
+            {
+                if (request.Images != null && request.Images.Count > 0)
+                {
+                    dto.Images = request.Images.Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+                }
+                else if (!string.IsNullOrWhiteSpace(dto.ImageName))
+                {
+                    dto.Images = new List<string> { dto.ImageName };
+                }
+                dto.VideoUrl = request.VideoUrl;
+            }
 
             return Result<ProductDto>.Created(dto!, LocalizationKeys.Product.Created);
         }

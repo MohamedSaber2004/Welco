@@ -1,10 +1,11 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Product.Services.API.Common;
 using Product.Services.API.Features.Shared;
 using Welco.Shared.Common.DTOs.Products;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
+using Welco.Shared.Domain.Models;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
 using CategoryEntity = Welco.Shared.Domain.Models.Category;
@@ -34,16 +35,11 @@ namespace Product.Services.API.Features.Products.Commands.UpdateProduct
             if (product == null || product.IsDeleted)
                 return Result<ProductDto>.NotFound(LocalizationKeys.Product.NotFound);
 
-            // Mediator model: providers may only touch their own company's
-            // products. Legacy/global items (CompanyId = null) stay
-            // Admin/WelcoStaff-only. Return NotFound to avoid leaking existence.
             var scope = await ProviderScope.GetAsync(_unitOfWork, _currentUserService, cancellationToken);
             if (scope.IsOrganizationUser &&
                 (!scope.CompanyId.HasValue || product.CompanyId != scope.CompanyId.Value))
                 return Result<ProductDto>.NotFound(LocalizationKeys.Product.NotFound);
 
-            // SKU uniqueness is per owning company (same instrument may be
-            // supplied by many providers).
             var scopeId = scope.IsOrganizationUser ? scope.CompanyId : product.CompanyId;
 
             if (!string.Equals(product.Sku, request.Sku.Trim(), StringComparison.OrdinalIgnoreCase))
@@ -72,16 +68,23 @@ namespace Product.Services.API.Features.Products.Commands.UpdateProduct
 
             var currentUserId = _currentUserService.UserId != Guid.Empty ? _currentUserService.UserId.ToString() : "System";
 
+            var nameAr = string.IsNullOrWhiteSpace(request.NameAr) ? (product.NameAr ?? request.NameEn.Trim()) : request.NameAr.Trim();
+            var price = request.Price ?? product.Price;
+            var stock = request.Stock ?? product.Stock;
+            var primaryImage = (request.Images != null && request.Images.Count > 0)
+                ? request.Images[0].Trim()
+                : (string.IsNullOrWhiteSpace(request.ImageName) ? product.ImageName : request.ImageName.Trim());
+
             product.Update(
                 request.NameEn.Trim(),
-                request.NameAr.Trim(),
+                nameAr,
                 request.Sku.Trim(),
                 request.Slug.Trim().ToLowerInvariant(),
                 request.Description,
-                request.Price,
-                request.Stock,
+                price,
+                stock,
                 request.Specifications,
-                request.ImageName,
+                primaryImage,
                 request.Material,
                 request.LengthCm,
                 request.CurrencyId,
@@ -92,11 +95,80 @@ namespace Product.Services.API.Features.Products.Commands.UpdateProduct
                 product.SetActiveState(request.IsActive.Value, currentUserId);
 
             productRepo.Update(product);
+
+            var mediaRepo = _unitOfWork.GetRepository<ProductMedia, Guid>();
+
+            if (request.Images != null)
+            {
+                var oldImages = await mediaRepo.GetAll(m => !m.IsDeleted && m.ProductId == product.Id && m.Type == ProductMediaType.Image)
+                    .ToListAsync(cancellationToken);
+                foreach (var old in oldImages)
+                {
+                    old.MarkAsDeleted(currentUserId);
+                    mediaRepo.Update(old);
+                }
+
+                int order = 0;
+                foreach (var img in request.Images)
+                {
+                    if (string.IsNullOrWhiteSpace(img)) continue;
+                    order++;
+                    var media = new ProductMedia
+                    {
+                        Id = Guid.NewGuid(),
+                        ProductId = product.Id,
+                        Type = ProductMediaType.Image,
+                        Url = img.Trim(),
+                        SortOrder = order
+                    };
+                    media.MarkAsCreated(currentUserId);
+                    await mediaRepo.AddAsync(media, cancellationToken);
+                }
+            }
+
+            if (request.VideoUrl != null)
+            {
+                var oldVideos = await mediaRepo.GetAll(m => !m.IsDeleted && m.ProductId == product.Id && m.Type == ProductMediaType.Video)
+                    .ToListAsync(cancellationToken);
+                foreach (var old in oldVideos)
+                {
+                    old.MarkAsDeleted(currentUserId);
+                    mediaRepo.Update(old);
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.VideoUrl))
+                {
+                    var videoMedia = new ProductMedia
+                    {
+                        Id = Guid.NewGuid(),
+                        ProductId = product.Id,
+                        Type = ProductMediaType.Video,
+                        Url = request.VideoUrl.Trim(),
+                        SortOrder = 1
+                    };
+                    videoMedia.MarkAsCreated(currentUserId);
+                    await mediaRepo.AddAsync(videoMedia, cancellationToken);
+                }
+            }
+
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             var dto = await productRepo.GetAll(p => !p.IsDeleted && p.Id == product.Id)
                 .Select(ProductDtoMapper.Projection)
                 .FirstOrDefaultAsync(cancellationToken);
+
+            if (dto != null)
+            {
+                if (request.Images != null && request.Images.Count > 0)
+                {
+                    dto.Images = request.Images.Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+                }
+                else if (!string.IsNullOrWhiteSpace(dto.ImageName))
+                {
+                    dto.Images = new List<string> { dto.ImageName };
+                }
+                dto.VideoUrl = request.VideoUrl;
+            }
 
             return Result<ProductDto>.Success(dto!, LocalizationKeys.Product.Updated);
         }
