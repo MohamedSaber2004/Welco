@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Welco.Shared.Common.DTOs.Products;
 using ProductEntity = Welco.Shared.Domain.Models.Product;
 
@@ -29,9 +29,9 @@ namespace Product.Services.API.Common
             CompanyId = p.CompanyId,
             CompanyName = p.Company != null ? p.Company.Name : null,
             IsActive = p.IsActive,
+            IsMostSelling = p.IsMostSelling,
             CreatedAt = p.CreatedAt,
             UpdatedAt = p.UpdatedAt
-
         };
     }
 }

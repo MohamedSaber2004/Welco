@@ -1,10 +1,11 @@
-using Commerce.Services.API.CommerceRoutes;
+﻿using Commerce.Services.API.CommerceRoutes;
 using Commerce.Services.API.Features.Orders.Commands.CreateOrder;
 using Commerce.Services.API.Features.Orders.Commands.UpdateOrderStatus;
 using Commerce.Services.API.Features.Orders.Queries.GetOrderById;
 using Commerce.Services.API.Features.Orders.Queries.GetOrders;
 using Commerce.Services.API.Features.Orders.Queries.TrackOrder;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Welco.Shared.Common.Attributes;
@@ -31,7 +32,7 @@ namespace Commerce.Services.API.Controllers
 
         [HttpGet]
         [Route(CommerceApiRoutes.Orders.Track)]
-        [RoleAuthorize]
+        [AllowAnonymous]
         public async Task<IActionResult> Track([FromRoute] string orderNumber, CancellationToken ct)
             => ToActionResult(await _mediator.Send(new TrackOrderQuery { OrderNumber = orderNumber }, ct));
 
@@ -50,4 +51,3 @@ namespace Commerce.Services.API.Controllers
         }
     }
 }
-

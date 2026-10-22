@@ -29,6 +29,16 @@ namespace Sales.Services.API.Features.Quotes.Queries.GetQuotes
             {
                 q = q.Where(x => x.RFQ != null && x.RFQ.CompanyId == caller.CompanyId);
             }
+            else if (caller.IsClient && caller.UserId.HasValue)
+            {
+                // Strict customer isolation: Client only sees quotes for their own RFQs
+                var uid = caller.UserId.Value;
+                var uidStr = uid.ToString();
+                if (caller.CompanyId.HasValue)
+                    q = q.Where(x => (x.RFQ != null && (x.RFQ.CreatedBy == uidStr || x.RFQ.CompanyId == caller.CompanyId.Value)) || x.CreatedBy == uidStr);
+                else
+                    q = q.Where(x => (x.RFQ != null && x.RFQ.CreatedBy == uidStr) || x.CreatedBy == uidStr);
+            }
             return await q.OrderByDescending(x => x.CreatedAt).ToPaginatedListAsync(x => new QuoteDto
             {
                 Id = x.Id,

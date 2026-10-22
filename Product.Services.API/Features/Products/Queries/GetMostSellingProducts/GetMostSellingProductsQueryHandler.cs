@@ -1,4 +1,4 @@
-using MediatR;
+﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Product.Services.API.Common;
 using Welco.Shared.Common.DTOs.Products;
@@ -22,13 +22,13 @@ namespace Product.Services.API.Features.Products.Queries.GetMostSellingProducts
         public async Task<Result<IReadOnlyList<ProductDto>>> Handle(GetMostSellingProductsQuery request, CancellationToken cancellationToken)
         {
             var limit = request.Limit <= 0 ? 7 : Math.Min(request.Limit, 50);
-            var daysWindow = request.DaysWindow <= 0 ? 7 : Math.Min(request.DaysWindow, 365);
+            var daysWindow = request.DaysWindow <= 0 ? 30 : Math.Min(request.DaysWindow, 365);
             var cutoff = DateTime.UtcNow.AddDays(-daysWindow);
 
             var orderItemRepo = _unitOfWork.GetRepository<OrderItem, Guid>();
             var productRepo = _unitOfWork.GetRepository<ProductEntity, Guid>();
 
-            // Aggregate order items placed within the last DaysWindow days to find products with the highest sold quantities
+            // 1. Aggregate order items with actual sales quantities
             var topProductQuantities = await orderItemRepo.GetAll(oi =>
                     !oi.IsDeleted &&
                     oi.CreatedAt >= cutoff &&
@@ -52,7 +52,6 @@ namespace Product.Services.API.Features.Products.Queries.GetMostSellingProducts
                     .Select(ProductDtoMapper.Projection)
                     .ToListAsync(cancellationToken);
 
-                // Preserve rank ordering according to sales quantity
                 resultProducts = topProductIds
                     .Select(id => fetchedTopProducts.FirstOrDefault(p => p.Id == id))
                     .Where(p => p != null)
@@ -60,21 +59,21 @@ namespace Product.Services.API.Features.Products.Queries.GetMostSellingProducts
                     .ToList();
             }
 
-            // If fewer than limit, backfill with active catalog products (in-stock first, then newest)
+            // 2. If fewer than limit, backfill ONLY with products explicitly marked IsMostSelling by Admin
             if (resultProducts.Count < limit)
             {
                 var existingIds = resultProducts.Select(p => p.Id).ToHashSet();
                 var remainingCount = limit - resultProducts.Count;
 
-                var backfillProducts = await productsQuery
-                    .Where(p => !existingIds.Contains(p.Id))
+                var adminDesignatedProducts = await productsQuery
+                    .Where(p => !existingIds.Contains(p.Id) && p.IsMostSelling)
                     .OrderByDescending(p => p.Stock > 0)
                     .ThenByDescending(p => p.CreatedAt)
                     .Take(remainingCount)
                     .Select(ProductDtoMapper.Projection)
                     .ToListAsync(cancellationToken);
 
-                resultProducts.AddRange(backfillProducts);
+                resultProducts.AddRange(adminDesignatedProducts);
             }
 
             return Result<IReadOnlyList<ProductDto>>.Success(resultProducts, LocalizationKeys.Product.ListFetched);

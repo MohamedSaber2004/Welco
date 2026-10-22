@@ -23,5 +23,6 @@ namespace Product.Services.API.Features.Products.Commands.UpdateProduct
         public Guid? CurrencyId { get; set; }
         public Guid CategoryId { get; set; }
         public bool? IsActive { get; set; }
+        public bool? IsMostSelling { get; set; }
     }
 }

@@ -70,6 +70,21 @@
                        "DangerousAcceptAnyServerCertificateValidator":  false
                    },
                    {
+                       "DownstreamPathTemplate":  "/api/v1/orders/track/{orderNumber}",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "welco-commerce.runasp.net",
+                                                          "Port":  443
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/orders/track/{orderNumber}",
+                       "UpstreamHttpMethod":  [
+                                                  "GET"
+                                              ],
+                       "DangerousAcceptAnyServerCertificateValidator":  false
+                   },
+                   {
                        "DownstreamPathTemplate":  "/api/v1/orders/{everything}",
                        "DownstreamScheme":  "https",
                        "DownstreamHostAndPorts":  [

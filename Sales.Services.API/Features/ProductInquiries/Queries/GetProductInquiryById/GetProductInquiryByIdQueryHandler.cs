@@ -18,6 +18,7 @@ namespace Sales.Services.API.Features.ProductInquiries.Queries.GetProductInquiry
             if (x == null) return Result<ProductInquiryDto>.NotFound(LocalizationKeys.ProductInquiry.NotFound);
             var caller = await Sales.Services.API.Features.Shared.BuyerScope.GetAsync(_uow, _cur, ct);
             if (caller.IsOrganizationUser && caller.CompanyId.HasValue && (x.Product == null || x.Product.CompanyId != caller.CompanyId)) return Result<ProductInquiryDto>.NotFound(LocalizationKeys.ProductInquiry.NotFound);
+            if (caller.IsClient && caller.UserId.HasValue) { var curEmail = !string.IsNullOrWhiteSpace(_cur.Email) ? _cur.Email.ToLower() : null; var isOwner = x.UserId == caller.UserId.Value || x.CreatedBy == caller.UserId.Value.ToString() || (curEmail != null && x.Email != null && x.Email.ToLower() == curEmail); if (!isOwner) return Result<ProductInquiryDto>.NotFound(LocalizationKeys.ProductInquiry.NotFound); }
             return Result<ProductInquiryDto>.Success(new ProductInquiryDto
             {
                 Id = x.Id,

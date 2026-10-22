@@ -1,4 +1,4 @@
-using Commerce.Services.API.Common;
+﻿using Commerce.Services.API.Common;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Commerce;
@@ -20,9 +20,12 @@ namespace Commerce.Services.API.Features.Orders.Queries.TrackOrder
                 return Result<OrderDto>.Failure(LocalizationKeys.Order.OrderNumberRequired);
 
             var repo = _uow.GetRepository<OrderEntity, Guid>();
-            var trimmed = request.OrderNumber.Trim().ToLower();
+            var trimmed = request.OrderNumber.Trim();
+            if (trimmed.StartsWith("#"))
+                trimmed = trimmed.TrimStart('#').Trim();
+            var searchKey = trimmed.ToLower();
 
-            var order = await repo.GetAll(o => !o.IsDeleted && o.OrderNumber.ToLower() == trimmed)
+            var order = await repo.GetAll(o => !o.IsDeleted && (o.OrderNumber.ToLower() == searchKey || (o.ExternalOrderId != null && o.ExternalOrderId.ToLower() == searchKey)))
                 .Include(o => o.Currency)
                 .Include(o => o.Items.Where(i => !i.IsDeleted))
                     .ThenInclude(i => i.Product)

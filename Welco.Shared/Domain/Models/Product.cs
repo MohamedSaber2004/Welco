@@ -1,4 +1,4 @@
-using Welco.Shared.Common.Classes;
+﻿using Welco.Shared.Common.Classes;
 
 namespace Welco.Shared.Domain.Models
 {
@@ -17,6 +17,8 @@ namespace Welco.Shared.Domain.Models
         public decimal? LengthCm { get; set; }
         public Guid? CurrencyId { get; set; }
         public Guid CategoryId { get; set; }
+        public bool IsMostSelling { get; set; } = false;
+
         /// <summary>
         /// Owning provider company (mediator model). Null = legacy/global
         /// catalog item, manageable only by Admin/WelcoStaff.
@@ -42,7 +44,8 @@ namespace Welco.Shared.Domain.Models
             Guid? currencyId,
             Guid categoryId,
             Guid? companyId,
-            string createdBy)
+            string createdBy,
+            bool isMostSelling = false)
         {
             var product = new Product
             {
@@ -60,7 +63,8 @@ namespace Welco.Shared.Domain.Models
                 LengthCm = lengthCm,
                 CurrencyId = currencyId,
                 CategoryId = categoryId,
-                CompanyId = companyId
+                CompanyId = companyId,
+                IsMostSelling = isMostSelling
             };
             product.MarkAsCreated(createdBy);
             return product;
@@ -80,7 +84,8 @@ namespace Welco.Shared.Domain.Models
             decimal? lengthCm,
             Guid? currencyId,
             Guid categoryId,
-            string updatedBy)
+            string updatedBy,
+            bool isMostSelling = false)
         {
             NameEn = nameEn.Trim();
             NameAr = nameAr.Trim();
@@ -95,6 +100,7 @@ namespace Welco.Shared.Domain.Models
             LengthCm = lengthCm;
             CurrencyId = currencyId;
             CategoryId = categoryId;
+            IsMostSelling = isMostSelling;
             MarkAsUpdated(updatedBy);
         }
     }

@@ -1,13 +1,13 @@
-using Welco.Shared.Common.Interfaces;
+﻿using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Domain.Models;
 using Welco.Shared.Enums;
 
 namespace Sales.Services.API.Features.Shared
 {
-        internal static class BuyerScope
+    internal static class BuyerScope
     {
-        public sealed record Caller(bool IsOrganizationUser, Guid? CompanyId);
+        public sealed record Caller(bool IsOrganizationUser, Guid? CompanyId, bool IsClient = false, Guid? UserId = null);
 
         public static async Task<Caller> GetAsync(IUnitOfWork uow, ICurrentUserService cur, CancellationToken ct)
         {
@@ -17,7 +17,8 @@ namespace Sales.Services.API.Features.Shared
             // Both OrganizationUser (provider) and provider-owned Sales staff (WelcoStaff with CompanyId)
             // are scoped to their provider company.
             var isScoped = user.UserType == UserType.OrganizationUser || (user.UserType == UserType.WelcoStaff && user.CompanyId.HasValue);
-            return new Caller(isScoped, isScoped ? user.CompanyId : null);
+            var isClient = user.UserType == UserType.Client;
+            return new Caller(isScoped, isScoped ? user.CompanyId : user.CompanyId, isClient, user.Id);
         }
     }
 }

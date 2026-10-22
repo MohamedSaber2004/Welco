@@ -1,9 +1,11 @@
-using MediatR;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.Interfaces;
 using Welco.Shared.Common.Repositories.Interfaces.Base;
 using Welco.Shared.Localization;
 using Welco.Shared.Results;
 using CategoryEntity = Welco.Shared.Domain.Models.Category;
+using ProductEntity = Welco.Shared.Domain.Models.Product;
 
 namespace Product.Services.API.Features.Categories.Commands.DeleteCategory
 {
@@ -36,6 +38,18 @@ namespace Product.Services.API.Features.Categories.Commands.DeleteCategory
 
             category.MarkAsDeleted(currentUserId);
             categoryRepo.Update(category);
+
+            // Cascading soft-delete: Delete all active products belonging to this category
+            var productRepo = _unitOfWork.GetRepository<ProductEntity, Guid>();
+            var productsInCategory = await productRepo.GetAll(p => !p.IsDeleted && p.CategoryId == category.Id)
+                .ToListAsync(cancellationToken);
+
+            foreach (var prod in productsInCategory)
+            {
+                prod.MarkAsDeleted(currentUserId);
+                productRepo.Update(prod);
+            }
+
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Result<string>.Success(category.Id.ToString(), LocalizationKeys.Category.Deleted);

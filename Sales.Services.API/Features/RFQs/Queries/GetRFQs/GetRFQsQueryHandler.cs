@@ -30,6 +30,16 @@ namespace Sales.Services.API.Features.RFQs.Queries.GetRFQs
             {
                 q = q.Where(x => x.CompanyId == caller.CompanyId);
             }
+            else if (caller.IsClient && caller.UserId.HasValue)
+            {
+                // Strict customer isolation: Client only sees their own RFQs
+                var uid = caller.UserId.Value;
+                var uidStr = uid.ToString();
+                if (caller.CompanyId.HasValue)
+                    q = q.Where(x => x.CreatedBy == uidStr || x.CompanyId == caller.CompanyId.Value);
+                else
+                    q = q.Where(x => x.CreatedBy == uidStr);
+            }
             return await q.OrderByDescending(x => x.CreatedAt).ToPaginatedListAsync(x => new RFQDto
             {
                 Id = x.Id,

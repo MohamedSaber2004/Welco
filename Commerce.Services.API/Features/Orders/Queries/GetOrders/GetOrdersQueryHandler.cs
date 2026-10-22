@@ -33,12 +33,23 @@ namespace Commerce.Services.API.Features.Orders.Queries.GetOrders
             {
                 var userRepo = _uow.GetRepository<ApplicationUser, Guid>();
                 var user = await userRepo.GetByIdAsync(_currentUser.UserId, cancellationToken);
-                if (user != null && !user.IsDeleted && user.UserType == UserType.OrganizationUser)
+                if (user != null && !user.IsDeleted)
                 {
-                    if (user.CompanyId.HasValue)
-                        query = query.Where(o => o.CompanyId == user.CompanyId.Value || o.UserId == user.Id);
-                    else
-                        query = query.Where(o => o.UserId == user.Id);
+                    if (user.UserType == UserType.OrganizationUser)
+                    {
+                        if (user.CompanyId.HasValue)
+                            query = query.Where(o => o.CompanyId == user.CompanyId.Value || o.UserId == user.Id);
+                        else
+                            query = query.Where(o => o.UserId == user.Id);
+                    }
+                    else if (user.UserType == UserType.Client)
+                    {
+                        // Strict isolation: Client only sees their own orders
+                        if (user.CompanyId.HasValue)
+                            query = query.Where(o => o.UserId == user.Id || o.CompanyId == user.CompanyId.Value);
+                        else
+                            query = query.Where(o => o.UserId == user.Id);
+                    }
                 }
             }
 

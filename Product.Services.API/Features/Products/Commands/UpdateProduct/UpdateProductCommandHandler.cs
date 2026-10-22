@@ -89,7 +89,8 @@ namespace Product.Services.API.Features.Products.Commands.UpdateProduct
                 request.LengthCm,
                 request.CurrencyId,
                 request.CategoryId,
-                currentUserId);
+                currentUserId,
+                request.IsMostSelling ?? product.IsMostSelling);
 
             if (request.IsActive.HasValue)
                 product.SetActiveState(request.IsActive.Value, currentUserId);

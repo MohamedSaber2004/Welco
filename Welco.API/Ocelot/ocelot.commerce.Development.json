@@ -70,6 +70,21 @@
                        "DangerousAcceptAnyServerCertificateValidator":  true
                    },
                    {
+                       "DownstreamPathTemplate":  "/api/v1/orders/track/{orderNumber}",
+                       "DownstreamScheme":  "https",
+                       "DownstreamHostAndPorts":  [
+                                                      {
+                                                          "Host":  "localhost",
+                                                          "Port":  7045
+                                                      }
+                                                  ],
+                       "UpstreamPathTemplate":  "/api/v1/orders/track/{orderNumber}",
+                       "UpstreamHttpMethod":  [
+                                                  "GET"
+                                              ],
+                       "DangerousAcceptAnyServerCertificateValidator":  true
+                   },
+                   {
                        "DownstreamPathTemplate":  "/api/v1/orders/{everything}",
                        "DownstreamScheme":  "https",
                        "DownstreamHostAndPorts":  [

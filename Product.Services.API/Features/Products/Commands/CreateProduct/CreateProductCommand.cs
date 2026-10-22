@@ -21,5 +21,6 @@ namespace Product.Services.API.Features.Products.Commands.CreateProduct
         public decimal? LengthCm { get; set; }
         public Guid? CurrencyId { get; set; }
         public Guid CategoryId { get; set; }
+        public bool IsMostSelling { get; set; } = false;
     }
 }

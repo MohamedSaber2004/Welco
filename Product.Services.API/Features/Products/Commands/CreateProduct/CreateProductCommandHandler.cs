@@ -31,9 +31,6 @@ namespace Product.Services.API.Features.Products.Commands.CreateProduct
         {
             var productRepo = _unitOfWork.GetRepository<ProductEntity, Guid>();
 
-            // Mediator model: OrganizationUser products are owned by their
-            // company (resolved server-side from claims, never from input).
-            // Admin/Staff create legacy/global items (CompanyId = null).
             var scope = await ProviderScope.GetAsync(_unitOfWork, _currentUserService, cancellationToken);
             Guid? companyId = null;
             if (scope.IsOrganizationUser)
@@ -90,7 +87,8 @@ namespace Product.Services.API.Features.Products.Commands.CreateProduct
                 request.CurrencyId,
                 request.CategoryId,
                 companyId,
-                currentUserId);
+                currentUserId,
+                request.IsMostSelling);
 
             await productRepo.AddAsync(product, cancellationToken);
 

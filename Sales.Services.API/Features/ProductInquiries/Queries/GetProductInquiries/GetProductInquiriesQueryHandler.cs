@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Common.DTOs.Sales;
 using Welco.Shared.Common.Extensions;
@@ -26,7 +26,7 @@ namespace Sales.Services.API.Features.ProductInquiries.Queries.GetProductInquiri
                     var companyId = caller.CompanyId.Value;
                     q = q.Where(x => x.Product != null && x.Product.CompanyId == companyId);
                 }
-                else if (!caller.IsOrganizationUser && _cur.UserId != Guid.Empty)
+                else if (caller.IsClient && _cur.UserId != Guid.Empty)
                 {
                     var uid = _cur.UserId;
                     var uidStr = uid.ToString();
