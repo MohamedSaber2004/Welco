@@ -10,6 +10,8 @@ namespace Welco.Tests;
 
 public class LiveDatabaseProductTest
 {
+    
+
     private readonly ITestOutputHelper _output;
 
     public LiveDatabaseProductTest(ITestOutputHelper output)
