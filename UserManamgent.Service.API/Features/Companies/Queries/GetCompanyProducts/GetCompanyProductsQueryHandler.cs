@@ -80,6 +80,7 @@ namespace UserManamgent.Service.API.Features.Companies.Queries.GetCompanyProduct
                 CompanyId = p.CompanyId,
                 CompanyName = p.Company != null ? p.Company.Name : null,
                 IsActive = p.IsActive,
+                IsMostSelling = p.IsMostSelling,
                 CreatedAt = p.CreatedAt,
                 UpdatedAt = p.UpdatedAt
             }, request.PageNumber, request.PageSize, LocalizationKeys.Product.ListFetched, cancellationToken);

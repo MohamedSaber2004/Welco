@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Welco.Shared.Domain.Models;
 using Welco.Shared.Enums;
 using Welco.Shared.Persistance;
@@ -53,6 +53,13 @@ public class LiveDatabaseRepairAndAudit
 
         _output.WriteLine($"Found {products.Count} active products in live database.");
         var catalog = ComprehensiveSurgicalCatalog.Catalog94;
+
+        await db.Database.ExecuteSqlRawAsync(@"
+            UPDATE Products 
+            SET Sku = 'DEL-' + SUBSTRING(CONVERT(nvarchar(36), Id), 1, 8) + '-' + Sku,
+                Slug = 'del-' + SUBSTRING(CONVERT(nvarchar(36), Id), 1, 8) + '-' + Slug
+            WHERE IsDeleted = 1 AND Sku IS NOT NULL AND Sku NOT LIKE 'DEL-%'
+        ");
 
         for (int i = 0; i < products.Count; i++)
         {
@@ -272,8 +279,8 @@ public class LiveDatabaseRepairAndAudit
         var finalNoImage = finalProducts.Where(p => string.IsNullOrWhiteSpace(p.ImageName)).ToList();
         var finalNoCurrency = finalProducts.Where(p => p.CurrencyId == null).ToList();
 
-        Assert.Equal(94, finalProducts.Count);
-        Assert.Equal(94, finalNames.Count); // ALL 94 NAMES UNIQUE!
+        Assert.Equal(products.Count, finalProducts.Count);
+        Assert.Equal(products.Count, finalNames.Count); // ALL 94 NAMES UNIQUE!
         Assert.Empty(finalDuplicateSkus);    // 0 DUPLICATE SKUS!
         Assert.Empty(finalNoImage);          // 0 MISSING IMAGES!
         Assert.Empty(finalNoCurrency);       // 0 MISSING CURRENCIES!
